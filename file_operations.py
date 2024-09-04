@@ -2,6 +2,7 @@ import json
 import streamlit as st
 
 def load_gtm_json(json_file):
+    """Loads and parses the GTM JSON file."""
     try:
         data = json.load(json_file)
         return data
@@ -10,6 +11,7 @@ def load_gtm_json(json_file):
         return None
 
 def extract_tags(data):
+    """Extracts tags from the GTM JSON data."""
     if 'containerVersion' in data and 'tag' in data['containerVersion']:
         return data['containerVersion']['tag']
     else:

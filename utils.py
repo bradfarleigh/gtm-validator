@@ -3,6 +3,8 @@
 from collections import defaultdict
 from id_extraction import extract_facebook_id, extract_ga4_id, extract_google_ads_id, extract_ua_id, extract_tiktok_id
 
+
+# Function to extract trigger names from GTM data
 def get_trigger_names(gtm_data):
     trigger_names = {}
     if 'trigger' in gtm_data['containerVersion']:
@@ -10,11 +12,14 @@ def get_trigger_names(gtm_data):
             trigger_names[trigger['triggerId']] = trigger['name']
     return trigger_names
 
+
+# Function to group tags by their type
 def group_tags_by_type(tags):
     grouped_tags = defaultdict(list)
     for tag in tags:
         grouped_tags[tag['type']].append(tag)
     return grouped_tags
+
 
 def check_id_consistency(tags):
     facebook_ids = set()
@@ -26,44 +31,62 @@ def check_id_consistency(tags):
     inconsistencies = []
     
     for tag in tags:
+        # Check for paused tags
         if tag.get('paused', False):
             paused_tags.append(tag['name'])
         
+        # Handle HTML tags
         if tag['type'] == 'html':
-            for param in tag['parameter']:
-                if param['key'] == 'html':
-                    html_content = param.get('value', '')
-                    fb_id = extract_facebook_id(html_content)
-                    if fb_id:
-                        facebook_ids.add(fb_id)
-                    ua_id = extract_ua_id(html_content)
-                    if ua_id:
-                        ua_ids.add(ua_id)
-                    tiktok_id, email, phone = extract_tiktok_id(html_content)  # Adjusting to handle tuple
-                    if tiktok_id:
-                        tiktok_ids.add(tiktok_id)  # Only add the TikTok ID, not the full tuple
+            html_content = get_html_content(tag)
+            fb_id = extract_facebook_id(html_content)
+            if fb_id:
+                facebook_ids.add(fb_id)
+            ua_id = extract_ua_id(html_content)
+            if ua_id:
+                ua_ids.add(ua_id)
+            
+            # Unpack the TikTok info correctly
+            tiktok_id, email, phone = extract_tiktok_id(html_content)
+            if tiktok_id:
+                tiktok_ids.add(tiktok_id)
+        
+        # Handle GA4 tags
         elif tag['type'] in ['gaawe', 'googtag']:
             ga4_id = extract_ga4_id(tag)
             if ga4_id:
                 ga4_ids.add(ga4_id)
+        
+        # Handle Google Ads tags
         elif tag['type'] in ['awct', 'sp']:
             ads_id = extract_google_ads_id(tag)
             if ads_id:
                 google_ads_ids.add(ads_id)
 
-    if len(facebook_ids) > 1:
-        inconsistencies.append(f"Multiple Facebook IDs found: {', '.join(facebook_ids)}")
-    if len(ga4_ids) > 1:
-        inconsistencies.append(f"Multiple GA4 Measurement IDs found: {', '.join(ga4_ids)}")
-    if len(google_ads_ids) > 1:
-        inconsistencies.append(f"Multiple Google Ads IDs found: {', '.join(google_ads_ids)}")
-    if len(tiktok_ids) > 1:
-        inconsistencies.append(f"Multiple TikTok IDs found: {', '.join(tiktok_ids)}")
-    if len(ua_ids) > 1:
-        inconsistencies.append(f"Multiple Universal Analytics IDs found: {', '.join(ua_ids)}")
+    # Identify inconsistencies for each platform
+    check_for_inconsistencies(facebook_ids, 'Facebook', inconsistencies)
+    check_for_inconsistencies(ga4_ids, 'GA4 Measurement', inconsistencies)
+    check_for_inconsistencies(google_ads_ids, 'Google Ads', inconsistencies)
+    check_for_inconsistencies(tiktok_ids, 'TikTok', inconsistencies)
+    check_for_inconsistencies(ua_ids, 'Universal Analytics', inconsistencies)
 
     return facebook_ids, ga4_ids, google_ads_ids, ua_ids, tiktok_ids, paused_tags, inconsistencies
 
+
+# Helper function to check for multiple IDs and add inconsistencies to the list
+def check_for_inconsistencies(ids_set, platform_name, inconsistencies):
+    if len(ids_set) > 1:
+        inconsistencies.append(f"Multiple {platform_name} IDs found: {', '.join(ids_set)}")
+
+
+# Helper function to extract HTML content from a tag
+def get_html_content(tag):
+    for param in tag.get('parameter', []):
+        if param.get('key') == 'html':
+            return param.get('value', '')
+    return ''
+
+
+# Function to generate action points based on the consistency of IDs and paused tags
 def generate_action_points(facebook_ids, ga4_ids, google_ads_ids, ua_ids, tiktok_ids, paused_tags):
     action_points = []
     if len(facebook_ids) > 1:
@@ -86,18 +109,15 @@ def generate_action_points(facebook_ids, ga4_ids, google_ads_ids, ua_ids, tiktok
         action_points.append("Consider adding TikTok tracking if it's relevant for your marketing strategy")
     return action_points
 
+
+# Function to group Google Ads tags with trigger and conversion details
 def group_google_ads_tags(tags, trigger_names):
     google_ads_tags = []
     for tag in tags:
         if tag['type'] in ['awct', 'sp']:  # Assuming these are the types for Google Ads conversion tags
             ads_id = extract_google_ads_id(tag)
-            conversion_label = None
+            conversion_label = get_conversion_label(tag)
             
-            # Extract the conversionLabel if present
-            for param in tag.get('parameter', []):
-                if param['key'] == 'conversionLabel':
-                    conversion_label = param.get('value', 'No Label')
-
             if ads_id:
                 # Get the trigger names associated with this tag
                 trigger_ids = tag.get('firingTriggerId', [])
@@ -106,39 +126,16 @@ def group_google_ads_tags(tags, trigger_names):
                 google_ads_tags.append({
                     'Tag Name': tag.get('name', 'Unnamed Tag'),
                     'Tracking ID': ads_id,
-                    'Conversion Label': conversion_label if conversion_label else 'No Label',
+                    'Conversion Label': conversion_label,
                     'Trigger Name': ', '.join(triggers) if triggers else 'No Triggers'
                 })
     return google_ads_tags
 
-def group_tiktok_tags(tags, trigger_names):
-    tiktok_tags = []
-    for tag in tags:
-        if tag['type'] == 'html':  # Assuming TikTok is identified through 'html' tag type
-            is_base_pixel = False
 
-            # Determine if it's a base pixel (e.g., looking for "PageView" or generic events)
-            for param in tag.get('parameter', []):
-                if param['key'] == 'html' and ('ttq.page' in param['value'] or 'PageView' in param['value']):
-                    is_base_pixel = True
+# Helper function to extract the conversion label from a tag
+def get_conversion_label(tag):
+    for param in tag.get('parameter', []):
+        if param['key'] == 'conversionLabel':
+            return param.get('value', 'No Label')
+    return 'No Label'
 
-            # Ignore the base pixel for email/phone extraction
-            if not is_base_pixel:
-                for param in tag.get('parameter', []):
-                    if param['key'] == 'html':
-                        html_content = param.get('value', '')
-                        tiktok_id, email, phone = extract_tiktok_id(html_content)
-
-                        if tiktok_id:
-                            # Get the trigger names associated with this tag
-                            trigger_ids = tag.get('firingTriggerId', [])
-                            triggers = [trigger_names.get(str(tid), "Unknown Trigger") for tid in trigger_ids]
-                            
-                            tiktok_tags.append({
-                                'Tag Name': tag.get('name', 'Unnamed Tag'),
-                                'TikTok Pixel ID': tiktok_id,
-                                'Email': email,
-                                'Phone': phone,
-                                'Trigger Name': ', '.join(triggers) if triggers else 'No Triggers'
-                            })
-    return tiktok_tags
