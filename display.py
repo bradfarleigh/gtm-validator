@@ -7,6 +7,13 @@ from id_extraction import extract_ga4_id, extract_google_ads_id  # Necessary imp
 def display_tracking_id_summary(facebook_ids, ga4_ids, google_ads_ids, ua_ids, tiktok_ids, inconsistencies):
     
     st.subheader("Summary of tracking ID's detected")
+    st.markdown(
+        """    
+        We anlayse your Tags and extract the various tracking ID's being used.
+
+        Make sure you're pushing data to the right places - be sure to validate the ID's against your accounts and measurement plan.
+        """
+    )
     
     # Prepare data for the table
     data = []
@@ -124,7 +131,7 @@ def display_tag_details(tag, trigger_names):
 
 def display_action_points(action_points):
     st.divider()
-    st.header("Summary of findings")
+    st.header("Our findings")
     if action_points:
         for point in action_points:
             st.write(f"- {point}")
