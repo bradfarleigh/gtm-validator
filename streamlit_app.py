@@ -9,12 +9,11 @@ from id_extraction import (
 from display import (
     display_tracking_id_summary, display_grouped_tags, display_action_points
 )
-from utils import get_trigger_names, group_tags_by_type, check_id_consistency, generate_action_points, group_google_ads_tags
+from utils import get_trigger_names, group_tags_by_type, check_id_consistency, generate_action_points, group_google_ads_tags, group_floodlight_tags
 
 def main():
     st.title("GTM Tag Explorer and Validator")
     
-    # File uploader for the GTM JSON file
     uploaded_file = st.file_uploader("Upload GTM JSON file", type="json")
     
     if uploaded_file is not None:
@@ -36,25 +35,38 @@ def main():
                 display_action_points(action_points)
                 
                 # Create tabs to organize the data display
-                tabs = st.tabs(["Tracking ID Summary", "Google Ads Conversion Tags", "Tags Grouped by Type"])
+                try:
+                    tabs = st.tabs(["Tracking ID Summary", "Google Ads Conversion Tags", "Floodlight Tags", "Tags Grouped by Type"])
 
-                # Tab 1: Tracking ID Summary (including issues)
-                with tabs[0]:
-                    display_tracking_id_summary(facebook_ids, ga4_ids, google_ads_ids, ua_tags, tiktok_ids, inconsistencies)
-                
-                # Tab 2: Google Ads Conversion Tags (only if found)
-                with tabs[1]:
-                    grouped_google_ads_tags = group_google_ads_tags(tags, trigger_names)
-                    if grouped_google_ads_tags:
-                        st.write("### Google Ads Conversion Tags")
-                        st.dataframe(pd.DataFrame(grouped_google_ads_tags))
-                    else:
-                        st.write("No Google Ads Conversion Tags found.")
-                
-                # Tab 3: Tags Grouped by Type
-                with tabs[2]:
-                    grouped_tags = group_tags_by_type(tags)
-                    display_grouped_tags(grouped_tags, trigger_names)
+                    # Tab 1: Tracking ID Summary (including issues)
+                    with tabs[0]:
+                        display_tracking_id_summary(facebook_ids, ga4_ids, google_ads_ids, ua_tags, tiktok_ids, inconsistencies)
+
+                    # Tab 2: Google Ads Conversion Tags (only if found)
+                    with tabs[1]:
+                        grouped_google_ads_tags = group_google_ads_tags(tags, trigger_names)
+                        if grouped_google_ads_tags:
+                            st.write("### Google Ads Conversion Tags")
+                            st.dataframe(pd.DataFrame(grouped_google_ads_tags).reset_index(drop=True))
+                        else:
+                            st.write("No Google Ads Conversion Tags found.")
+                    
+                    # Tab 3: Floodlight Tags (only if found)
+                    with tabs[2]:
+                        grouped_floodlight_tags = group_floodlight_tags(tags, trigger_names)
+                        if grouped_floodlight_tags:
+                            st.write("### Floodlight Tags")
+                            st.dataframe(pd.DataFrame(grouped_floodlight_tags).reset_index(drop=True))
+                        else:
+                            st.write("No Floodlight Tags found.")
+                    
+                    # Tab 4: Tags Grouped by Type
+                    with tabs[3]:
+                        grouped_tags = group_tags_by_type(tags)
+                        display_grouped_tags(grouped_tags, trigger_names)
+
+                except IndexError as e:
+                    st.error(f"Error displaying tabs: {e}")
                     
             else:
                 st.warning("No tags found in the GTM JSON file.")

@@ -139,3 +139,33 @@ def get_conversion_label(tag):
             return param.get('value', 'No Label')
     return 'No Label'
 
+def group_floodlight_tags(tags, trigger_names):
+    floodlight_tags = []
+    for tag in tags:
+        if tag['type'] == 'flc':  # 'flc' is the type for Floodlight tags
+            # Extracting parameters
+            grouptag = get_floodlight_param(tag, 'groupTag')
+            activitytag = get_floodlight_param(tag, 'activityTag')
+            advertiserid = get_floodlight_param(tag, 'advertiserId')
+            
+            # Get the trigger names associated with this tag
+            trigger_ids = tag.get('firingTriggerId', [])
+            triggers = [trigger_names.get(str(tid), "Unknown Trigger") for tid in trigger_ids]
+            
+            # Append the extracted values to the list
+            floodlight_tags.append({
+                'Tag Name': tag.get('name', 'Unnamed Tag'),
+                'Group Tag': grouptag,
+                'Activity Tag': activitytag,
+                'Advertiser ID': advertiserid,
+                'Trigger Name': ', '.join(triggers) if triggers else 'No Triggers'
+            })
+    return floodlight_tags
+
+
+# Helper function to extract the Floodlight parameters
+def get_floodlight_param(tag, param_key):
+    for param in tag.get('parameter', []):
+        if param.get('key') == param_key:
+            return param.get('value', 'No Value')
+    return 'No Value'

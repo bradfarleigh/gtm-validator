@@ -9,63 +9,64 @@ def display_tracking_id_summary(facebook_ids, ga4_ids, google_ads_ids, ua_ids, t
     
     # Prepare data for the table
     data = []
+    issues_exist = False  # Initialize the variable to False by default
     
     # Facebook
     if facebook_ids:
-        consistency = "✓" if len(facebook_ids) == 1 else "✗"
+        status = "✓" if len(facebook_ids) == 1 else "✗"
         issue = "Multiple Facebook IDs found" if len(facebook_ids) > 1 else ""
-        data.append(["Facebook", ", ".join(facebook_ids), consistency, issue])
-
+        data.append(["Facebook", ", ".join(facebook_ids), status, issue])
         if issue:
             issues_exist = True
     
     # Google Analytics 4 (GA4)
     if ga4_ids:
-        consistency = "✓" if len(ga4_ids) == 1 else "✗"
+        status = "✓" if len(ga4_ids) == 1 else "✗"
         issue = "Multiple GA4 Measurement IDs found" if len(ga4_ids) > 1 else ""
-        data.append(["Google Analytics 4", ", ".join(ga4_ids), consistency, issue])
-
+        data.append(["Google Analytics 4", ", ".join(ga4_ids), status, issue])
         if issue:
             issues_exist = True
     
     # Google Ads
     if google_ads_ids:
-        consistency = "✓" if len(google_ads_ids) == 1 else "✗"
+        status = "✓" if len(google_ads_ids) == 1 else "✗"
         issue = "Multiple Google Ads IDs found" if len(google_ads_ids) > 1 else ""
-        data.append(["Google Ads", ", ".join(google_ads_ids), consistency, issue])
-
+        data.append(["Google Ads", ", ".join(google_ads_ids), status, issue])
         if issue:
             issues_exist = True
     
     # Universal Analytics (UA)
     if ua_ids:
-        consistency = "✓" if len(ua_ids) == 1 else "✗"
+        status = "✓" if len(ua_ids) == 1 else "✗"
         issue = "Multiple Universal Analytics IDs found" if len(ua_ids) > 1 else ""
-        data.append(["Universal Analytics", ", ".join(ua_ids), consistency, issue])
-
+        data.append(["Universal Analytics", ", ".join(ua_ids), status, issue])
         if issue:
             issues_exist = True
     
     # TikTok
     if tiktok_ids:
-        consistency = "✓" if len(tiktok_ids) == 1 else "✗"
+        status = "✓" if len(tiktok_ids) == 1 else "✗"
         issue = "Multiple TikTok IDs found" if len(tiktok_ids) > 1 else ""
-        data.append(["TikTok", ", ".join(tiktok_ids), consistency, issue])
-
+        data.append(["TikTok", ", ".join(tiktok_ids), status, issue])
         if issue:
             issues_exist = True
     
-    # Create the DataFrame with or without the "Issue" column
+    # Validate data before creating DataFrame
     if data:
-        if issues_exist:
-            # Create DataFrame with the "Issue" column
-            df = pd.DataFrame(data, columns=["Platform", "ID", "Status", "Issue"])
-        else:
-            # Create DataFrame without the "Issue" column
-            df = pd.DataFrame(data, columns=["Platform", "ID", "Status"])
-        
-        # Display the table
-        st.table(df)
+        try:
+            # Check if issues exist and create DataFrame accordingly
+            if issues_exist:
+                df = pd.DataFrame(data, columns=["Platform", "ID", "Status", "Issue"])
+            else:
+                # Ensure data contains only 3 columns when "Issue" is not needed
+                data_without_issue = [row[:3] for row in data]
+                df = pd.DataFrame(data_without_issue, columns=["Platform", "ID", "Status"])
+
+            # Display the table
+            st.dataframe(df.reset_index(drop=True))  # Reset index to avoid row numbers
+
+        except ValueError as e:
+            st.error(f"Error creating DataFrame: {e}")
     else:
         st.write("No Tracking IDs found.")
 
