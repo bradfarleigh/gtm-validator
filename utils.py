@@ -121,6 +121,7 @@ def group_google_ads_tags(tags, trigger_names):
     google_ads_tags = []
     tag_check = {}  # Dictionary to track tags by ID and conversion label
     issues = []     # List to store any detected issues
+    issue_flags = {}  # Dictionary to track which tag key has issues
 
     for tag in tags:
         if tag['type'] == 'awct':  # Google Ads - Conversion
@@ -128,13 +129,15 @@ def group_google_ads_tags(tags, trigger_names):
             conversion_label = get_conversion_label(tag)
             tag_name = tag.get('name', 'Unnamed Tag')
 
-            # Check for tags with same ID and conversion label but different tag names
+            # Generate a key to track unique combinations of tracking ID and conversion label
             tag_key = (ads_id, conversion_label)
             issue_flag = False
 
-            if tag_key in tag_check and tag_check[tag_key] != tag_name:
-                issue_flag = True  # Mark as an issue
+            # If this tag key has been seen before, mark both as an issue
+            if tag_key in tag_check:
+                issue_flag = True
                 issues.append(f"Duplicate Google Ads Conversion Tags found for ID: {ads_id}, Label: {conversion_label}")
+                issue_flags[tag_key] = True  # Mark this tag key as having an issue
 
             # Track the tag by its ID and conversion label
             tag_check[tag_key] = tag_name
@@ -152,8 +155,13 @@ def group_google_ads_tags(tags, trigger_names):
                 'Issue': "Potential issue: same ID/label, different tag name" if issue_flag else ""
             })
     
-    return google_ads_tags, issues
+    # After processing all tags, apply the issue flag to all tags with duplicate tracking IDs
+    for i, tag in enumerate(google_ads_tags):
+        tag_key = (tag['Tracking ID'], tag['Conversion Label'])
+        if issue_flags.get(tag_key, False):
+            google_ads_tags[i]['Issue'] = "Potential issue: same ID/label, different tag name"
 
+    return google_ads_tags, issues
 
 def group_ga4_tags(tags, trigger_names):
     ga4_tags = []
