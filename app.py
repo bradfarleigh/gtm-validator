@@ -15,37 +15,40 @@ from utils import get_trigger_names, group_tags_by_type, check_id_consistency, g
 st.set_page_config(page_title="GTM Tag Explorer and Validator", layout="wide")
 
 def main():
-    st.title("GTM Tag Explorer and Validator")
+    st.title("🎯 Validate Your Google Tag Manager Setup")
     
-    # Your app logic here
-    
-    # Add the text section with the link to LinkedIn
     st.markdown(
         """
 
-        This tool can be used to:
+        Our tool simplifies the process of reviewing and validating your Google Tag Manager (GTM) configuration. Use it to:
 
-        * Get a summary of the tags being fired in your GTM
-        * Get a summary of the platform tracking ID's being used (i.e. Facebook pixel ID, GA4 ID, TikTok pixel ID) to quickly spot-check against your measurement plan, or to spot mis-configuration
-        * Detect when more than one ID is being used across tags (i.e. multiple FB accounts being incorrectly used)
-        * Detect redundant UA tags are being used
-        * Detect when Google Conversion Tags have duplicate information (which may be an indication that the wrong ID has been used)
-        * Display floodlight tag usage and detection of duplicates
+        - 🔍 **Get a summary** of the tags firing in your GTM container.
+        - 📊 **Check platform tracking IDs** (e.g., Facebook Pixel, GA4, TikTok Pixel) to ensure alignment with your measurement plan and quickly catch any misconfigurations.
+        - 🚨 **Detect multiple IDs** being used across tags (e.g., multiple Facebook accounts used incorrectly).
+        - 🔄 **Identify redundant Universal Analytics (UA) tags**.
+        - ❗ **Flag duplicate Google Conversion Tags**, which might indicate incorrect ID usage.
+        - 🌐 **Examine Floodlight tag usage** and detect duplicates.
 
-        **To get started**
-        Export your Google Tag Manager configuration (Google Tag Manager > Admin > Export Container).
+        ---
 
-        Upload the .json file here and we'll analyse the setup.
+        ### 🚀 **Getting Started**
 
-        This works on published and draft workspaces - allowing you to spot-check and verify configurations before publishing.
+        1. **Export** your GTM configuration (Google Tag Manager > Admin > Export Container).
+        2. **Upload** the `.json` file here.
+        
+        Tip: We can **analyse** both published and draft workspaces to help you spot-check and verify your setup before publishing.
 
-        **Coming soon**
-        * Tag naming convention check vs best practice
-        * Variable naming convention check vs best practice
-        * GA4 event naming check vs best practic
-        * Duplicate/redundant tag detection'
-        * Ga4 custom dimensions flagging
-    
+        ---
+
+        ### 🔧 **Coming Soon**
+
+        - 🏷️ **Best practice checks** for tag naming conventions.
+        - 🛠️ **Variable naming convention** validation.
+        - 📈 **GA4 event naming validation** against best practices.
+        - 🗑️ **Duplicate or redundant tag detection**.
+        - 🛑 **GA4 custom dimensions flagging**.
+        - 🛠️ **Natural language analysis of tag, variable and trigger names**.
+
         
         """, unsafe_allow_html=True
     )
