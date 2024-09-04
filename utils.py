@@ -168,6 +168,7 @@ def group_ga4_tags(tags, trigger_names):
     for tag in tags:
         if tag['type'] == 'gaawe':  # GA4 - Event
             ga4_id = extract_ga4_id(tag)
+            event_name = get_event_name(tag)  # Extract the eventName key
             tag_name = tag.get('name', 'Unnamed Tag')
 
             # Get the trigger names associated with this tag
@@ -177,11 +178,18 @@ def group_ga4_tags(tags, trigger_names):
             ga4_tags.append({
                 'Tag Name': tag_name,
                 'GA4 Measurement ID': ga4_id,
+                'Event Name': event_name,  # Include the eventName
                 'Trigger Name': ', '.join(triggers) if triggers else 'No Triggers',
             })
 
     return ga4_tags
 
+# Helper function to extract the eventName from the GA4 tag parameters
+def get_event_name(tag):
+    for param in tag.get('parameter', []):
+        if param.get('key') == 'eventName':
+            return param.get('value', 'No Event Name')
+    return 'No Event Name'
 
 def group_tiktok_tags(tags, trigger_names):
     tiktok_tags = []

@@ -74,7 +74,9 @@ def main():
                 with tabs[2]:
                     if grouped_ga4_tags:
                         st.write("### GA4 - Event Tags")
-                        st.dataframe(pd.DataFrame(grouped_ga4_tags).reset_index(drop=True))
+                        # Create a DataFrame for GA4 tags, including eventName
+                        df_ga4 = pd.DataFrame(grouped_ga4_tags).reset_index(drop=True)
+                        st.dataframe(df_ga4)
                     else:
                         st.write("No GA4 Tags found.")
                 

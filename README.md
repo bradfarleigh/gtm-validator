@@ -23,3 +23,6 @@
 * verbose action points (i.e. tag X needs X)
 * Login
    * Custom naming rules
+* consent mode check
+* cookie consent detection
+   * check tags are hooked in properly
