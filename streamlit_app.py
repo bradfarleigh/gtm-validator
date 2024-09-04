@@ -9,7 +9,7 @@ from id_extraction import (
 from display import (
     display_tracking_id_summary, display_grouped_tags, display_action_points
 )
-from utils import get_trigger_names, group_tags_by_type, check_id_consistency, generate_action_points, group_google_ads_tags, group_floodlight_tags
+from utils import get_trigger_names, group_tags_by_type, check_id_consistency, generate_action_points, group_google_ads_tags, group_floodlight_tags, group_ga4_tags, group_tiktok_tags
 
 def main():
     st.title("GTM Tag Explorer and Validator")
@@ -29,14 +29,19 @@ def main():
                 # Check for inconsistencies and collect tracking IDs
                 facebook_ids, ga4_ids, google_ads_ids, ua_tags, tiktok_ids, paused_tags, inconsistencies = check_id_consistency(tags)
                 
-                # Generate action points
-                action_points = generate_action_points(facebook_ids, ga4_ids, google_ads_ids, ua_tags, tiktok_ids, paused_tags)
+                # Google Ads Conversion Tags and Issues
+                grouped_google_ads_tags, google_ads_issues = group_google_ads_tags(tags, trigger_names)
+                grouped_ga4_tags = group_ga4_tags(tags, trigger_names)
+                grouped_tiktok_tags = group_tiktok_tags(tags, trigger_names)
+                
+                # Generate action points (including Google Ads issues)
+                action_points = generate_action_points(facebook_ids, ga4_ids, google_ads_ids, ua_tags, tiktok_ids, paused_tags, google_ads_issues)
                 
                 # Display action points (always displayed under the file uploader)
                 display_action_points(action_points)
                 
                 # Create tabs to organize the data display
-                tabs = st.tabs(["Tracking ID Summary", "Google Ads Conversion Tags", "Floodlight Tags", "Tags Grouped by Type"])
+                tabs = st.tabs(["Tracking ID Summary", "Google Ads Conversion Tags", "GA4 Tags", "TikTok Tags", "Floodlight Tags", "Tags Grouped by Type"])
 
                 # Tab 1: Tracking ID Summary (including issues)
                 with tabs[0]:
@@ -44,8 +49,6 @@ def main():
                 
                 # Tab 2: Google Ads Conversion Tags (only if found)
                 with tabs[1]:
-                    grouped_google_ads_tags = group_google_ads_tags(tags, trigger_names)
-
                     if grouped_google_ads_tags:
                         st.write("### Google Ads Conversion Tags")
 
@@ -66,9 +69,25 @@ def main():
                         st.dataframe(styled_df)
                     else:
                         st.write("No Google Ads Conversion Tags found.")
-               
-                # Tab 3: Floodlight Tags (only if found)
+                
+                # Tab 3: GA4 Tags
                 with tabs[2]:
+                    if grouped_ga4_tags:
+                        st.write("### GA4 - Event Tags")
+                        st.dataframe(pd.DataFrame(grouped_ga4_tags).reset_index(drop=True))
+                    else:
+                        st.write("No GA4 Tags found.")
+                
+                # Tab 4: TikTok Tags
+                with tabs[3]:
+                    if grouped_tiktok_tags:
+                        st.write("### TikTok - Event Tags")
+                        st.dataframe(pd.DataFrame(grouped_tiktok_tags).reset_index(drop=True))
+                    else:
+                        st.write("No TikTok Tags found.")
+               
+                # Tab 5: Floodlight Tags (only if found)
+                with tabs[4]:
                     grouped_floodlight_tags = group_floodlight_tags(tags, trigger_names)
                     if grouped_floodlight_tags:
                         st.write("### Floodlight Tags")
@@ -76,8 +95,8 @@ def main():
                     else:
                         st.write("No Floodlight Tags found.")
                 
-                # Tab 4: Tags Grouped by Type
-                with tabs[3]:
+                # Tab 6: Tags Grouped by Type
+                with tabs[5]:
                     grouped_tags = group_tags_by_type(tags)
                     display_grouped_tags(grouped_tags, trigger_names)
                     

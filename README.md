@@ -1,10 +1,4 @@
-# 🎈 Blank app template
-
-A simple Streamlit app template for you to modify!
-
-[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://blank-app-template.streamlit.app/)
-
-### How to run it on your own machine
+# How to run it on your own machine
 
 1. Install the requirements
 
@@ -15,5 +9,17 @@ A simple Streamlit app template for you to modify!
 2. Run the app
 
    ```
-   $ streamlit run app.py
+   $ streamlit run stremlit_app.py
    ```
+
+# Todo
+
+* Tag naming convention check vs best practice
+* Check vs defined tracking code numbers (FB TT etc)
+* GA4 event name checks
+* Checkboxes on what to audit
+* Get container name from json
+* export action points
+* verbose action points (i.e. tag X needs X)
+* Login
+   * Custom naming rules
