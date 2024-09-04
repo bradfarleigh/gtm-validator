@@ -96,19 +96,19 @@ def generate_action_points(facebook_ids, ga4_ids, google_ads_ids, ua_ids, tiktok
     
     # Existing checks for consistency and paused tags
     if len(facebook_ids) > 1:
-        action_points.append("Consolidate Facebook tracking IDs to use a single ID across all tags")
+        action_points.append("More than one Facebook tracking ID was found to be used across your tags - review required")
     if len(ga4_ids) > 1:
-        action_points.append("Consolidate GA4 measurement IDs to use a single ID across all tags")
+        action_points.append("More than one GA4 measurement tag was found to be used across your tags - review required")
     if len(google_ads_ids) > 1:
-        action_points.append("Consolidate Google Ads conversion IDs to use a single ID across all tags")
+        action_points.append("Google Conversion Tag information is repeated across tags - indicating redudant tags or accidental misconfiguration")
     if len(tiktok_ids) > 1:
-        action_points.append("Consolidate TikTok tracking IDs to use a single ID across all tags")
+        action_points.append("More than one TikTok tracking ID was found to be used across your tags - review required")
     if ua_ids:
         action_points.append("Review and delete UA tags as they are no longer collecting data")
     if paused_tags:
         action_points.append(f"Review and decide on the status of paused tags: {', '.join(paused_tags)}")
     if not facebook_ids:
-        action_points.append("Consider adding Facebook tracking if it's relevant for your analytics needs")
+        action_points.append("No Facebook tags were found - manual verification required")
     if not ga4_ids:
         action_points.append("Implement Google Analytics 4 (GA4) for future-proof analytics")
     if not tiktok_ids:

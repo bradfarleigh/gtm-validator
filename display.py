@@ -5,7 +5,8 @@ import pandas as pd
 from id_extraction import extract_ga4_id, extract_google_ads_id  # Necessary imports
 
 def display_tracking_id_summary(facebook_ids, ga4_ids, google_ads_ids, ua_ids, tiktok_ids, inconsistencies):
-    st.header("Tracking ID Summary")
+    
+    st.subheader("Summary of tracking ID's detected")
     
     # Prepare data for the table
     data = []
@@ -79,7 +80,7 @@ def display_inconsistencies(inconsistencies):
         st.success("No inconsistencies found in tracking IDs")
 
 def display_grouped_tags(grouped_tags, trigger_names):
-    st.header("Tags Grouped by Type")
+    st.header("Summary of all tags")
     for tag_type, type_tags in grouped_tags.items():
         st.subheader(f"Type: {tag_type}")
         for tag in type_tags:
@@ -122,7 +123,8 @@ def display_tag_details(tag, trigger_names):
                 st.write(f"- {trigger_name} (ID: {trigger_id})")
 
 def display_action_points(action_points):
-    st.header("Action Points")
+    st.divider()
+    st.header("Summary of findings")
     if action_points:
         for point in action_points:
             st.write(f"- {point}")

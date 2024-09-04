@@ -11,11 +11,50 @@ from display import (
 )
 from utils import get_trigger_names, group_tags_by_type, check_id_consistency, generate_action_points, group_google_ads_tags, group_floodlight_tags, group_ga4_tags, group_tiktok_tags
 
+# Set the page configuration to full width
+st.set_page_config(page_title="GTM Tag Explorer and Validator", layout="wide")
+
 def main():
     st.title("GTM Tag Explorer and Validator")
     
+    # Your app logic here
+    
+    # Add the text section with the link to LinkedIn
+    st.markdown(
+        """
+
+        This tool can be used to:
+
+        * Get a summary of the tags being fired in your GTM
+        * Get a summary of the platform tracking ID's being used (i.e. Facebook pixel ID, GA4 ID, TikTok pixel ID) to quickly spot-check against your measurement plan, or to spot mis-configuration
+        * Detect when more than one ID is being used across tags (i.e. multiple FB accounts being incorrectly used)
+        * Detect redundant UA tags are being used
+        * Detect when Google Conversion Tags have duplicate information (which may be an indication that the wrong ID has been used)
+        * Display floodlight tag usage and detection of duplicates
+
+        **To get started**
+        Export your Google Tag Manager configuration (Google Tag Manager > Admin > Export Container).
+
+        Upload the .json file here and we'll analyse the setup.
+
+        This works on published and draft workspaces - allowing you to spot-check and verify configurations before publishing.
+
+        **Coming soon**
+        * Tag naming convention check vs best practice
+        * Variable naming convention check vs best practice
+        * GA4 event naming check vs best practic
+        * Duplicate/redundant tag detection'
+        * Ga4 custom dimensions flagging
+    
+        
+        """, unsafe_allow_html=True
+    )
+
+    st.divider()
+
+    st.header("Get started - upload your container .json file")
     # File uploader for the GTM JSON file
-    uploaded_file = st.file_uploader("Upload GTM JSON file", type="json")
+    uploaded_file = st.file_uploader("Upload your GTM JSON file", type="json")
     
     if uploaded_file is not None:
         # Load and parse the GTM JSON data
@@ -41,7 +80,7 @@ def main():
                 display_action_points(action_points)
                 
                 # Create tabs to organize the data display
-                tabs = st.tabs(["Tracking ID Summary", "Google Ads Conversion Tags", "GA4 Tags", "TikTok Tags", "Floodlight Tags", "Tags Grouped by Type"])
+                tabs = st.tabs(["Tracking ID Summary", "Google Ads Conversion Tags", "GA4 Tags", "TikTok Tags", "Floodlight Tags", "Tag Summary"])
 
                 # Tab 1: Tracking ID Summary (including issues)
                 with tabs[0]:
@@ -97,7 +136,7 @@ def main():
                     else:
                         st.write("No Floodlight Tags found.")
                 
-                # Tab 6: Tags Grouped by Type
+                # Tab 6: Tags
                 with tabs[5]:
                     grouped_tags = group_tags_by_type(tags)
                     display_grouped_tags(grouped_tags, trigger_names)
@@ -106,6 +145,14 @@ def main():
                 st.warning("No tags found in the GTM JSON file.")
         else:
             st.warning("Failed to load GTM data from the JSON file.")
+    
+    st.divider()
+
+    st.markdown(
+        """
+        Built by <a href="https://www.linkedin.com/in/brad-farleigh" target="_blank">Brad Farleigh</a>.
+        """, unsafe_allow_html=True
+    )
 
 if __name__ == "__main__":
     main()
