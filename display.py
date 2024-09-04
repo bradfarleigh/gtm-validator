@@ -130,10 +130,12 @@ def display_tag_details(tag, trigger_names):
                 st.write(f"- {trigger_name} (ID: {trigger_id})")
 
 def display_action_points(action_points):
+    
     st.divider()
-    st.header("Our findings")
-    if action_points:
-        for point in action_points:
-            st.write(f"- {point}")
-    else:
-        st.write("No immediate action required. Your GTM setup appears to be consistent.")
+    st.header("🔎 Our findings")
+    with st.container(border=True):
+        if action_points:
+            for point in action_points:
+                st.write(f"- {point}")
+        else:
+            st.write("No immediate action required. Your GTM setup appears to be consistent.")

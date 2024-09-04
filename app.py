@@ -16,80 +16,76 @@ st.set_page_config(page_title="GTM Tag Explorer and Validator", layout="wide")
 
 def main():
 
-    # Create a sidebar with navigation links
 
-    section = st.sidebar.selectbox("Navigation", ["Intro", "Get Started", "Roadmap"])
-
-    if section == "Intro":
-    
-        st.title("🎯 Validate and Analyse Your Google Tag Manager Setup")
-    
-
-        st.markdown(
-            """
-
-            Our tool simplifies the process of reviewing and validating your Google Tag Manager (GTM) configuration. 
-            
-            ### Use it to:
-
-            - 🔍 **Get a summary** of the tags firing in your GTM container.
-            - 📊 **Check platform tracking IDs** (e.g., Facebook Pixel, GA4, TikTok Pixel) to ensure alignment with your measurement plan and quickly catch any misconfigurations.
-            - 🚨 **Detect multiple IDs** being used across tags (e.g., multiple Facebook accounts used incorrectly).
-            - 🔄 **Identify redundant Universal Analytics (UA) tags**.
-            - ❗ **Flag duplicate Google Conversion Tags**, which might indicate incorrect ID usage.
-            - 🌐 **Examine Floodlight tag usage** and detect duplicates.
+    st.title("🎯 Validate and Analyse Your Google Tag Manager Setup")
 
 
-            #### 🔧 **Features coming soon**
+    st.markdown(
+        """
 
-            - 🏷️ **Best practice checks** for tag naming conventions.
-            - 🛠️ **Variable naming convention** validation.
-            - 📈 **GA4 event naming validation** against best practices.
-            - 🗑️ **Duplicate or redundant tag detection**.
-            - 🛑 **GA4 custom dimensions flagging**.
-            - 🛠️ **Natural language analysis of tag, variable and trigger names**.
-
-            # 🚀 **Getting Started**
-
-            1. **Export** your GTM configuration (Google Tag Manager > Admin > Export Container).
-            2. **Upload** the `.json` file here.
-            
-            Tip: We can **analyse** both published and draft workspaces to help you spot-check and verify your setup before publishing.
-
-
-
-            """, unsafe_allow_html=True
-        )
-
-    if section == "Get Started":
-
-        st.header("Get started - upload your container .json file")
-        # File uploader for the GTM JSON file
-        uploaded_file = st.file_uploader("Upload your GTM JSON file", type="json")
+        Our tool simplifies the process of reviewing and validating your Google Tag Manager (GTM) configuration. 
         
-        if uploaded_file is not None:
-            # Load and parse the GTM JSON data
-            gtm_data = load_gtm_json(uploaded_file)
+        ### Use it to:
+
+        - 🔍 **Get a summary** of the tags firing in your GTM container.
+        - 📊 **Check platform tracking IDs** (e.g., Facebook Pixel, GA4, TikTok Pixel) to ensure alignment with your measurement plan and quickly catch any misconfigurations.
+        - 🚨 **Detect multiple IDs** being used across tags (e.g., multiple Facebook accounts used incorrectly).
+        - 🔄 **Identify redundant Universal Analytics (UA) tags**.
+        - ❗ **Flag duplicate Google Conversion Tags**, which might indicate incorrect ID usage.
+        - 🌐 **Examine Floodlight tag usage** and detect duplicates.
+
+
+        #### 🔧 **Features coming soon**
+
+        - 🏷️ **Best practice checks** for tag naming conventions.
+        - 🛠️ **Variable naming convention** validation.
+        - 📈 **GA4 event naming validation** against best practices.
+        - 🗑️ **Duplicate or redundant tag detection**.
+        - 🛑 **GA4 custom dimensions flagging**.
+        - 🛠️ **Natural language analysis of tag, variable and trigger names**.
+
+        # 🚀 **Getting Started**
+
+        1. **Export** your GTM configuration (Google Tag Manager > Admin > Export Container).
+        2. **Upload** the `.json` file here.
+        
+        Tip: We can **analyse** both published and draft workspaces to help you spot-check and verify your setup before publishing.
+
+
+
+        """, unsafe_allow_html=True
+    )
+
+    # File uploader for the GTM JSON file
+    uploaded_file = st.file_uploader("Upload your GTM JSON file", type="json")
+    
+    if uploaded_file is not None:
+        # Load and parse the GTM JSON data
+        gtm_data = load_gtm_json(uploaded_file)
+        
+        if gtm_data:
+            tags = extract_tags(gtm_data)
+            trigger_names = get_trigger_names(gtm_data)
             
-            if gtm_data:
-                tags = extract_tags(gtm_data)
-                trigger_names = get_trigger_names(gtm_data)
+            if tags:
+                # Check for inconsistencies and collect tracking IDs
+                facebook_ids, ga4_ids, google_ads_ids, ua_tags, tiktok_ids, paused_tags, inconsistencies = check_id_consistency(tags)
                 
-                if tags:
-                    # Check for inconsistencies and collect tracking IDs
-                    facebook_ids, ga4_ids, google_ads_ids, ua_tags, tiktok_ids, paused_tags, inconsistencies = check_id_consistency(tags)
-                    
-                    # Google Ads Conversion Tags and Issues
-                    grouped_google_ads_tags, google_ads_issues = group_google_ads_tags(tags, trigger_names)
-                    grouped_ga4_tags = group_ga4_tags(tags, trigger_names)
-                    grouped_tiktok_tags = group_tiktok_tags(tags, trigger_names)
-                    
-                    # Generate action points (including Google Ads issues)
-                    action_points = generate_action_points(facebook_ids, ga4_ids, google_ads_ids, ua_tags, tiktok_ids, paused_tags, google_ads_issues)
-                    
-                    # Display action points (always displayed under the file uploader)
-                    display_action_points(action_points)
-                    
+                # Google Ads Conversion Tags and Issues
+                grouped_google_ads_tags, google_ads_issues = group_google_ads_tags(tags, trigger_names)
+                grouped_ga4_tags = group_ga4_tags(tags, trigger_names)
+                grouped_tiktok_tags = group_tiktok_tags(tags, trigger_names)
+                
+                # Generate action points (including Google Ads issues)
+                action_points = generate_action_points(facebook_ids, ga4_ids, google_ads_ids, ua_tags, tiktok_ids, paused_tags, google_ads_issues)
+                
+                # Display action points (always displayed under the file uploader)
+                display_action_points(action_points)
+                
+                st.header("🔧 The details")
+
+                with st.container(border=True):
+                
                     # Create tabs to organize the data display
                     tabs = st.tabs(["Tracking ID Summary", "Google Ads Conversion Tags", "GA4 Tags", "TikTok Tags", "Floodlight Tags", "Tag Summary"])
 
@@ -163,32 +159,32 @@ def main():
                     with tabs[5]:
                         grouped_tags = group_tags_by_type(tags)
                         display_grouped_tags(grouped_tags, trigger_names)
-                        
-                else:
-                    st.warning("No tags found in the GTM JSON file.")
+                    
             else:
-                st.warning("Failed to load GTM data from the JSON file.")
-        
-        
-    if section == "Roadmap":
+                st.warning("No tags found in the GTM JSON file.")
+        else:
+            st.warning("Failed to load GTM data from the JSON file.")
+    
+    
+    st.divider()
 
+    st.header("🔧 Features coming soon")
 
-        st.header("🔧 Features coming soon")
+    st.markdown(
+        """
+        - 🏷️ **Best practice checks** for tag naming conventions.
+        - 🛠️ **Variable naming convention** validation.
+        - 📈 **GA4 event naming validation** against best practices.
+        - 🗑️ **Duplicate or redundant tag detection**.
+        - 🛑 **GA4 custom dimensions flagging**.
+        - 🛠️ **Natural language analysis of tag, variable and trigger names**.
+        - **Validation vs measurement plan**.
 
-        st.markdown(
-            """
-            - 🏷️ **Best practice checks** for tag naming conventions.
-            - 🛠️ **Variable naming convention** validation.
-            - 📈 **GA4 event naming validation** against best practices.
-            - 🗑️ **Duplicate or redundant tag detection**.
-            - 🛑 **GA4 custom dimensions flagging**.
-            - 🛠️ **Natural language analysis of tag, variable and trigger names**.
-            - **Validation vs measurement plan**.
+        Want to see a feature added? <a href="https://www.linkedin.com/in/brad-farleigh" target="_blank">Hit me up</a>.
 
-            Want to see a feature added? <a href="https://www.linkedin.com/in/brad-farleigh" target="_blank">Hit me up</a>.
+        """, unsafe_allow_html=True
+    )
 
-            """, unsafe_allow_html=True
-        )
     st.divider()
     st.markdown(
         """
