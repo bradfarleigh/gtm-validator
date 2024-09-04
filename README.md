@@ -9,7 +9,7 @@
 2. Run the app
 
    ```
-   $ streamlit run stremlit_app.py
+   $ streamlit run  app.py
    ```
 
 # Todo
