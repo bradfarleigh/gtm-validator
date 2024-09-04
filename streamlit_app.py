@@ -1,6 +1,7 @@
 # streamlit_app.py
 
 import streamlit as st
+import pandas as pd
 from file_operations import load_gtm_json, extract_tags
 from id_extraction import (
     extract_facebook_id, extract_ga4_id, extract_google_ads_id, extract_ua_id, extract_tiktok_id
@@ -8,16 +9,13 @@ from id_extraction import (
 from display import (
     display_tracking_id_summary, display_inconsistencies, display_grouped_tags, display_action_points
 )
-from utils import get_trigger_names, group_tags_by_type, check_id_consistency, generate_action_points
+from utils import get_trigger_names, group_tags_by_type, check_id_consistency, generate_action_points, group_google_ads_tags, group_tiktok_tags
 
 def main():
     st.title("GTM Tag Explorer and Validator")
     
     uploaded_file = st.file_uploader("Upload GTM JSON file", type="json")
     
-    # Initialize action points variable
-    action_points = []
-
     if uploaded_file is not None:
         gtm_data = load_gtm_json(uploaded_file)
         
@@ -26,19 +24,36 @@ def main():
             trigger_names = get_trigger_names(gtm_data)
             
             if tags:
+                # Check ID consistency and display summary
                 facebook_ids, ga4_ids, google_ads_ids, ua_tags, tiktok_ids, paused_tags, inconsistencies = check_id_consistency(tags)
                 
+                # Generate and display action points
                 action_points = generate_action_points(facebook_ids, ga4_ids, google_ads_ids, ua_tags, tiktok_ids, paused_tags)
-                
-                # Display action points right after file upload and before other summaries
                 display_action_points(action_points)
                 
-                display_tracking_id_summary(facebook_ids, ga4_ids, google_ads_ids, ua_tags, tiktok_ids)
-                display_inconsistencies(inconsistencies)
+                # Create tabs for the Tracking ID Summary, Google Ads Conversion Tags, and Grouped Tags
+                tabs = st.tabs(["Tracking ID Summary", "Google Ads Conversion Tags", "Tags Grouped by Type"])
+
+                # Tab 1: Tracking ID Summary (including inconsistencies)
+                with tabs[0]:
+                    display_tracking_id_summary(facebook_ids, ga4_ids, google_ads_ids, ua_tags, tiktok_ids)
+                    if inconsistencies:
+                        display_inconsistencies(inconsistencies)
                 
-                grouped_tags = group_tags_by_type(tags)
-                display_grouped_tags(grouped_tags, trigger_names)
+                # Tab 2: Google Ads Conversion Tags (only if found)
+                with tabs[1]:
+                    grouped_google_ads_tags = group_google_ads_tags(tags, trigger_names)
+                    if grouped_google_ads_tags:
+                        st.write("### Google Ads Conversion Tags")
+                        st.dataframe(pd.DataFrame(grouped_google_ads_tags))
+                    else:
+                        st.write("No Google Ads Conversion Tags found.")
                 
+                # Tab 3: Tags Grouped by Type
+                with tabs[2]:
+                    grouped_tags = group_tags_by_type(tags)
+                    display_grouped_tags(grouped_tags, trigger_names)
+                    
             else:
                 st.warning("No tags found in the GTM JSON file.")
         else:

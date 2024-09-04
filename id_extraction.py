@@ -1,18 +1,27 @@
+# id_extraction.py
+
 import re
 
 def extract_facebook_id(html_content):
-    # Existing Facebook pixel ID extraction
     pixel_match = re.search(r'https://www\.facebook\.com/tr\?id=(\d+)&ev=PageView&noscript=1', html_content)
     if pixel_match:
         return pixel_match.group(1)
-    
-    # New Facebook ID extraction from fbq('init', 'XXX')
     init_match = re.search(r"fbq\('init',\s*'(\d+)'\)", html_content)
     return init_match.group(1) if init_match else None
 
 def extract_tiktok_id(html_content):
-    match = re.search(r"ttq\.load\('([A-Z0-9]+)'\)", html_content)
-    return match.group(1) if match else None
+    # Extract TikTok Pixel ID
+    pixel_match = re.search(r"ttq\.load\('([A-Z0-9]+)'\)", html_content)
+    tiktok_id = pixel_match.group(1) if pixel_match else None
+
+    # Extract email or phone parameters
+    email_match = re.search(r"email['\"]?:\s*['\"]([^'\"]+)['\"]", html_content)
+    phone_match = re.search(r"phone['\"]?:\s*['\"]([^'\"]+)['\"]", html_content)
+
+    email = email_match.group(1) if email_match else 'No Email'
+    phone = phone_match.group(1) if phone_match else 'No Phone'
+
+    return tiktok_id, email, phone
 
 def extract_ga4_id(tag):
     if tag['type'] in ['gaawe', 'googtag']:
