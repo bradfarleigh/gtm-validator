@@ -14,6 +14,7 @@ from utils import get_trigger_names, group_tags_by_type, check_id_consistency, g
 def main():
     st.title("GTM Tag Explorer and Validator")
     
+    # File uploader for the GTM JSON file
     uploaded_file = st.file_uploader("Upload GTM JSON file", type="json")
     
     if uploaded_file is not None:
@@ -35,38 +36,50 @@ def main():
                 display_action_points(action_points)
                 
                 # Create tabs to organize the data display
-                try:
-                    tabs = st.tabs(["Tracking ID Summary", "Google Ads Conversion Tags", "Floodlight Tags", "Tags Grouped by Type"])
+                tabs = st.tabs(["Tracking ID Summary", "Google Ads Conversion Tags", "Floodlight Tags", "Tags Grouped by Type"])
 
-                    # Tab 1: Tracking ID Summary (including issues)
-                    with tabs[0]:
-                        display_tracking_id_summary(facebook_ids, ga4_ids, google_ads_ids, ua_tags, tiktok_ids, inconsistencies)
+                # Tab 1: Tracking ID Summary (including issues)
+                with tabs[0]:
+                    display_tracking_id_summary(facebook_ids, ga4_ids, google_ads_ids, ua_tags, tiktok_ids, inconsistencies)
+                
+                # Tab 2: Google Ads Conversion Tags (only if found)
+                with tabs[1]:
+                    grouped_google_ads_tags = group_google_ads_tags(tags, trigger_names)
 
-                    # Tab 2: Google Ads Conversion Tags (only if found)
-                    with tabs[1]:
-                        grouped_google_ads_tags = group_google_ads_tags(tags, trigger_names)
-                        if grouped_google_ads_tags:
-                            st.write("### Google Ads Conversion Tags")
-                            st.dataframe(pd.DataFrame(grouped_google_ads_tags).reset_index(drop=True))
-                        else:
-                            st.write("No Google Ads Conversion Tags found.")
-                    
-                    # Tab 3: Floodlight Tags (only if found)
-                    with tabs[2]:
-                        grouped_floodlight_tags = group_floodlight_tags(tags, trigger_names)
-                        if grouped_floodlight_tags:
-                            st.write("### Floodlight Tags")
-                            st.dataframe(pd.DataFrame(grouped_floodlight_tags).reset_index(drop=True))
-                        else:
-                            st.write("No Floodlight Tags found.")
-                    
-                    # Tab 4: Tags Grouped by Type
-                    with tabs[3]:
-                        grouped_tags = group_tags_by_type(tags)
-                        display_grouped_tags(grouped_tags, trigger_names)
+                    if grouped_google_ads_tags:
+                        st.write("### Google Ads Conversion Tags")
 
-                except IndexError as e:
-                    st.error(f"Error displaying tabs: {e}")
+                        # Create a DataFrame
+                        df_ads = pd.DataFrame(grouped_google_ads_tags).reset_index(drop=True)
+
+                        # Define a function to highlight rows with issues
+                        def highlight_issues(row):
+                            if row['Issue']:  # If there is an issue
+                                return ['background-color: yellow'] * len(row)
+                            else:
+                                return [''] * len(row)
+
+                        # Apply highlighting to the DataFrame
+                        styled_df = df_ads.style.apply(highlight_issues, axis=1)
+
+                        # Display the styled DataFrame
+                        st.dataframe(styled_df)
+                    else:
+                        st.write("No Google Ads Conversion Tags found.")
+               
+                # Tab 3: Floodlight Tags (only if found)
+                with tabs[2]:
+                    grouped_floodlight_tags = group_floodlight_tags(tags, trigger_names)
+                    if grouped_floodlight_tags:
+                        st.write("### Floodlight Tags")
+                        st.dataframe(pd.DataFrame(grouped_floodlight_tags).reset_index(drop=True))
+                    else:
+                        st.write("No Floodlight Tags found.")
+                
+                # Tab 4: Tags Grouped by Type
+                with tabs[3]:
+                    grouped_tags = group_tags_by_type(tags)
+                    display_grouped_tags(grouped_tags, trigger_names)
                     
             else:
                 st.warning("No tags found in the GTM JSON file.")

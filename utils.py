@@ -113,24 +113,37 @@ def generate_action_points(facebook_ids, ga4_ids, google_ads_ids, ua_ids, tiktok
 # Function to group Google Ads tags with trigger and conversion details
 def group_google_ads_tags(tags, trigger_names):
     google_ads_tags = []
+    tag_check = {}  # To track IDs and conversion labels
+    
     for tag in tags:
         if tag['type'] in ['awct', 'sp']:  # Assuming these are the types for Google Ads conversion tags
             ads_id = extract_google_ads_id(tag)
             conversion_label = get_conversion_label(tag)
+            tag_name = tag.get('name', 'Unnamed Tag')
             
-            if ads_id:
-                # Get the trigger names associated with this tag
-                trigger_ids = tag.get('firingTriggerId', [])
-                triggers = [trigger_names.get(str(tid), "Unknown Trigger") for tid in trigger_ids]
-                
-                google_ads_tags.append({
-                    'Tag Name': tag.get('name', 'Unnamed Tag'),
-                    'Tracking ID': ads_id,
-                    'Conversion Label': conversion_label,
-                    'Trigger Name': ', '.join(triggers) if triggers else 'No Triggers'
-                })
-    return google_ads_tags
+            # Check if the same tracking ID and conversion label exist with a different tag name
+            tag_key = (ads_id, conversion_label)
+            issue_flag = False
+            
+            if tag_key in tag_check and tag_check[tag_key] != tag_name:
+                issue_flag = True  # This indicates a problem: same ID/label, but different tag name
+            
+            # Track the tag by ID and conversion label
+            tag_check[tag_key] = tag_name
 
+            # Get the trigger names associated with this tag
+            trigger_ids = tag.get('firingTriggerId', [])
+            triggers = [trigger_names.get(str(tid), "Unknown Trigger") for tid in trigger_ids]
+            
+            # Append the tag data along with the issue flag
+            google_ads_tags.append({
+                'Tag Name': tag_name,
+                'Tracking ID': ads_id,
+                'Conversion Label': conversion_label,
+                'Trigger Name': ', '.join(triggers) if triggers else 'No Triggers',
+                'Issue': "Potential issue: same ID/label, different tag name" if issue_flag else ""
+            })
+    return google_ads_tags
 
 # Helper function to extract the conversion label from a tag
 def get_conversion_label(tag):
