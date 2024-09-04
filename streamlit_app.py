@@ -7,16 +7,18 @@ from id_extraction import (
     extract_facebook_id, extract_ga4_id, extract_google_ads_id, extract_ua_id, extract_tiktok_id
 )
 from display import (
-    display_tracking_id_summary, display_inconsistencies, display_grouped_tags, display_action_points
+    display_tracking_id_summary, display_grouped_tags, display_action_points
 )
-from utils import get_trigger_names, group_tags_by_type, check_id_consistency, generate_action_points, group_google_ads_tags, group_tiktok_tags
+from utils import get_trigger_names, group_tags_by_type, check_id_consistency, generate_action_points, group_google_ads_tags
 
 def main():
     st.title("GTM Tag Explorer and Validator")
     
+    # File uploader for the GTM JSON file
     uploaded_file = st.file_uploader("Upload GTM JSON file", type="json")
     
     if uploaded_file is not None:
+        # Load and parse the GTM JSON data
         gtm_data = load_gtm_json(uploaded_file)
         
         if gtm_data:
@@ -24,21 +26,21 @@ def main():
             trigger_names = get_trigger_names(gtm_data)
             
             if tags:
-                # Check ID consistency and display summary
+                # Check for inconsistencies and collect tracking IDs
                 facebook_ids, ga4_ids, google_ads_ids, ua_tags, tiktok_ids, paused_tags, inconsistencies = check_id_consistency(tags)
                 
-                # Generate and display action points
+                # Generate action points
                 action_points = generate_action_points(facebook_ids, ga4_ids, google_ads_ids, ua_tags, tiktok_ids, paused_tags)
+                
+                # Display action points (always displayed under the file uploader)
                 display_action_points(action_points)
                 
-                # Create tabs for the Tracking ID Summary, Google Ads Conversion Tags, and Grouped Tags
+                # Create tabs to organize the data display
                 tabs = st.tabs(["Tracking ID Summary", "Google Ads Conversion Tags", "Tags Grouped by Type"])
 
-                # Tab 1: Tracking ID Summary (including inconsistencies)
+                # Tab 1: Tracking ID Summary (including issues)
                 with tabs[0]:
-                    display_tracking_id_summary(facebook_ids, ga4_ids, google_ads_ids, ua_tags, tiktok_ids)
-                    if inconsistencies:
-                        display_inconsistencies(inconsistencies)
+                    display_tracking_id_summary(facebook_ids, ga4_ids, google_ads_ids, ua_tags, tiktok_ids, inconsistencies)
                 
                 # Tab 2: Google Ads Conversion Tags (only if found)
                 with tabs[1]:

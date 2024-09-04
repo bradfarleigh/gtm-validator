@@ -1,46 +1,52 @@
+# display.py
+
 import streamlit as st
 import pandas as pd
-from id_extraction import extract_ga4_id, extract_google_ads_id
+from id_extraction import extract_ga4_id, extract_google_ads_id  # Necessary imports
 
-def display_tracking_id_summary(facebook_ids, ga4_ids, google_ads_ids, ua_ids, tiktok_ids):
+def display_tracking_id_summary(facebook_ids, ga4_ids, google_ads_ids, ua_ids, tiktok_ids, inconsistencies):
     st.header("Tracking ID Summary")
-
+    
     # Prepare data for the table
     data = []
     
     # Facebook
     if facebook_ids:
-        data.append(["Facebook", ", ".join(facebook_ids), "Consistent" if len(facebook_ids) == 1 else "Inconsistent"])
-    else:
-        data.append(["Facebook", "Not found", "Missing"])
+        consistency = "✓" if len(facebook_ids) == 1 else "✗"
+        issue = "Multiple Facebook IDs found" if len(facebook_ids) > 1 else ""
+        data.append(["Facebook", ", ".join(facebook_ids), consistency, issue])
     
     # Google Analytics 4 (GA4)
     if ga4_ids:
-        data.append(["Google Analytics 4", ", ".join(ga4_ids), "Consistent" if len(ga4_ids) == 1 else "Inconsistent"])
-    else:
-        data.append(["Google Analytics 4", "Not found", "Missing"])
+        consistency = "✓" if len(ga4_ids) == 1 else "✗"
+        issue = "Multiple GA4 Measurement IDs found" if len(ga4_ids) > 1 else ""
+        data.append(["Google Analytics 4", ", ".join(ga4_ids), consistency, issue])
     
     # Google Ads
     if google_ads_ids:
-        data.append(["Google Ads", ", ".join(google_ads_ids), "Consistent" if len(google_ads_ids) == 1 else "Inconsistent"])
-    else:
-        data.append(["Google Ads", "Not found", "Missing"])
+        consistency = "✓" if len(google_ads_ids) == 1 else "✗"
+        issue = "Multiple Google Ads IDs found" if len(google_ads_ids) > 1 else ""
+        data.append(["Google Ads", ", ".join(google_ads_ids), consistency, issue])
     
     # Universal Analytics (UA)
     if ua_ids:
-        data.append(["Universal Analytics", ", ".join(ua_ids), "Consistent" if len(ua_ids) == 1 else "Inconsistent"])
-    else:
-        data.append(["Universal Analytics", "Not found", "Missing"])
+        consistency = "✓" if len(ua_ids) == 1 else "✗"
+        issue = "Multiple Universal Analytics IDs found" if len(ua_ids) > 1 else ""
+        data.append(["Universal Analytics", ", ".join(ua_ids), consistency, issue])
     
     # TikTok
     if tiktok_ids:
-        data.append(["TikTok", ", ".join(tiktok_ids), "Consistent" if len(tiktok_ids) == 1 else "Inconsistent"])
+        consistency = "✓" if len(tiktok_ids) == 1 else "✗"
+        issue = "Multiple TikTok IDs found" if len(tiktok_ids) > 1 else ""
+        data.append(["TikTok", ", ".join(tiktok_ids), consistency, issue])
+    
+    # If there is no data, display a message
+    if data:
+        # Create a DataFrame and display it as a table with an "Issue" column
+        df = pd.DataFrame(data, columns=["Platform", "ID", "Consistency", "Issue"])
+        st.table(df)
     else:
-        data.append(["TikTok", "Not found", "Missing"])
-
-    # Create a DataFrame and display it as a table
-    df = pd.DataFrame(data, columns=["Platform", "ID", "Status"])
-    st.table(df)
+        st.write("No Tracking IDs found.")
 
 def display_inconsistencies(inconsistencies):
     if inconsistencies:
