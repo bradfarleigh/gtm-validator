@@ -1,5 +1,6 @@
 from collections import defaultdict
 from id_extraction import extract_facebook_id, extract_ga4_id, extract_google_ads_id, extract_ua_id, extract_tiktok_id
+import re
 
 # Function to extract trigger names from GTM data
 def get_trigger_names(gtm_data):
@@ -18,7 +19,6 @@ def group_tags_by_type(tags):
 
 # Function to check consistency of tracking IDs and collect relevant information
 def check_id_consistency(tags):
-    """Check consistency for tracking IDs across platforms like Facebook, GA4, Google Ads, etc."""
     facebook_ids = set()
     ga4_ids = set()
     google_ads_ids = set()
@@ -79,23 +79,23 @@ def generate_action_points(facebook_ids, ga4_ids, google_ads_ids, ua_ids, tiktok
         action_points.extend(google_ads_issues)
     
     if len(facebook_ids) > 1:
-        action_points.append("Consolidate Facebook tracking IDs to use a single ID across all tags")
+        action_points.append("⚠️ Consolidate Facebook tracking IDs to use a single ID across all tags")
     if len(ga4_ids) > 1:
-        action_points.append("Consolidate GA4 measurement IDs to use a single ID across all tags")
+        action_points.append("⚠️ Consolidate GA4 measurement IDs to use a single ID across all tags")
     if len(google_ads_ids) > 1:
-        action_points.append("Consolidate Google Ads conversion IDs to use a single ID across all tags")
+        action_points.append("⚠️ Consolidate Google Ads conversion IDs to use a single ID across all tags")
     if len(tiktok_ids) > 1:
-        action_points.append("Consolidate TikTok tracking IDs to use a single ID across all tags")
+        action_points.append("⚠️ Consolidate TikTok tracking IDs to use a single ID across all tags")
     if ua_ids:
-        action_points.append("Review and delete UA tags as they are no longer collecting data")
+        action_points.append("🗑️ Review and delete UA tags as they are no longer collecting data")
     if paused_tags:
-        action_points.append(f"Review and decide on the status of paused tags: {', '.join(paused_tags)}")
+        action_points.append(f"⚠️ Review and decide on the status of paused tags: {', '.join(paused_tags)}")
     if not facebook_ids:
-        action_points.append("Consider adding Facebook tracking if it's relevant for your analytics needs")
+        action_points.append("❓ No Facebook tags detected - best to check if this is correct")
     if not ga4_ids:
-        action_points.append("Implement Google Analytics 4 (GA4) for future-proof analytics")
+        action_points.append("❓ No GA4 Tags detected")
     if not tiktok_ids:
-        action_points.append("Consider adding TikTok tracking if it's relevant for your marketing strategy")
+        action_points.append("❓ No TikTok tags detected")
 
     return action_points
 
@@ -182,13 +182,26 @@ def group_tiktok_tags(tags, trigger_names):
     for tag in tags:
         tag_name = tag.get('name', 'Unnamed Tag')
 
-        # Handle base TikTok Pixel code (HTML tag type)
+        # Handle base TikTok Pixel code (HTML tag type with ttq.load())
         if tag['type'] == 'html':
-            tiktok_id = extract_tiktok_id(tag)
-            if tiktok_id:
+            tiktok_id = None
+            html_content = ""
+            
+            # Extract the HTML content from the tag
+            for param in tag.get('parameter', []):
+                if param['key'] == 'html':
+                    html_content = param.get('value', '')
+
+            # Only process if the content includes 'ttq.load' (indicating it's a TikTok Pixel)
+            if 'ttq.load' in html_content:
+                # Use regex to extract the TikTok Pixel ID from the HTML content
+                tiktok_id_match = re.search(r"ttq\.load\('([A-Z0-9]+)'\)", html_content)
+                if tiktok_id_match:
+                    tiktok_id = tiktok_id_match.group(1)
+
                 tiktok_tags.append({
                     'Tag Name': tag_name,
-                    'TikTok Pixel ID': tiktok_id,
+                    'TikTok Pixel ID': tiktok_id or 'Not Found',
                     'Event': 'Base Pixel',
                     'Trigger Name': 'N/A'
                 })
@@ -196,66 +209,74 @@ def group_tiktok_tags(tags, trigger_names):
         # Handle TikTok event tags (type starts with 'cvt')
         elif tag['type'].startswith('cvt'):
             tiktok_id = extract_tiktok_id(tag)
-            event_name = get_event_name(tag)
+            event_name = None
 
+            # Extract event name from tag parameters
+            for param in tag.get('parameter', []):
+                if param['key'] == 'eventName':                    event_name = param.get('value', 'No Event Name')
+
+            # Get the trigger names associated with this tag
             trigger_ids = tag.get('firingTriggerId', [])
             triggers = [trigger_names.get(str(tid), "Unknown Trigger") for tid in trigger_ids]
 
             tiktok_tags.append({
                 'Tag Name': tag_name,
-                'TikTok Pixel ID': tiktok_id,
-                'Event': event_name,
+                'TikTok Pixel ID': tiktok_id or 'Not Found',
+                'Event': event_name or 'No Event Name',
                 'Trigger Name': ', '.join(triggers) if triggers else 'No Triggers',
             })
 
     return tiktok_tags
 
-# Function to group Floodlight tags
+# Function to group Floodlight (FLC) tags
 def group_floodlight_tags(tags, trigger_names):
     floodlight_tags = []
     for tag in tags:
-        if tag['type'] == 'flc':  # 'flc' is the type for Floodlight tags
+        if tag['type'] == 'flc':  # Floodlight Tag (FLC)
+            # Extracting necessary parameters from the Floodlight tag
             grouptag = get_floodlight_param(tag, 'groupTag')
             activitytag = get_floodlight_param(tag, 'activityTag')
             advertiserid = get_floodlight_param(tag, 'advertiserId')
             
+            # Get the trigger names associated with this tag
             trigger_ids = tag.get('firingTriggerId', [])
             triggers = [trigger_names.get(str(tid), "Unknown Trigger") for tid in trigger_ids]
             
+            # Append the extracted values to the list
             floodlight_tags.append({
-                    'Tag Name': tag.get('name', 'Unnamed Tag'),
-                    'Group Tag': grouptag,
-                    'Activity Tag': activitytag,
-                    'Advertiser ID': advertiserid,
-                    'Trigger Name': ', '.join(triggers) if triggers else 'No Triggers'
-                })
-        return floodlight_tags
+                'Tag Name': tag.get('name', 'Unnamed Tag'),
+                'Group Tag': grouptag,
+                'Activity Tag': activitytag,
+                'Advertiser ID': advertiserid,
+                'Trigger Name': ', '.join(triggers) if triggers else 'No Triggers'
+            })
+    return floodlight_tags
 
-    # Helper function to extract Floodlight parameters
-    def get_floodlight_param(tag, param_key):
-        for param in tag.get('parameter', []):
-            if param.get('key') == param_key:
-                return param.get('value', 'No Value')
-        return 'No Value'
+# Helper function to extract Floodlight parameters
+def get_floodlight_param(tag, param_key):
+    for param in tag.get('parameter', []):
+        if param['key'] == param_key:
+            return param.get('value', 'No Value')
+    return 'No Value'
 
-    # Function to extract variables from GTM data and replace placeholders
-    def extract_variables(gtm_data):
-        variables = {}
-        if 'variable' in gtm_data['containerVersion']:
-            for variable in gtm_data['containerVersion']['variable']:
-                variable_name = variable.get('name', '')
-                variable_value = None
-                for param in variable.get('parameter', []):
-                    if param.get('key') == 'name':
-                        variable_value = param.get('value', 'Unknown')
-                if variable_name and variable_value:
-                    variables[variable_name] = variable_value
-        return variables
+# Function to extract variables from GTM data
+def extract_variables(gtm_data):
+    variables = {}
+    if 'variable' in gtm_data['containerVersion']:
+        for variable in gtm_data['containerVersion']['variable']:
+            variable_name = variable.get('name', '')
+            variable_value = None
+            for param in variable.get('parameter', []):
+                if param.get('key') == 'name':
+                    variable_value = param.get('value', 'Unknown')
+            if variable_name and variable_value:
+                variables[variable_name] = variable_value
+    return variables
 
-    # Function to replace placeholders in tag parameters with variable values
-    def replace_variable_placeholders(value, variables):
-        if '{{' in value and '}}' in value:
-            var_name = value.strip('{}')
-            if var_name in variables:
-                return f"{{{{{var_name}}}}} - {variables[var_name]}"
-        return value
+# Function to replace placeholders in tag parameters with variable values
+def replace_variable_placeholders(value, variables):
+    if '{{' in value and '}}' in value:
+        var_name = value.strip('{}')
+        if var_name in variables:
+            return f"{{{{{var_name}}}}} - {variables[var_name]}"
+    return value

@@ -136,6 +136,6 @@ def display_action_points(action_points):
     with st.container(border=True):
         if action_points:
             for point in action_points:
-                st.write(f"- {point}")
+                st.write(f"{point}")
         else:
             st.write("No immediate action required. Your GTM setup appears to be consistent.")
