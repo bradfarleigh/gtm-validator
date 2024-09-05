@@ -28,19 +28,15 @@ def extract_ua_id(html_content):
     match = re.search(r'UA-\d{4,10}-\d{1,4}', html_content)
     return match.group(0) if match else None
 
-def extract_tiktok_id(html_content):
-    """Extracts TikTok Pixel ID, email, and phone from the HTML content"""
-    # Extract TikTok pixel ID
-    tiktok_id_match = re.search(r"ttq\.load\('([A-Z0-9]+)'\)", html_content)
-    tiktok_id = tiktok_id_match.group(1) if tiktok_id_match else None
-
-    # Extract email (if available)
-    email_match = re.search(r"[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+", html_content)
-    email = email_match.group(0) if email_match else None
-
-    # Extract phone (if available)
-    phone_match = re.search(r"\+?[0-9.\-() ]{7,}", html_content)
-    phone = phone_match.group(0) if phone_match else None
-
-    # Return a tuple (tiktok_id, email, phone) even if some of them are None
-    return tiktok_id, email, phone
+def extract_tiktok_id(tag):
+    """Extract TikTok Pixel ID from HTML content."""
+    for param in tag.get('parameter', []):
+        if param['key'] == 'html':
+            html_content = param.get('value', '')
+            # Ensure we are only using the regex on strings
+            if isinstance(html_content, str):
+                # Use regex to extract the TikTok Pixel ID from the ttq.load() function
+                tiktok_id_match = re.search(r"ttq\.load\('([A-Z0-9]+)'\)", html_content)
+                if tiktok_id_match:
+                    return tiktok_id_match.group(1)
+    return None

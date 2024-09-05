@@ -1,14 +1,8 @@
-# streamlit_app.py
-
 import streamlit as st
 import pandas as pd
 from file_operations import load_gtm_json, extract_tags
-from id_extraction import (
-    extract_facebook_id, extract_ga4_id, extract_google_ads_id, extract_ua_id, extract_tiktok_id
-)
-from display import (
-    display_tracking_id_summary, display_grouped_tags, display_action_points
-)
+from id_extraction import extract_facebook_id, extract_ga4_id, extract_google_ads_id, extract_ua_id, extract_tiktok_id
+from display import display_tracking_id_summary, display_grouped_tags, display_action_points
 from utils import get_trigger_names, group_tags_by_type, check_id_consistency, generate_action_points, group_google_ads_tags, group_floodlight_tags, group_ga4_tags, group_tiktok_tags
 
 # Set the page configuration to full width
@@ -16,13 +10,10 @@ st.set_page_config(page_title="GTM Tag Explorer and Validator", layout="wide")
 
 def main():
 
-
     st.title("🎯 Validate and Analyse Your Google Tag Manager Setup")
-
 
     st.markdown(
         """
-
         Our tool simplifies the process of reviewing and validating your Google Tag Manager (GTM) configuration. 
         
         ### Use it to:
@@ -33,26 +24,13 @@ def main():
         - 🔄 **Identify redundant Universal Analytics (UA) tags**.
         - ❗ **Flag duplicate Google Conversion Tags**, which might indicate incorrect ID usage.
         - 🌐 **Examine Floodlight tag usage** and detect duplicates.
-
-
-        #### 🔧 **Features coming soon**
-
-        - 🏷️ **Best practice checks** for tag naming conventions.
-        - 🛠️ **Variable naming convention** validation.
-        - 📈 **GA4 event naming validation** against best practices.
-        - 🗑️ **Duplicate or redundant tag detection**.
-        - 🛑 **GA4 custom dimensions flagging**.
-        - 🛠️ **Natural language analysis of tag, variable and trigger names**.
-
+        
         # 🚀 **Getting Started**
 
         1. **Export** your GTM configuration (Google Tag Manager > Admin > Export Container).
         2. **Upload** the `.json` file here.
         
         Tip: We can **analyse** both published and draft workspaces to help you spot-check and verify your setup before publishing.
-
-
-
         """, unsafe_allow_html=True
     )
 
@@ -100,7 +78,7 @@ def main():
 
                             st.markdown(
                                 """    
-                                We anlayse your Google Ads Conversion Tags and extract the tracking ID and Labels.
+                                We analyse your Google Ads Conversion Tags and extract the tracking ID and Labels.
 
                                 Be sure to validate the ID's against your Google Ads conversion configurations, and measurement plan.
                                 """
@@ -181,7 +159,6 @@ def main():
         - **Validation vs measurement plan**.
 
         Want to see a feature added? <a href="https://www.linkedin.com/in/brad-farleigh" target="_blank">Hit me up</a>.
-
         """, unsafe_allow_html=True
     )
 
