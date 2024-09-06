@@ -2,6 +2,12 @@ from collections import defaultdict
 from id_extraction import extract_facebook_id, extract_ga4_id, extract_google_ads_id, extract_ua_id, extract_tiktok_id
 import re
 
+# Dictionary of built-in GTM trigger IDs and their names
+BUILT_IN_TRIGGERS = {
+    "2147479553": "All Pages",  # Example of built-in trigger mapping
+    # Add other built-in triggers here as necessary
+}
+
 # Function to extract trigger names from GTM data
 def get_trigger_names(gtm_data):
     trigger_names = {}
@@ -79,23 +85,23 @@ def generate_action_points(facebook_ids, ga4_ids, google_ads_ids, ua_ids, tiktok
         action_points.extend(google_ads_issues)
     
     if len(facebook_ids) > 1:
-        action_points.append("⚠️ Consolidate Facebook tracking IDs to use a single ID across all tags")
+        action_points.append("Consolidate Facebook tracking IDs to use a single ID across all tags")
     if len(ga4_ids) > 1:
-        action_points.append("⚠️ Consolidate GA4 measurement IDs to use a single ID across all tags")
+        action_points.append("Consolidate GA4 measurement IDs to use a single ID across all tags")
     if len(google_ads_ids) > 1:
-        action_points.append("⚠️ Consolidate Google Ads conversion IDs to use a single ID across all tags")
+        action_points.append("Consolidate Google Ads conversion IDs to use a single ID across all tags")
     if len(tiktok_ids) > 1:
-        action_points.append("⚠️ Consolidate TikTok tracking IDs to use a single ID across all tags")
+        action_points.append("Consolidate TikTok tracking IDs to use a single ID across all tags")
     if ua_ids:
-        action_points.append("🗑️ Review and delete UA tags as they are no longer collecting data")
+        action_points.append("Review and delete UA tags as they are no longer collecting data")
     if paused_tags:
-        action_points.append(f"⚠️ Review and decide on the status of paused tags: {', '.join(paused_tags)}")
+        action_points.append(f"Review and decide on the status of paused tags: {', '.join(paused_tags)}")
     if not facebook_ids:
-        action_points.append("❓ No Facebook tags detected - best to check if this is correct")
+        action_points.append("Consider adding Facebook tracking if it's relevant for your analytics needs")
     if not ga4_ids:
-        action_points.append("❓ No GA4 Tags detected")
+        action_points.append("Implement Google Analytics 4 (GA4) for future-proof analytics")
     if not tiktok_ids:
-        action_points.append("❓ No TikTok tags detected")
+        action_points.append("Consider adding TikTok tracking if it's relevant for your marketing strategy")
 
     return action_points
 
@@ -123,20 +129,20 @@ def group_google_ads_tags(tags, trigger_names):
             tag_check[tag_key] = tag_name
 
             trigger_ids = tag.get('firingTriggerId', [])
-            triggers = [trigger_names.get(str(tid), "Unknown Trigger") for tid in trigger_ids]
+            triggers = [BUILT_IN_TRIGGERS.get(str(tid), trigger_names.get(str(tid), f"Unknown Trigger (ID: {tid})")) for tid in trigger_ids]
 
             google_ads_tags.append({
                 'Tag Name': tag_name,
                 'Tracking ID': ads_id,
                 'Conversion Label': conversion_label,
                 'Trigger Name': ', '.join(triggers) if triggers else 'No Triggers',
-                'Issue': "Potential issue: same ID/label, different tag name" if issue_flag else ""
+                'Issue': "⚠️ Potential issue: same ID/label, different tag name" if issue_flag else ""
             })
     
     for i, tag in enumerate(google_ads_tags):
         tag_key = (tag['Tracking ID'], tag['Conversion Label'])
         if issue_flags.get(tag_key, False):
-            google_ads_tags[i]['Issue'] = "Potential issue: same ID/label, different tag name"
+            google_ads_tags[i]['Issue'] = "⚠️ Potential issue: same ID/label, different tag name"
 
     return google_ads_tags, issues
 
@@ -157,7 +163,7 @@ def group_ga4_tags(tags, trigger_names):
             tag_name = tag.get('name', 'Unnamed Tag')
 
             trigger_ids = tag.get('firingTriggerId', [])
-            triggers = [trigger_names.get(str(tid), "Unknown Trigger") for tid in trigger_ids]
+            triggers = [BUILT_IN_TRIGGERS.get(str(tid), trigger_names.get(str(tid), f"Unknown Trigger (ID: {tid})")) for tid in trigger_ids]
 
             ga4_tags.append({
                 'Tag Name': tag_name,
@@ -194,16 +200,19 @@ def group_tiktok_tags(tags, trigger_names):
 
             # Only process if the content includes 'ttq.load' (indicating it's a TikTok Pixel)
             if 'ttq.load' in html_content:
-                # Use regex to extract the TikTok Pixel ID from the HTML content
                 tiktok_id_match = re.search(r"ttq\.load\('([A-Z0-9]+)'\)", html_content)
                 if tiktok_id_match:
                     tiktok_id = tiktok_id_match.group(1)
+                    
+                # Get the trigger names associated with this tag
+                trigger_ids = tag.get('firingTriggerId', [])
+                triggers = [BUILT_IN_TRIGGERS.get(str(tid), trigger_names.get(str(tid), f"Unknown Trigger (ID: {tid})")) for tid in trigger_ids]
 
                 tiktok_tags.append({
                     'Tag Name': tag_name,
-                    'TikTok Pixel ID': tiktok_id or 'Not Found',
+                    'TikTok Pixel ID': tiktok_id or '✗ Not Found',
                     'Event': 'Base Pixel',
-                    'Trigger Name': 'N/A'
+                    'Trigger Name': ', '.join(triggers) if triggers else 'No Triggers'
                 })
 
         # Handle TikTok event tags (type starts with 'cvt')
@@ -213,15 +222,16 @@ def group_tiktok_tags(tags, trigger_names):
 
             # Extract event name from tag parameters
             for param in tag.get('parameter', []):
-                if param['key'] == 'eventName':                    event_name = param.get('value', 'No Event Name')
+                if param['key'] == 'event':
+                    event_name = param.get('value', 'No Event Name')
 
             # Get the trigger names associated with this tag
             trigger_ids = tag.get('firingTriggerId', [])
-            triggers = [trigger_names.get(str(tid), "Unknown Trigger") for tid in trigger_ids]
+            triggers = [BUILT_IN_TRIGGERS.get(str(tid), trigger_names.get(str(tid), f"Unknown Trigger (ID: {tid})")) for tid in trigger_ids]
 
             tiktok_tags.append({
                 'Tag Name': tag_name,
-                'TikTok Pixel ID': tiktok_id or 'Not Found',
+                'TikTok Pixel ID': tiktok_id or '',
                 'Event': event_name or 'No Event Name',
                 'Trigger Name': ', '.join(triggers) if triggers else 'No Triggers',
             })
@@ -233,14 +243,14 @@ def group_floodlight_tags(tags, trigger_names):
     floodlight_tags = []
     for tag in tags:
         if tag['type'] == 'flc':  # Floodlight Tag (FLC)
-            # Extracting necessary parameters from the Floodlight tag
+            # Extract necessary parameters from the Floodlight tag
             grouptag = get_floodlight_param(tag, 'groupTag')
             activitytag = get_floodlight_param(tag, 'activityTag')
             advertiserid = get_floodlight_param(tag, 'advertiserId')
             
             # Get the trigger names associated with this tag
             trigger_ids = tag.get('firingTriggerId', [])
-            triggers = [trigger_names.get(str(tid), "Unknown Trigger") for tid in trigger_ids]
+            triggers = [BUILT_IN_TRIGGERS.get(str(tid), trigger_names.get(str(tid), f"Unknown Trigger (ID: {tid})")) for tid in trigger_ids]
             
             # Append the extracted values to the list
             floodlight_tags.append({
