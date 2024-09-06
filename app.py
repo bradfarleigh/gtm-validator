@@ -58,50 +58,41 @@ def main():
                 # Generate action points (including Google Ads issues)
                 action_points = generate_action_points(facebook_ids, ga4_ids, google_ads_ids, ua_tags, tiktok_ids, paused_tags, google_ads_issues)
                 
-                # Display action points (always displayed under the file uploader)
-                display_action_points(action_points)
-                
-                st.header("🔧 The details")
+                st.divider()
 
-                tabs = []
-                content = []
+                # Create two columns for layout
+                col1, col2 = st.columns([1, 2])
 
-                # Add "Tracking ID Summary" tab if any inconsistencies or IDs exist
-                if any([facebook_ids, ga4_ids, google_ads_ids, ua_tags, tiktok_ids]):
-                    tabs.append("Tracking ID Summary")
-                    content.append(lambda: display_tracking_id_summary(facebook_ids, ga4_ids, google_ads_ids, ua_tags, tiktok_ids, inconsistencies))
-                
-                # Add Google Ads tab if there are any Google Ads tags
-                if grouped_google_ads_tags:
-                    tabs.append("Google Ads Conversion Tags")
-                    content.append(lambda: display_google_ads_tags(grouped_google_ads_tags))
+                # Column 1: Findings
+                with col1:
+                    # Display action points (always displayed under the file uploader)
+                    display_action_points(action_points)
 
-                # Add GA4 Tags tab if there are any GA4 tags
-                if grouped_ga4_tags:
-                    tabs.append("GA4 Tags")
-                    content.append(lambda: display_ga4_tags(grouped_ga4_tags))
-                
-                # Add TikTok Tags tab if there are any TikTok tags
-                if grouped_tiktok_tags:
-                    tabs.append("TikTok Tags")
-                    content.append(lambda: display_tiktok_tags(grouped_tiktok_tags))
+                # Column 2: Details (display sections sequentially without tabs)
+                with col2:
+                    # Display Tracking ID Summary if any inconsistencies or IDs exist
+                    if any([facebook_ids, ga4_ids, google_ads_ids, ua_tags, tiktok_ids]):
+                        display_tracking_id_summary(facebook_ids, ga4_ids, google_ads_ids, ua_tags, tiktok_ids, inconsistencies)
+                    
+                    # Display Google Ads Conversion Tags if available
+                    if grouped_google_ads_tags:
+                        display_google_ads_tags(grouped_google_ads_tags)
 
-                # Add Floodlight Tags tab if there are any Floodlight tags
-                if grouped_floodlight_tags:
-                    tabs.append("Floodlight Tags")
-                    content.append(lambda: display_floodlight_tags(grouped_floodlight_tags))
+                    # Display GA4 Tags if available
+                    if grouped_ga4_tags:
+                        display_ga4_tags(grouped_ga4_tags)
 
-                # Add "Tag Summary" tab for a grouped tag summary
-                if grouped_tags := group_tags_by_type(tags):
-                    tabs.append("Tag Summary")
-                    content.append(lambda: display_grouped_tags(grouped_tags, trigger_names))
+                    # Display TikTok Tags if available
+                    if grouped_tiktok_tags:
+                        display_tiktok_tags(grouped_tiktok_tags)
 
-                # Display the tabs dynamically
-                if tabs:
-                    selected_tab = st.tabs(tabs)
-                    for idx, tab in enumerate(tabs):
-                        with selected_tab[idx]:
-                            content[idx]()
+                    # Display Floodlight Tags if available
+                    if grouped_floodlight_tags:
+                        display_floodlight_tags(grouped_floodlight_tags)
+
+                    # Display Tag Summary if available
+                    if grouped_tags := group_tags_by_type(tags):
+                        display_grouped_tags(grouped_tags, trigger_names)
             else:
                 st.warning("No tags found in the GTM JSON file.")
         else:
@@ -145,17 +136,17 @@ def display_google_ads_tags(grouped_google_ads_tags):
     st.dataframe(styled_df, use_container_width=True)
 
 def display_ga4_tags(grouped_ga4_tags):
-    st.write("### GA4 - Event Tags")
+    st.header("GA4 - Event Tags")
     df_ga4 = pd.DataFrame(grouped_ga4_tags).reset_index(drop=True)
     st.dataframe(df_ga4, use_container_width=True)
 
 def display_tiktok_tags(grouped_tiktok_tags):
-    st.write("### TikTok - Event Tags")
+    st.header("TikTok - Event Tags")
     df_tiktok = pd.DataFrame(grouped_tiktok_tags).reset_index(drop=True)
     st.dataframe(df_tiktok, use_container_width=True)
 
 def display_floodlight_tags(grouped_floodlight_tags):
-    st.write("### Floodlight Tags")
+    st.header("Floodlight Tags")
     df_floodlight = pd.DataFrame(grouped_floodlight_tags).reset_index(drop=True)
     st.dataframe(df_floodlight, use_container_width=True)
 

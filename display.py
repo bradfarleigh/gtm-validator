@@ -6,7 +6,7 @@ from id_extraction import extract_ga4_id, extract_google_ads_id  # Necessary imp
 
 def display_tracking_id_summary(facebook_ids, ga4_ids, google_ads_ids, ua_ids, tiktok_ids, inconsistencies):
     
-    st.subheader("Summary of tracking ID's detected")
+    st.header("Summary of tracking ID's detected")
     st.markdown(
         """    
         We anlayse your Tags and extract the various tracking ID's being used.
@@ -130,12 +130,12 @@ def display_tag_details(tag, trigger_names):
                 st.write(f"- {trigger_name} (ID: {trigger_id})")
 
 def display_action_points(action_points):
-    
-    st.divider()
-    st.header("🔎 Our findings")
+
     with st.container(border=True):
+        st.header("🔎 Our findings")
+
         if action_points:
             for point in action_points:
-                st.write(f"{point}")
+                st.write(f"- {point}")
         else:
             st.write("No immediate action required. Your GTM setup appears to be consistent.")
