@@ -6,22 +6,16 @@ def generate_action_points(facebook_ids, ga4_ids, google_ads_ids, ua_ids, tiktok
         action_points.extend(google_ads_issues)
     
     if len(facebook_ids) > 1:
-        action_points.append("Consolidate Facebook tracking IDs to use a single ID across all tags")
+        action_points.append("**Facebook** - Multiple Facebook tracking IDs being used across tags. Refer Facebook Tags Tab.");
     if len(ga4_ids) > 1:
-        action_points.append("Consolidate GA4 measurement IDs to use a single ID across all tags")
+        action_points.append("**GA4** - Multiple GA4 tracking IDs being used across tags. Refer GA4 tags tab.");
     if len(google_ads_ids) > 1:
-        action_points.append("Consolidate Google Ads conversion IDs to use a single ID across all tags")
+        action_points.append("**Google Ads** - Multiple Google Ads tracking IDs being used across tags. Refer Google Ads Conversion Tags Tab.");
     if len(tiktok_ids) > 1:
-        action_points.append("Consolidate TikTok tracking IDs to use a single ID across all tags")
+        action_points.append("**TikTok** - Multiple TikTok tracking IDs being used across tags. Refer TikTok Tags tab");
     if ua_ids:
-        action_points.append("Review and delete UA tags as they are no longer collecting data")
+        action_points.append("**Universal Analytics** - Cleanup required of Universal (UA) tags. Refer Tag Summary tab.")
     if paused_tags:
-        action_points.append(f"Review and decide on the status of paused tags: {', '.join(paused_tags)}")
-    if not facebook_ids:
-        action_points.append("Consider adding Facebook tracking if it's relevant for your analytics needs")
-    if not ga4_ids:
-        action_points.append("Implement Google Analytics 4 (GA4) for future-proof analytics")
-    if not tiktok_ids:
-        action_points.append("Consider adding TikTok tracking if it's relevant for your marketing strategy")
+        action_points.append(f"**Paused Tags** - Review and decide on the status of paused tags: `{', '.join(paused_tags)}`")
 
     return action_points
