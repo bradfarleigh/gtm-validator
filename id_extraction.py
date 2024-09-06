@@ -1,42 +1,39 @@
 import re
 
+# Extract Facebook Pixel ID from HTML content
 def extract_facebook_id(html_content):
-    """Extracts Facebook Pixel ID from HTML content."""
-    pixel_match = re.search(r'https://www\.facebook\.com/tr\?id=(\d+)&ev=PageView&noscript=1', html_content)
-    if pixel_match:
-        return pixel_match.group(1)
-    
-    init_match = re.search(r"fbq\('init',\s*'(\d+)'\)", html_content)
-    return init_match.group(1) if init_match else None
+    # Regex to find Facebook Pixel ID in the HTML content
+    fb_id_match = re.search(r'fbq\(\'init\',\s*\'(\d{13,17})\'\)', html_content)
+    return fb_id_match.group(1) if fb_id_match else None
 
-def extract_ga4_id(tag):
-    """Extracts GA4 Measurement ID from a tag."""
-    for param in tag.get('parameter', []):
-        if param['key'] in ['measurementIdOverride', 'tagId']:
-            return param['value']
-    return None
-
-def extract_google_ads_id(tag):
-    """Extracts Google Ads conversion ID from a tag."""
-    for param in tag.get('parameter', []):
-        if param['key'] == 'conversionId':
-            return param['value']
-    return None
-
+# Extract Universal Analytics (UA) ID from HTML content
 def extract_ua_id(html_content):
-    """Extracts Universal Analytics ID from HTML content."""
-    match = re.search(r'UA-\d{4,10}-\d{1,4}', html_content)
-    return match.group(0) if match else None
+    # Regex to find UA (Universal Analytics) ID in the HTML content
+    ua_id_match = re.search(r'UA-\d{4,10}-\d{1,4}', html_content)
+    return ua_id_match.group(0) if ua_id_match else None
 
 def extract_tiktok_id(tag):
-    """Extract TikTok Pixel ID from HTML content."""
-    for param in tag.get('parameter', []):
-        if param['key'] == 'html':
-            html_content = param.get('value', '')
-            # Ensure we are only using the regex on strings
-            if isinstance(html_content, str):
-                # Use regex to extract the TikTok Pixel ID from the ttq.load() function
-                tiktok_id_match = re.search(r"ttq\.load\('([A-Z0-9]+)'\)", html_content)
+    # Check if the tag type is 'html' and it contains the 'parameter' key
+    if tag.get('type') == 'html':
+        for param in tag.get('parameter', []):
+            if param.get('key') == 'html':  # Look for HTML content
+                html_content = param.get('value', '')
+                # Use regex to extract the TikTok Pixel ID from the HTML content
+                tiktok_id_match = re.search(r'ttq\.load\([\'"]([A-Z0-9]+)[\'"]\)', html_content)
                 if tiktok_id_match:
-                    return tiktok_id_match.group(1)
-    return None
+                    return tiktok_id_match.group(1)  # Return the TikTok ID if found
+    return None  # Return None if the tag doesn't have TikTok ID or isn't the right type
+
+# Extract Google Ads ID
+def extract_google_ads_id(tag):
+    for param in tag.get('parameter', []):
+        if param['key'] == 'conversionId':
+            return param.get('value', 'No ID')
+    return 'No ID'
+
+# Extract GA4 Measurement ID
+def extract_ga4_id(tag):
+    for param in tag.get('parameter', []):
+        if param['key'] in ['measurementIdOverride', 'tagId']:
+            return param.get('value', 'No ID')
+    return 'No ID'
