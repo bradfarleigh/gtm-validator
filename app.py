@@ -53,7 +53,8 @@ def main():
                 grouped_google_ads_tags, google_ads_issues = group_google_ads_tags(tags, trigger_names)
                 grouped_ga4_tags = group_ga4_tags(tags, trigger_names)
                 grouped_tiktok_tags = group_tiktok_tags(tags, trigger_names)
-                
+                grouped_floodlight_tags = group_floodlight_tags(tags, trigger_names)
+
                 # Generate action points (including Google Ads issues)
                 action_points = generate_action_points(facebook_ids, ga4_ids, google_ads_ids, ua_tags, tiktok_ids, paused_tags, google_ads_issues)
                 
@@ -62,99 +63,49 @@ def main():
                 
                 st.header("🔧 The details")
 
-                with st.container(border=True):
+                tabs = []
+                content = []
+
+                # Add "Tracking ID Summary" tab if any inconsistencies or IDs exist
+                if any([facebook_ids, ga4_ids, google_ads_ids, ua_tags, tiktok_ids]):
+                    tabs.append("Tracking ID Summary")
+                    content.append(lambda: display_tracking_id_summary(facebook_ids, ga4_ids, google_ads_ids, ua_tags, tiktok_ids, inconsistencies))
                 
-                    # Create tabs to organize the data display
-                    tabs = st.tabs(["Tracking ID Summary", "Google Ads Conversion Tags", "GA4 Tags", "TikTok Tags", "Floodlight Tags", "Tag Summary"])
+                # Add Google Ads tab if there are any Google Ads tags
+                if grouped_google_ads_tags:
+                    tabs.append("Google Ads Conversion Tags")
+                    content.append(lambda: display_google_ads_tags(grouped_google_ads_tags))
 
-                    # Tab 1: Tracking ID Summary (including issues)
-                    with tabs[0]:
-                        display_tracking_id_summary(facebook_ids, ga4_ids, google_ads_ids, ua_tags, tiktok_ids, inconsistencies)
-                    
-                    # Tab 2: Google Ads Conversion Tags (only if found)
-                    with tabs[1]:
-                        if grouped_google_ads_tags:
-                            st.write("### Google Ads Conversion Tags")
-
-                            st.markdown(
-                                """    
-                                We analyse your Google Ads Conversion Tags and extract the tracking ID and Labels.
-
-                                Be sure to validate the ID's against your Google Ads conversion configurations, and measurement plan.
-                                """
-                            )
-                            
-                            # Create a DataFrame
-                            df_ads = pd.DataFrame(grouped_google_ads_tags).reset_index(drop=True)
-
-                            # Define a function to highlight rows with issues
-                            def highlight_issues(row):
-                                if row['Issue']:  # If there is an issue
-                                    return ['background-color: yellow'] * len(row)
-                                else:
-                                    return [''] * len(row)
-
-                            # Apply highlighting to the DataFrame
-                            styled_df = df_ads.style.apply(highlight_issues, axis=1)
-
-                            # Display the styled DataFrame
-                            st.dataframe(styled_df,use_container_width = True)
-                        else:
-                            st.markdown(
-                                """
-                                <p style='text-align: center;'>👍 No Google Ads Tags found.</p>
-                                """, unsafe_allow_html=True
-                            )
-                    
-                    # Tab 3: GA4 Tags
-                    with tabs[2]:
-                        if grouped_ga4_tags:
-                            st.write("### GA4 - Event Tags")
-                            # Create a DataFrame for GA4 tags, including eventName
-                            df_ga4 = pd.DataFrame(grouped_ga4_tags).reset_index(drop=True)
-                            st.dataframe(df_ga4,use_container_width = True)
-                        else:
-                            st.markdown(
-                                """
-                                <p style='text-align: center;'>👍 No GA4 Tags found.</p>
-                                """, unsafe_allow_html=True
-                            )
-                    
-                    # Tab 4: TikTok Tags
-                    with tabs[3]:
-                        if grouped_tiktok_tags:
-                            st.write("### TikTok - Event Tags")
-                            st.dataframe(pd.DataFrame(grouped_tiktok_tags).reset_index(drop=True))
-                        else:
-                            st.markdown(
-                                """
-                                <p style='text-align: center;'>👍 No TikTok Tags found.</p>
-                                """, unsafe_allow_html=True
-                            )
+                # Add GA4 Tags tab if there are any GA4 tags
+                if grouped_ga4_tags:
+                    tabs.append("GA4 Tags")
+                    content.append(lambda: display_ga4_tags(grouped_ga4_tags))
                 
-                    # Tab 5: Floodlight Tags (only if found)
-                    with tabs[4]:
-                        grouped_floodlight_tags = group_floodlight_tags(tags, trigger_names)
-                        if grouped_floodlight_tags:
-                            st.write("### Floodlight Tags")
-                            st.dataframe(pd.DataFrame(grouped_floodlight_tags).reset_index(drop=True))
-                        else:
-                            st.markdown(
-                                """
-                                <p style='text-align: center;'>👍 No Floodlight Tags found.</p>
-                                """, unsafe_allow_html=True
-                            )
-                    
-                    # Tab 6: Tags
-                    with tabs[5]:
-                        grouped_tags = group_tags_by_type(tags)
-                        display_grouped_tags(grouped_tags, trigger_names)
-                    
+                # Add TikTok Tags tab if there are any TikTok tags
+                if grouped_tiktok_tags:
+                    tabs.append("TikTok Tags")
+                    content.append(lambda: display_tiktok_tags(grouped_tiktok_tags))
+
+                # Add Floodlight Tags tab if there are any Floodlight tags
+                if grouped_floodlight_tags:
+                    tabs.append("Floodlight Tags")
+                    content.append(lambda: display_floodlight_tags(grouped_floodlight_tags))
+
+                # Add "Tag Summary" tab for a grouped tag summary
+                if grouped_tags := group_tags_by_type(tags):
+                    tabs.append("Tag Summary")
+                    content.append(lambda: display_grouped_tags(grouped_tags, trigger_names))
+
+                # Display the tabs dynamically
+                if tabs:
+                    selected_tab = st.tabs(tabs)
+                    for idx, tab in enumerate(tabs):
+                        with selected_tab[idx]:
+                            content[idx]()
             else:
                 st.warning("No tags found in the GTM JSON file.")
         else:
             st.warning("Failed to load GTM data from the JSON file.")
-    
     
     st.divider()
 
@@ -180,6 +131,33 @@ def main():
         Built by <a href="https://www.linkedin.com/in/brad-farleigh" target="_blank">Brad Farleigh</a>.
         """, unsafe_allow_html=True
     )
+
+def display_google_ads_tags(grouped_google_ads_tags):
+    st.write("### Google Ads Conversion Tags")
+    st.markdown(
+        """    
+        We analyse your Google Ads Conversion Tags and extract the tracking ID and Labels.
+        Be sure to validate the ID's against your Google Ads conversion configurations, and measurement plan.
+        """
+    )
+    df_ads = pd.DataFrame(grouped_google_ads_tags).reset_index(drop=True)
+    styled_df = df_ads.style.apply(lambda row: ['background-color: yellow' if row['Issue'] else '' for _ in row], axis=1)
+    st.dataframe(styled_df, use_container_width=True)
+
+def display_ga4_tags(grouped_ga4_tags):
+    st.write("### GA4 - Event Tags")
+    df_ga4 = pd.DataFrame(grouped_ga4_tags).reset_index(drop=True)
+    st.dataframe(df_ga4, use_container_width=True)
+
+def display_tiktok_tags(grouped_tiktok_tags):
+    st.write("### TikTok - Event Tags")
+    df_tiktok = pd.DataFrame(grouped_tiktok_tags).reset_index(drop=True)
+    st.dataframe(df_tiktok, use_container_width=True)
+
+def display_floodlight_tags(grouped_floodlight_tags):
+    st.write("### Floodlight Tags")
+    df_floodlight = pd.DataFrame(grouped_floodlight_tags).reset_index(drop=True)
+    st.dataframe(df_floodlight, use_container_width=True)
 
 if __name__ == "__main__":
     main()
