@@ -102,7 +102,7 @@ def display_tracking_id_summary(facebook_ids, ga4_ids, google_ads_ids, ua_ids, t
                 df = pd.DataFrame(data_without_issue, columns=["Platform", "ID", "Status"])
 
             # Display the table
-            st.dataframe(df,use_container_width = True)
+            st.dataframe(df,use_container_width = True,hide_index=True)
 
         except ValueError as e:
             st.error(f"Error creating DataFrame: {e}")
