@@ -73,7 +73,7 @@ def group_google_ads_tags(tags, trigger_names):
 
             if tag_key in tag_check:
                 issue_flag = True
-                issues.append(f"Duplicate Google Ads Conversion Tags found for ID: {ads_id}, Label: {conversion_label}")
+                issues.append(f"**Google Ads:** Duplicate Google Ads Conversion Tags found for ID - {ads_id}, Label: {conversion_label}")
                 issue_flags[tag_key] = True
 
             tag_check[tag_key] = tag_name

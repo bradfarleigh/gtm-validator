@@ -1,5 +1,3 @@
-# display.py
-
 import streamlit as st
 import pandas as pd
 from id_extraction import extract_ga4_id, extract_google_ads_id  # Necessary imports
@@ -27,7 +25,6 @@ def display_tracking_id_summary(facebook_ids, ga4_ids, google_ads_ids, ua_ids, t
         # Return True if both plain strings and variables are present
         return plain_strings and variable_strings
     
- 
     # Facebook
     if facebook_ids:
         status = "✓" if len(facebook_ids) == 1 else "✗"
@@ -164,6 +161,9 @@ def display_tag_details(tag, trigger_names):
                 st.write(f"- {trigger_name} (ID: {trigger_id})")
 
 def display_action_points(action_points):
+
+    # Remove duplicate action points
+    action_points = list(set(action_points))
 
     with st.container(border=True):
         st.header("🔎 Our findings")
