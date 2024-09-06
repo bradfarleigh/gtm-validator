@@ -1,4 +1,5 @@
 from id_extraction import extract_facebook_id, extract_ga4_id, extract_google_ads_id, extract_ua_id, extract_tiktok_id
+from collections import Counter
 
 # Function to check consistency of tracking IDs and collect relevant information
 def check_id_consistency(tags):
@@ -102,9 +103,27 @@ def get_conversion_label(tag):
             return param.get('value', 'No Label')
     return 'No Label'
 
-# Function to group GA4 tags
+from collections import Counter
+
+# Function to group GA4 tags and flag inconsistent measurement IDs
 def group_ga4_tags(tags, trigger_names):
     ga4_tags = []
+    ga4_ids = []
+
+    # First, collect all GA4 measurement IDs
+    for tag in tags:
+        if tag['type'] == 'gaawe':  # GA4 - Event
+            ga4_id = extract_ga4_id(tag)
+            if ga4_id:
+                ga4_ids.append(ga4_id)
+
+    # Count occurrences of each GA4 measurement ID
+    ga4_id_counter = Counter(ga4_ids)
+
+    # If more than one unique GA4 ID is found, all should be flagged
+    inconsistent_ids = [ga4_id for ga4_id, count in ga4_id_counter.items() if count > 1] if len(ga4_id_counter) > 1 else []
+
+    # Now process the tags and flag those that use an inconsistent GA4 measurement ID
     for tag in tags:
         if tag['type'] == 'gaawe':  # GA4 - Event
             ga4_id = extract_ga4_id(tag)
@@ -114,11 +133,17 @@ def group_ga4_tags(tags, trigger_names):
             trigger_ids = tag.get('firingTriggerId', [])
             triggers = [trigger_names.get(str(tid), f"Unknown Trigger (ID: {tid})") for tid in trigger_ids]
 
+            # Flag the tag if its GA4 measurement ID is one of the inconsistent ones
+            issue = ""
+            if ga4_id in inconsistent_ids:
+                issue = f"Inconsistent GA4 Measurement ID: {ga4_id} (Found Multiple Unique IDs)"
+
             ga4_tags.append({
                 'Tag Name': tag_name,
                 'GA4 Measurement ID': ga4_id,
                 'Event Name': event_name,
                 'Trigger Name': ', '.join(triggers) if triggers else 'No Triggers',
+                'Issue': issue  # Add the issue flag if inconsistent
             })
 
     return ga4_tags

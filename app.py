@@ -124,7 +124,7 @@ def main():
     )
 
 def display_google_ads_tags(grouped_google_ads_tags):
-    st.write("### Google Ads Conversion Tags")
+    st.header("Google Ads Conversion Tags")
     st.markdown(
         """    
         We analyse your Google Ads Conversion Tags and extract the tracking ID and Labels.
