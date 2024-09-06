@@ -132,7 +132,7 @@ def display_google_ads_tags(grouped_google_ads_tags):
         """
     )
     df_ads = pd.DataFrame(grouped_google_ads_tags).reset_index(drop=True)
-    styled_df = df_ads.style.apply(lambda row: ['background-color: yellow' if row['Issue'] else '' for _ in row], axis=1)
+    styled_df = df_ads.style.apply(lambda row: ['background-color: grey' if row['Issue'] else '' for _ in row], axis=1)
     st.dataframe(styled_df, use_container_width=True)
 
 def display_ga4_tags(grouped_ga4_tags):

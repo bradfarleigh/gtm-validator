@@ -18,47 +18,81 @@ def display_tracking_id_summary(facebook_ids, ga4_ids, google_ads_ids, ua_ids, t
     # Prepare data for the table
     data = []
     issues_exist = False  # Initialize the variable to False by default
+
+    def check_for_mixed_variables(ids):
     
+        plain_strings = any('{{' not in id for id in ids)
+        variable_strings = any('{{' in id for id in ids)
+
+        # Return True if both plain strings and variables are present
+        return plain_strings and variable_strings
+    
+ 
     # Facebook
     if facebook_ids:
         status = "✓" if len(facebook_ids) == 1 else "✗"
         issue = "Multiple Facebook IDs found" if len(facebook_ids) > 1 else ""
+        
+        # Check for mixed variable and static IDs
+        if check_for_mixed_variables(facebook_ids):
+            issue += " | Mix of static and variable IDs found, which may cause tracking inconsistencies."
+
         data.append(["Facebook", ", ".join(facebook_ids), status, issue])
         if issue:
             issues_exist = True
-    
+
     # Google Analytics 4 (GA4)
     if ga4_ids:
         status = "✓" if len(ga4_ids) == 1 else "✗"
         issue = "Multiple GA4 Measurement IDs found" if len(ga4_ids) > 1 else ""
+        
+        # Check for mixed variable and static IDs
+        if check_for_mixed_variables(ga4_ids):
+            issue += ". Mix of static and variable IDs found, which may cause tracking inconsistencies."
+
         data.append(["Google Analytics 4", ", ".join(ga4_ids), status, issue])
         if issue:
             issues_exist = True
-    
+
     # Google Ads
     if google_ads_ids:
         status = "✓" if len(google_ads_ids) == 1 else "✗"
         issue = "Multiple Google Ads IDs found" if len(google_ads_ids) > 1 else ""
+        
+        # Check for mixed variable and static IDs
+        if check_for_mixed_variables(google_ads_ids):
+            issue += " | Mix of static and variable IDs found, which may cause tracking inconsistencies."
+
         data.append(["Google Ads", ", ".join(google_ads_ids), status, issue])
         if issue:
             issues_exist = True
-    
+
     # Universal Analytics (UA)
     if ua_ids:
         status = "✓" if len(ua_ids) == 1 else "✗"
         issue = "Multiple Universal Analytics IDs found" if len(ua_ids) > 1 else ""
+        
+        # Check for mixed variable and static IDs
+        if check_for_mixed_variables(ua_ids):
+            issue += " | Mix of static and variable IDs found, which may cause tracking inconsistencies."
+
         data.append(["Universal Analytics", ", ".join(ua_ids), status, issue])
         if issue:
             issues_exist = True
-    
+
     # TikTok
     if tiktok_ids:
         status = "✓" if len(tiktok_ids) == 1 else "✗"
         issue = "Multiple TikTok IDs found" if len(tiktok_ids) > 1 else ""
+        
+        # Check for mixed variable and static IDs
+        if check_for_mixed_variables(tiktok_ids):
+            issue += " | Mix of static and variable IDs found, which may cause tracking inconsistencies."
+
         data.append(["TikTok", ", ".join(tiktok_ids), status, issue])
         if issue:
             issues_exist = True
-    
+            
     # Validate data before creating DataFrame
     if data:
         try:
