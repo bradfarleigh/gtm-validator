@@ -12,6 +12,9 @@
    $ streamlit run  app.py
    ```
 
+# Bugs
+* Fix TikTok / FB lookup - we need to match cvt_XXXX_(.*) on the event with customTemplate.TemplateId = $1 and return the customTemplate.name
+
 # Todo
 
 * Tag naming convention check vs best practice
