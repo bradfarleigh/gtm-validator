@@ -3,7 +3,7 @@ import pandas as pd
 from file_operations import load_gtm_json, extract_tags
 from id_extraction import extract_facebook_id, extract_ga4_id, extract_google_ads_id, extract_ua_id, extract_tiktok_id
 from display import display_tracking_id_summary, display_grouped_tags, display_action_points
-from utils import get_trigger_names, group_tags_by_type, check_id_consistency, generate_action_points, group_google_ads_tags, group_floodlight_tags, group_ga4_tags, group_tiktok_tags
+from utils import get_trigger_names, group_tags_by_type, check_id_consistency, generate_action_points, group_google_ads_tags, group_floodlight_tags, group_ga4_tags, group_tiktok_tags, group_fb_event_tags
 
 # Set the page configuration to full width
 st.set_page_config(page_title="GTM Tag Explorer and Validator", layout="wide")
@@ -52,11 +52,12 @@ def main():
                 # Google Ads Conversion Tags and Issues
                 grouped_google_ads_tags, google_ads_issues = group_google_ads_tags(tags, trigger_names)
                 grouped_ga4_tags = group_ga4_tags(tags, trigger_names)
+                grouped_fb_event_tags, grouped_fb_event_issues = group_fb_event_tags(tags, trigger_names)
                 grouped_tiktok_tags = group_tiktok_tags(tags, trigger_names)
                 grouped_floodlight_tags = group_floodlight_tags(tags, trigger_names)
 
                 # Generate action points (including Google Ads issues)
-                action_points = generate_action_points(facebook_ids, ga4_ids, google_ads_ids, ua_tags, tiktok_ids, paused_tags, google_ads_issues)
+                action_points = generate_action_points(facebook_ids, ga4_ids, google_ads_ids, ua_tags, tiktok_ids, paused_tags, google_ads_issues, grouped_fb_event_issues)
                 
                 st.divider()
 
@@ -67,6 +68,11 @@ def main():
                 with col1:
                     # Display action points (always displayed under the file uploader)
                     display_action_points(action_points)
+                    st.markdown(
+                    """
+                    <p style='text-align:center; color: #3f3f'>Built by <a href="https://www.linkedin.com/in/brad-farleigh" target="_blank">Brad Farleigh</a></p>.
+                    """, unsafe_allow_html=True
+                    )
 
                 # Column 2: Details (display sections sequentially without tabs)
                 with col2:
@@ -81,6 +87,10 @@ def main():
                     # Display GA4 Tags if available
                     if grouped_ga4_tags:
                         display_ga4_tags(grouped_ga4_tags)
+
+                    # Display Facebook Tags if available
+                    if grouped_fb_event_tags:
+                        display_fb_event_tags(grouped_fb_event_tags)
 
                     # Display TikTok Tags if available
                     if grouped_tiktok_tags:
@@ -116,13 +126,25 @@ def main():
         """, unsafe_allow_html=True
     )
 
-    st.divider()
-    st.markdown(
-        """
-        Built by <a href="https://www.linkedin.com/in/brad-farleigh" target="_blank">Brad Farleigh</a>.
-        """, unsafe_allow_html=True
-    )
 
+def style_dataframe(df):
+    # Define a function to highlight rows with issues
+    def highlight_issues(row):
+        return ['background-color: #ffcccb' if row.get('Issue', '') else '' for _ in row]
+    
+    # Check if "Issue" column exists and if there are any issues
+    if 'Issue' in df.columns:
+        if df['Issue'].str.strip().any():  # If there are any issues
+            styled_df = df.style.apply(highlight_issues, axis=1)
+        else:
+            # If there are no issues, drop the "Issue" column
+            styled_df = df.drop(columns=['Issue']).style
+    else:
+        # If no "Issue" column exists, return the styled DataFrame as is
+        styled_df = df.style
+    
+    return styled_df
+    
 def display_google_ads_tags(grouped_google_ads_tags):
     st.header("Google Ads Conversion Tags")
     st.markdown(
@@ -132,23 +154,34 @@ def display_google_ads_tags(grouped_google_ads_tags):
         """
     )
     df_ads = pd.DataFrame(grouped_google_ads_tags).reset_index(drop=True)
-    styled_df = df_ads.style.apply(lambda row: ['background-color: grey' if row['Issue'] else '' for _ in row], axis=1)
-    st.dataframe(styled_df, use_container_width=True)
+    styled_df = style_dataframe(df_ads)
+    st.dataframe(styled_df, use_container_width=True,hide_index=True)
+
+
+def display_fb_event_tags(grouped_fb_tags):
+    st.header("Facebook - Event Tags")
+    df_fb = pd.DataFrame(grouped_fb_tags).reset_index(drop=True)
+    styled_df = style_dataframe(df_fb)
+    st.dataframe(styled_df, use_container_width=True,hide_index=True)
+
 
 def display_ga4_tags(grouped_ga4_tags):
     st.header("GA4 - Event Tags")
     df_ga4 = pd.DataFrame(grouped_ga4_tags).reset_index(drop=True)
-    st.dataframe(df_ga4, use_container_width=True)
+    styled_df = style_dataframe(df_ga4)
+    st.dataframe(styled_df, use_container_width=True,hide_index=True)
 
 def display_tiktok_tags(grouped_tiktok_tags):
     st.header("TikTok - Event Tags")
     df_tiktok = pd.DataFrame(grouped_tiktok_tags).reset_index(drop=True)
-    st.dataframe(df_tiktok, use_container_width=True)
+    styled_df = style_dataframe(df_tiktok)
+    st.dataframe(styled_df, use_container_width=True,hide_index=True)
 
 def display_floodlight_tags(grouped_floodlight_tags):
     st.header("Floodlight Tags")
     df_floodlight = pd.DataFrame(grouped_floodlight_tags).reset_index(drop=True)
-    st.dataframe(df_floodlight, use_container_width=True)
+    styled_df = style_dataframe(df_floodlight)
+    st.dataframe(styled_df, use_container_width=True,hide_index=True)
 
 if __name__ == "__main__":
     main()

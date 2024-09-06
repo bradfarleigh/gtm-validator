@@ -1,5 +1,7 @@
 from id_extraction import extract_facebook_id, extract_ga4_id, extract_google_ads_id, extract_ua_id, extract_tiktok_id
 from collections import Counter
+import re
+import streamlit as st
 
 # Function to check consistency of tracking IDs and collect relevant information
 def check_id_consistency(tags):
@@ -154,3 +156,79 @@ def get_event_name(tag):
         if param.get('key') == 'eventName':
             return param.get('value', 'No Event Name')
     return 'No Event Name'
+
+# Function to group Facebook event tags and detect issues
+def group_fb_event_tags(tags, trigger_names):
+    facebook_event_tags = []
+    tag_check = {}
+    issues = []
+    issue_flags = {}
+
+    # Collect all Facebook event tags
+    for tag in tags:
+        # Case 1: HTML tag with fbq('track', 'EventName')
+        if tag['type'] == 'html':
+            for param in tag.get('parameter', []):
+                if param.get('key') == 'html':
+                    html_content = param.get('value', '')
+                    # Extract event name from fbq('track', 'EventName')
+                    fb_event_match = re.search(r"fbq\('track',\s*'([A-Za-z0-9_]+)'\)", html_content)
+                    if fb_event_match:
+                        event_name = fb_event_match.group(1)
+
+                        tag_name = tag.get('name', 'Unnamed Tag')
+                        trigger_ids = tag.get('firingTriggerId', [])
+                        triggers = [trigger_names.get(str(tid), f"Unknown Trigger (ID: {tid})") for tid in trigger_ids]
+
+                        tag_key = (event_name, tag_name, ', '.join(triggers))
+                        issue_flag = False
+
+                        # Check for duplicate tags with the same event name and trigger
+                        if tag_key in tag_check:
+                            issue_flag = True
+                            issues.append(f"**Facebook:** Duplicate Event Name - {event_name} for tag {tag_name}")
+                            issue_flags[tag_key] = True
+
+                        tag_check[tag_key] = tag_name
+
+                        facebook_event_tags.append({
+                            'Tag Name': tag_name,
+                            'Event Name': event_name,
+                            'Trigger Name': ', '.join(triggers) if triggers else 'No Triggers',
+                            'Issue': "⚠️ Potential duplicate event name" if issue_flag else ""
+                        })
+
+        # Case 2: CLV tag type (cvt_6900614_XXXX) with standardEventName
+        elif tag['type'].startswith('cvt_6900614_'):
+            standard_event_name = None
+
+            for param in tag.get('parameter', []):
+                if param.get('key') == 'standardEventName':
+                    standard_event_name = param.get('value', 'No Event Name')
+
+                    tag_name = tag.get('name', 'Unnamed Tag')
+                    trigger_ids = tag.get('firingTriggerId', [])
+                    triggers = [trigger_names.get(str(tid), f"Unknown Trigger (ID: {tid})") for tid in trigger_ids]
+
+                    tag_key = (standard_event_name, tag_name, ', '.join(triggers))
+                    issue_flag = False
+
+                    # Check for duplicate tags with the same standard event name and trigger
+                    if tag_key in tag_check:
+                        issue_flag = True
+                        issues.append(f"**Facebook:** Duplicate Event Name - {standard_event_name} for tag {tag_name}")
+                        issue_flags[tag_key] = True
+
+                    tag_check[tag_key] = tag_name
+
+                    facebook_event_tags.append({
+                        'Tag Name': tag_name,
+                        'Event Name': standard_event_name,
+                        'Trigger Name': ', '.join(triggers) if triggers else 'No Triggers',
+                        'Issue': "⚠️ Potential duplicate event name" if issue_flag else ""
+                    })
+
+    # Return the flat list of dictionaries (facebook_event_tags) and issues
+
+
+    return facebook_event_tags, issues
