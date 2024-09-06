@@ -98,9 +98,13 @@ def main():
                             styled_df = df_ads.style.apply(highlight_issues, axis=1)
 
                             # Display the styled DataFrame
-                            st.dataframe(styled_df)
+                            st.dataframe(styled_df,use_container_width = True)
                         else:
-                            st.write("No Google Ads Conversion Tags found.")
+                            st.markdown(
+                                """
+                                <p style='text-align: center;'>👍 No Google Ads Tags found.</p>
+                                """, unsafe_allow_html=True
+                            )
                     
                     # Tab 3: GA4 Tags
                     with tabs[2]:
@@ -108,9 +112,13 @@ def main():
                             st.write("### GA4 - Event Tags")
                             # Create a DataFrame for GA4 tags, including eventName
                             df_ga4 = pd.DataFrame(grouped_ga4_tags).reset_index(drop=True)
-                            st.dataframe(df_ga4)
+                            st.dataframe(df_ga4,use_container_width = True)
                         else:
-                            st.write("No GA4 Tags found.")
+                            st.markdown(
+                                """
+                                <p style='text-align: center;'>👍 No GA4 Tags found.</p>
+                                """, unsafe_allow_html=True
+                            )
                     
                     # Tab 4: TikTok Tags
                     with tabs[3]:
@@ -131,7 +139,11 @@ def main():
                             st.write("### Floodlight Tags")
                             st.dataframe(pd.DataFrame(grouped_floodlight_tags).reset_index(drop=True))
                         else:
-                            st.write("No Floodlight Tags found.")
+                            st.markdown(
+                                """
+                                <p style='text-align: center;'>👍 No Floodlight Tags found.</p>
+                                """, unsafe_allow_html=True
+                            )
                     
                     # Tab 6: Tags
                     with tabs[5]:
