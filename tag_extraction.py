@@ -105,7 +105,7 @@ def get_conversion_label(tag):
 
 def group_ga4_tags(tags, trigger_names):
     ga4_tags = []
-    ga4_ids = []
+    ga4_ids = set()
 
     for tag in tags:
         if tag['type'] == 'gaawe':  # GA4 - Event
@@ -116,19 +116,21 @@ def group_ga4_tags(tags, trigger_names):
             trigger_ids = tag.get('firingTriggerId', [])
             triggers = [trigger_names.get(str(tid), f"Unknown Trigger (ID: {tid})") for tid in trigger_ids]
 
-            issue = ""
-            if ga4_id in ga4_ids:
-                issue = f"Inconsistent GA4 Measurement ID: {ga4_id} (Found Multiple Unique IDs)"
-
             ga4_tags.append({
                 'Tag Name': tag_name,
                 'GA4 Measurement ID': ga4_id,
                 'Event Name': event_name,
                 'Trigger Name': ', '.join(triggers) if triggers else 'No Triggers',
-                'Issue': issue
+                'Issue': ""
             })
 
-            ga4_ids.append(ga4_id)
+            ga4_ids.add(ga4_id)
+
+    # Check for multiple GA4 IDs after processing all tags
+    if len(ga4_ids) > 1:
+        issue = f"Multiple GA4 Measurement IDs found: {', '.join(ga4_ids)}"
+        for tag in ga4_tags:
+            tag['Issue'] = issue
 
     return ga4_tags
 
