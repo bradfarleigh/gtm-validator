@@ -12,6 +12,8 @@
    $ streamlit run  app.py
    ```
 
+Run `python _export.py` to dump out a file which contains all scripts which can be loaded to a LLM for analysis
+
 # Bugs
 * Fix TikTok / FB lookup - we need to match cvt_XXXX_(.*) on the event with customTemplate.TemplateId = $1 and return the customTemplate.name 
 
