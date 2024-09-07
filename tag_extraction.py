@@ -161,30 +161,32 @@ def group_fb_event_tags(tags: List[Dict[str, Any]], trigger_names: Dict[str, str
     for tag in tags:
         tag_name = tag.get('name', 'Unnamed Tag')
         template_name = get_custom_template_name(tag, gtm_data)
+        is_html_tag = tag['type'] == 'html'
 
-        if template_name == "Facebook Pixel":
+        if template_name == "Facebook Pixel" or (is_html_tag and 'fbq' in str(tag)):
             event_name = get_event_name(tag)
-            fb_id = extract_facebook_id(tag, gtm_data)
+            fb_id = extract_facebook_id(tag, gtm_data) if not is_html_tag else 'N/A for HTML tags'
 
             trigger_names_str = get_trigger_names(tag.get('firingTriggerId', []), trigger_names)
             
-            # Use both event name and pixel ID as the key
-            tag_key = (event_name, fb_id)
+            # Use both event name and pixel ID as the key, but only for non-HTML tags
+            tag_key = (event_name, fb_id) if not is_html_tag else None
             
-            if tag_key in tag_check:
+            if tag_key and tag_key in tag_check:
                 issues.append(f"**Facebook:** Duplicate Event - '{event_name}' for Pixel ID '{fb_id}' in tags '{tag_name}' and '{tag_check[tag_key]}'")
                 facebook_event_tags.append({
                     'Tag Name': tag_name,
-                    'Facebook Pixel ID': fb_id if fb_id else '✗ Not Found',
+                    'Facebook Pixel ID': fb_id,
                     'Event Name': event_name,
                     'Trigger Name': trigger_names_str,
-                    'Issue': "⚠️ Duplicate event for this Pixel ID"
+                    'Issue': "⚠️ Duplicate event for this Pixel ID" if not is_html_tag else ""
                 })
             else:
-                tag_check[tag_key] = tag_name
+                if tag_key:
+                    tag_check[tag_key] = tag_name
                 facebook_event_tags.append({
                     'Tag Name': tag_name,
-                    'Facebook Pixel ID': fb_id if fb_id else '✗ Not Found',
+                    'Facebook Pixel ID': fb_id,
                     'Event Name': event_name,
                     'Trigger Name': trigger_names_str,
                     'Issue': ""
@@ -197,14 +199,25 @@ def get_event_name(tag: Dict[str, Any]) -> str:
     event_name = 'No Event Name'
     custom_event_name = None
     
-    for param in tag.get('parameter', []):
-        if param['key'] in ['event', 'standardEventName', 'eventName']:
-            event_name = param.get('value', 'No Event Name')
-        elif param['key'] == 'customEventName':
-            custom_event_name = param.get('value', '')
+    if tag['type'].startswith('cvt_'):
+        # For custom template (CVT) tags
+        for param in tag.get('parameter', []):
+            if param['key'] == 'standardEventName':
+                event_name = param.get('value', 'No Event Name')
+            elif param['key'] == 'customEventName':
+                custom_event_name = param.get('value', '')
+    else:
+        # For HTML tags
+        for param in tag.get('parameter', []):
+            if param['key'] == 'html':
+                html_content = param.get('value', '')
+                event_match = re.search(r"fbq\s*\(\s*['\"](?:track|trackCustom)['\"],\s*['\"]([\w\s]+)['\"]\s*[,)]", html_content)
+                if event_match:
+                    event_name = event_match.group(1)
+                break
 
-    # If the event is 'custom' and we have a custom event name, use that
-    if event_name.lower() == 'custom' and custom_event_name:
+    # If we have a custom event name, use that
+    if custom_event_name:
         return custom_event_name
     
     return event_name
