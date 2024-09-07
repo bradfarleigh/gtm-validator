@@ -37,14 +37,15 @@ def display_tracking_id_summary(facebook_ids, ga4_ids, google_ads_ids, ua_ids, t
             data.append([platform, ", ".join(ids), status, issue])
             if issue:
                 issues_exist = True
-        else:
+        elif platform != "Universal Analytics":  # Only add row for missing IDs if it's not UA
             data.append([platform, "No ID found", "✗", f"No {platform} ID detected"])
             issues_exist = True
 
     add_platform_data("Facebook", facebook_ids, len(facebook_ids) <= 1)
     add_platform_data("Google Analytics 4", ga4_ids, len(ga4_ids) <= 1)
     add_platform_data("Google Ads", google_ads_ids, len(google_ads_ids) <= 1)
-    add_platform_data("Universal Analytics", ua_ids, len(ua_ids) <= 1)
+    if ua_ids:  # Only add UA row if UA IDs are found
+        add_platform_data("Universal Analytics", ua_ids, len(ua_ids) <= 1)
     add_platform_data("TikTok", tiktok_ids, len(tiktok_ids) <= 1)
 
     if data:
