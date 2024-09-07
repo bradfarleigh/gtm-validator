@@ -110,16 +110,6 @@ def group_ga4_tags(tags, trigger_names):
     for tag in tags:
         if tag['type'] == 'gaawe':  # GA4 - Event
             ga4_id = extract_ga4_id(tag)
-            if ga4_id:
-                ga4_ids.append(ga4_id)
-
-    ga4_id_counter = Counter(ga4_ids)
-
-    inconsistent_ids = [ga4_id for ga4_id, count in ga4_id_counter.items() if count > 1] if len(ga4_id_counter) > 1 else []
-
-    for tag in tags:
-        if tag['type'] == 'gaawe':  # GA4 - Event
-            ga4_id = extract_ga4_id(tag)
             event_name = get_event_name(tag)
             tag_name = tag.get('name', 'Unnamed Tag')
 
@@ -127,7 +117,7 @@ def group_ga4_tags(tags, trigger_names):
             triggers = [trigger_names.get(str(tid), f"Unknown Trigger (ID: {tid})") for tid in trigger_ids]
 
             issue = ""
-            if ga4_id in inconsistent_ids:
+            if ga4_id in ga4_ids:
                 issue = f"Inconsistent GA4 Measurement ID: {ga4_id} (Found Multiple Unique IDs)"
 
             ga4_tags.append({
@@ -137,6 +127,8 @@ def group_ga4_tags(tags, trigger_names):
                 'Trigger Name': ', '.join(triggers) if triggers else 'No Triggers',
                 'Issue': issue
             })
+
+            ga4_ids.append(ga4_id)
 
     return ga4_tags
 
@@ -182,7 +174,7 @@ def group_fb_event_tags(tags: List[Dict[str, Any]], trigger_names: Dict[str, str
 def get_event_name(tag: Dict[str, Any]) -> str:
     """Extract event name from tag parameters."""
     for param in tag.get('parameter', []):
-        if param['key'] == 'event' or param['key'] == 'standardEventName':
+        if param['key'] == 'event' or param['key'] == 'standardEventName' or param['key'] == 'eventName':
             return param.get('value', 'No Event Name')
     return 'No Event Name'
 
