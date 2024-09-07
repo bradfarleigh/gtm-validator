@@ -66,12 +66,22 @@ def main():
 
                 st.divider()
 
+                # Add checkboxes for toggling analyses
+                st.subheader("Select analyses to display:")
+                show_tracking_summary = st.checkbox("Tracking ID Summary", value=False)
+                show_google_ads = st.checkbox("Google Ads Conversion Tags", value=False)
+                show_ga4 = st.checkbox("GA4 Event Tags", value=False)
+                show_facebook = st.checkbox("Facebook Event Tags", value=False)
+                show_tiktok = st.checkbox("TikTok Event Tags", value=False)
+                show_floodlight = st.checkbox("Floodlight Tags", value=False)
+                show_naming_conventions = st.checkbox("Tag Naming Conventions", value=False)
+                show_tag_summary = st.checkbox("Tag Summary", value=False)
+
                 # Create two columns for layout
                 col1, col2 = st.columns([1, 2])
 
-                # Column 1: Findings
+                # Column 1: Findings (always displayed)
                 with col1:
-                    # Display action points (always displayed under the file uploader)
                     display_action_points(action_points)
                     st.markdown(
                     """
@@ -79,38 +89,41 @@ def main():
                     """, unsafe_allow_html=True
                     )
 
-                # Column 2: Details (display sections sequentially without tabs)
+                # Column 2: Details (display sections based on checkbox selections)
                 with col2:
-                    # Display Tracking ID Summary if any inconsistencies or IDs exist
-                    if any([facebook_ids, ga4_ids, google_ads_ids, ua_tags, tiktok_ids]):
+                    # Display Tracking ID Summary if selected and any inconsistencies or IDs exist
+                    if show_tracking_summary and any([facebook_ids, ga4_ids, google_ads_ids, ua_tags, tiktok_ids]):
                         display_tracking_id_summary(facebook_ids, ga4_ids, google_ads_ids, ua_tags, tiktok_ids, inconsistencies)
                     
-                    # Display Google Ads Conversion Tags if available
-                    if grouped_google_ads_tags:
+                    # Display Google Ads Conversion Tags if selected and available
+                    if show_google_ads and grouped_google_ads_tags:
                         display_google_ads_tags(grouped_google_ads_tags)
 
-                    # Display GA4 Tags if available
-                    if grouped_ga4_tags:
+                    # Display GA4 Tags if selected and available
+                    if show_ga4 and grouped_ga4_tags:
                         display_ga4_tags(grouped_ga4_tags)
 
-                    # Display Facebook Tags if available
-                    if grouped_fb_event_tags:
+                    # Display Facebook Tags if selected and available
+                    if show_facebook and grouped_fb_event_tags:
                         display_fb_event_tags(grouped_fb_event_tags)
 
-                    # Display TikTok Tags if available
-                    if grouped_tiktok_tags:
+                    # Display TikTok Tags if selected and available
+                    if show_tiktok and grouped_tiktok_tags:
                         display_tiktok_tags(grouped_tiktok_tags)
 
-                    # Display Floodlight Tags if available
-                    if grouped_floodlight_tags:
+                    # Display Floodlight Tags if selected and available
+                    if show_floodlight and grouped_floodlight_tags:
                         display_floodlight_tags(grouped_floodlight_tags)
 
-                    # Display Tag Naming Conventions
-                    display_tag_naming_conventions(tag_naming_info)
+                    # Display Tag Naming Conventions if selected
+                    if show_naming_conventions:
+                        display_tag_naming_conventions(tag_naming_info)
 
-                    # Display Tag Summary if available
-                    if grouped_tags := group_tags_by_type(tags):
-                        display_grouped_tags(grouped_tags, trigger_names)
+                    # Display Tag Summary if selected and available
+                    if show_tag_summary:
+                        grouped_tags = group_tags_by_type(tags)
+                        if grouped_tags:
+                            display_grouped_tags(grouped_tags, trigger_names)
             else:
                 st.warning("No tags found in the GTM JSON file.")
         else:
