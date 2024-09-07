@@ -3,7 +3,7 @@ from collections import Counter
 import re
 from id_extraction import extract_facebook_id, extract_ga4_id, extract_google_ads_id, extract_ua_id, extract_tiktok_id, resolve_variable
 
-def check_id_consistency(tags, variables):
+def check_id_consistency(tags, variables, gtm_data):
     facebook_ids = set()
     ga4_ids = set()
     google_ads_ids = set()
@@ -12,6 +12,25 @@ def check_id_consistency(tags, variables):
     paused_tags = []
     inconsistencies = []
     
+    # First, try to find the Facebook Pixel ID from the PageView event
+    for tag in tags:
+        if tag['type'].startswith('cvt_'):
+            for param in tag.get('parameter', []):
+                if param.get('key') == 'standardEventName' and param.get('value') == 'PageView':
+                    fb_id = extract_facebook_id(tag, gtm_data)
+                    if fb_id:
+                        facebook_ids.add(fb_id)
+                        break
+            if facebook_ids:
+                break  # Stop if we've found the PageView event
+
+    # If we didn't find a Facebook ID from PageView, check all tags
+    if not facebook_ids:
+        for tag in tags:
+            fb_id = extract_facebook_id(tag, gtm_data)
+            if fb_id:
+                facebook_ids.add(fb_id)
+
     for tag in tags:
         if not isinstance(tag, dict):
             continue
@@ -23,9 +42,6 @@ def check_id_consistency(tags, variables):
             for param in tag.get('parameter', []):
                 if param.get('key') == 'html':
                     html_content = param.get('value', '')
-                    fb_id = extract_facebook_id(html_content)
-                    if fb_id:
-                        facebook_ids.add(fb_id)
                     ua_id = extract_ua_id(html_content)
                     if ua_id:
                         ua_ids.add(ua_id)
@@ -42,8 +58,11 @@ def check_id_consistency(tags, variables):
             if ads_id != 'No Conversion ID':
                 google_ads_ids.add(ads_id)
 
-        # Add TikTok detection here when needed
+        tiktok_id = extract_tiktok_id(tag)
+        if tiktok_id and tiktok_id != 'No Pixel ID':
+            tiktok_ids.add(tiktok_id)
 
+    # Check for inconsistencies
     if len(facebook_ids) > 1:
         inconsistencies.append(f"Multiple Facebook IDs found: {', '.join(facebook_ids)}")
     if len(ga4_ids) > 1:
@@ -145,7 +164,7 @@ def group_fb_event_tags(tags: List[Dict[str, Any]], trigger_names: Dict[str, str
 
         if template_name == "Facebook Pixel":
             event_name = get_event_name(tag)
-            fb_id = extract_facebook_id(tag)
+            fb_id = extract_facebook_id(tag,gtm_data)
 
             trigger_names_str = get_trigger_names(tag.get('firingTriggerId', []), trigger_names)
             

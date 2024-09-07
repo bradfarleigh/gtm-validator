@@ -2,14 +2,27 @@
 
 import re
 
-def extract_facebook_id(tag_or_content):
-    if isinstance(tag_or_content, dict):
-        for param in tag_or_content.get('parameter', []):
-            if param.get('key') == 'pixelId':
-                return param.get('value')
-    elif isinstance(tag_or_content, str):
-        fb_id_match = re.search(r'fbq\(\'init\',\s*\'(\d{13,17})\'\)', tag_or_content)
-        return fb_id_match.group(1) if fb_id_match else None
+def extract_facebook_id(tag, gtm_data):
+    # Check if it's a custom template tag
+    if tag['type'].startswith('cvt_'):
+        template_id = tag['type'].split('_')[-1]
+        # Find the corresponding custom template
+        for template in gtm_data.get('containerVersion', {}).get('customTemplate', []):
+            if template.get('templateId') == template_id and 'Facebook Pixel' in template.get('name', ''):
+                # It's a Facebook Pixel custom template
+                for param in tag.get('parameter', []):
+                    if param.get('key') == 'pixelId':
+                        return param.get('value')
+    
+    # Fallback to checking HTML content if it's an HTML tag
+    elif tag['type'] == 'html':
+        for param in tag.get('parameter', []):
+            if param.get('key') == 'html':
+                html_content = param.get('value', '')
+                fb_id_match = re.search(r'fbq\s*\(\s*[\'"]init[\'"]\s*,\s*[\'"](\d{13,17})[\'"]', html_content)
+                if fb_id_match:
+                    return fb_id_match.group(1)
+    
     return None
 
 def extract_ga4_id(tag):

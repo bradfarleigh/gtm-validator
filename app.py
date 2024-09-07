@@ -44,7 +44,7 @@ def main():
             
             if tags:
                 # Check for inconsistencies and collect tracking IDs
-                facebook_ids, ga4_ids, google_ads_ids, ua_tags, tiktok_ids, paused_tags, inconsistencies = check_id_consistency(tags, variables)
+                facebook_ids, ga4_ids, google_ads_ids, ua_tags, tiktok_ids, paused_tags, inconsistencies = facebook_ids, ga4_ids, google_ads_ids, ua_tags, tiktok_ids, paused_tags, inconsistencies = check_id_consistency(tags, variables, gtm_data)
                 
                 # Google Ads Conversion Tags and Issues
                 grouped_google_ads_tags, google_ads_issues = group_google_ads_tags(tags, trigger_names)
