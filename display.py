@@ -3,6 +3,7 @@
 
 import streamlit as st
 import pandas as pd
+from typing import List, Dict
 from id_extraction import extract_facebook_id, extract_ga4_id, extract_google_ads_id, extract_ua_id, extract_tiktok_id
 
 
@@ -175,3 +176,35 @@ def display_floodlight_tags(grouped_floodlight_tags):
     df_floodlight = pd.DataFrame(grouped_floodlight_tags).reset_index(drop=True)
     styled_df = style_dataframe(df_floodlight)
     st.dataframe(styled_df, use_container_width=True,hide_index=True)
+
+def display_tag_naming_conventions(tag_naming_info: List[Dict[str, str]]):
+    st.header("Tag Naming Conventions")
+    st.markdown(
+        """
+        This section provides an overview of your tag names, types, and associated triggers. 
+        It also assesses the naming conventions based on the provided guidelines.
+        """
+    )
+    
+    df = pd.DataFrame(tag_naming_info)
+    
+    # Display the dataframe
+    st.dataframe(df, use_container_width=True, hide_index=True)
+
+    # Display detailed explanations for tags with issues
+    st.subheader("Detailed Naming Convention Issues")
+    for tag in tag_naming_info:
+        if tag['Naming Convention'] != "✅ Acceptable":
+            st.markdown(f"**{tag['Tag Name']}**: {tag['Naming Convention']}")
+            st.markdown(f"- {tag['Details']}")
+
+def assess_naming_convention(tag_name: str) -> str:
+    # This is a basic assessment. You can expand this function to include more specific rules.
+    if not tag_name or tag_name == 'Unnamed Tag':
+        return "❌ Missing name"
+    elif len(tag_name) < 5:
+        return "⚠️ Name might be too short"
+    elif len(tag_name) > 50:
+        return "⚠️ Name might be too long"
+    else:
+        return "✅ Acceptable"

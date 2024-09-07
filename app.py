@@ -1,5 +1,3 @@
-# This is app.py
-
 import streamlit as st
 import pandas as pd
 from file_operations import load_gtm_json, extract_tags
@@ -12,10 +10,17 @@ from display import (
     display_ga4_tags,
     display_fb_event_tags,
     display_tiktok_tags,
-    display_floodlight_tags
+    display_floodlight_tags,
+    display_tag_naming_conventions
 )
 from utils import get_trigger_names, group_tags_by_type
-from tag_extraction import check_id_consistency, group_google_ads_tags, group_ga4_tags, group_fb_event_tags
+from tag_extraction import (
+    check_id_consistency,
+    group_google_ads_tags,
+    group_ga4_tags,
+    group_fb_event_tags
+)
+from naming_conventions import gather_tag_naming_info
 from tiktok_helpers import group_tiktok_tags
 from floodlight_helpers import group_floodlight_tags
 from action_points import generate_action_points
@@ -44,7 +49,7 @@ def main():
             
             if tags:
                 # Check for inconsistencies and collect tracking IDs
-                facebook_ids, ga4_ids, google_ads_ids, ua_tags, tiktok_ids, paused_tags, inconsistencies = facebook_ids, ga4_ids, google_ads_ids, ua_tags, tiktok_ids, paused_tags, inconsistencies = check_id_consistency(tags, variables, gtm_data)
+                facebook_ids, ga4_ids, google_ads_ids, ua_tags, tiktok_ids, paused_tags, inconsistencies = check_id_consistency(tags, variables, gtm_data)
                 
                 # Google Ads Conversion Tags and Issues
                 grouped_google_ads_tags, google_ads_issues = group_google_ads_tags(tags, trigger_names)
@@ -56,6 +61,9 @@ def main():
                 # Generate action points (including Google Ads issues)
                 action_points = generate_action_points(facebook_ids, ga4_ids, google_ads_ids, ua_tags, tiktok_ids, paused_tags, google_ads_issues, grouped_fb_event_issues)
                 
+                # New section for tag naming conventions
+                tag_naming_info = gather_tag_naming_info(tags, trigger_names)
+
                 st.divider()
 
                 # Create two columns for layout
@@ -96,6 +104,9 @@ def main():
                     # Display Floodlight Tags if available
                     if grouped_floodlight_tags:
                         display_floodlight_tags(grouped_floodlight_tags)
+
+                    # Display Tag Naming Conventions
+                    display_tag_naming_conventions(tag_naming_info)
 
                     # Display Tag Summary if available
                     if grouped_tags := group_tags_by_type(tags):

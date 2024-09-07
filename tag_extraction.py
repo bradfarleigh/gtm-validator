@@ -163,7 +163,7 @@ def group_fb_event_tags(tags: List[Dict[str, Any]], trigger_names: Dict[str, str
         template_name = get_custom_template_name(tag, gtm_data)
 
         if template_name == "Facebook Pixel":
-            event_name = get_event_name(tag)  # This now handles custom events correctly
+            event_name = get_event_name(tag)
             fb_id = extract_facebook_id(tag, gtm_data)
 
             trigger_names_str = get_trigger_names(tag.get('firingTriggerId', []), trigger_names)
@@ -191,6 +191,7 @@ def group_fb_event_tags(tags: List[Dict[str, Any]], trigger_names: Dict[str, str
                 })
 
     return facebook_event_tags, issues
+
 def get_event_name(tag: Dict[str, Any]) -> str:
     """Extract event name from tag parameters."""
     event_name = 'No Event Name'
@@ -207,6 +208,7 @@ def get_event_name(tag: Dict[str, Any]) -> str:
         return custom_event_name
     
     return event_name
+
 def get_trigger_names(trigger_ids: List[str], trigger_names: Dict[str, str]) -> str:
     """Get trigger names for a tag."""
     triggers = [trigger_names.get(str(tid), f"Unknown Trigger (ID: {tid})") for tid in trigger_ids]
@@ -229,3 +231,34 @@ def get_custom_template_name(tag: Dict[str, Any], gtm_data: Dict[str, Any]) -> s
             if template.get('templateId') == template_id:
                 return template.get('name')
     return None
+
+def gather_tag_naming_info(tags: List[Dict[str, Any]], trigger_names: Dict[str, str]) -> List[Dict[str, str]]:
+    tag_naming_info = []
+    
+    for tag in tags:
+        tag_name = tag.get('name', 'Unnamed Tag')
+        tag_type = tag.get('type', 'Unknown Type')
+        
+        # Get trigger names
+        trigger_ids = tag.get('firingTriggerId', [])
+        triggers = [trigger_names.get(str(tid), f"Unknown Trigger (ID: {tid})") for tid in trigger_ids]
+        trigger_names_str = ', '.join(triggers) if triggers else 'No Triggers'
+        
+        tag_naming_info.append({
+            'Tag Name': tag_name,
+            'Tag Type': tag_type,
+            'Trigger Name': trigger_names_str
+        })
+    
+    return tag_naming_info
+
+# Make sure to export all the functions you want to use in other files
+__all__ = [
+    'check_id_consistency',
+    'group_google_ads_tags',
+    'group_ga4_tags',
+    'group_fb_event_tags',
+    'get_event_name',
+    'get_trigger_names',
+    'get_custom_template_name'
+]
