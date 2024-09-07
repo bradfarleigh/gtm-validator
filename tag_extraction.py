@@ -163,8 +163,8 @@ def group_fb_event_tags(tags: List[Dict[str, Any]], trigger_names: Dict[str, str
         template_name = get_custom_template_name(tag, gtm_data)
 
         if template_name == "Facebook Pixel":
-            event_name = get_event_name(tag)
-            fb_id = extract_facebook_id(tag,gtm_data)
+            event_name = get_event_name(tag)  # This now handles custom events correctly
+            fb_id = extract_facebook_id(tag, gtm_data)
 
             trigger_names_str = get_trigger_names(tag.get('firingTriggerId', []), trigger_names)
             
@@ -191,14 +191,22 @@ def group_fb_event_tags(tags: List[Dict[str, Any]], trigger_names: Dict[str, str
                 })
 
     return facebook_event_tags, issues
-
 def get_event_name(tag: Dict[str, Any]) -> str:
     """Extract event name from tag parameters."""
+    event_name = 'No Event Name'
+    custom_event_name = None
+    
     for param in tag.get('parameter', []):
-        if param['key'] == 'event' or param['key'] == 'standardEventName' or param['key'] == 'eventName':
-            return param.get('value', 'No Event Name')
-    return 'No Event Name'
+        if param['key'] in ['event', 'standardEventName', 'eventName']:
+            event_name = param.get('value', 'No Event Name')
+        elif param['key'] == 'customEventName':
+            custom_event_name = param.get('value', '')
 
+    # If the event is 'custom' and we have a custom event name, use that
+    if event_name.lower() == 'custom' and custom_event_name:
+        return custom_event_name
+    
+    return event_name
 def get_trigger_names(trigger_ids: List[str], trigger_names: Dict[str, str]) -> str:
     """Get trigger names for a tag."""
     triggers = [trigger_names.get(str(tid), f"Unknown Trigger (ID: {tid})") for tid in trigger_ids]
