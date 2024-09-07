@@ -6,7 +6,7 @@ from id_extraction import extract_ga4_id, extract_google_ads_id  # Necessary imp
 
 def display_tracking_id_summary(facebook_ids, ga4_ids, google_ads_ids, ua_ids, tiktok_ids, inconsistencies):
     
-    st.header("Summary of tracking ID's detected")
+    st.header("Your tracking ID's")
     st.markdown(
         """    
         We anlayse your Tags and extract the various tracking ID's being used.

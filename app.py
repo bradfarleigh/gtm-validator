@@ -75,7 +75,7 @@ def main():
                     display_action_points(action_points)
                     st.markdown(
                     """
-                    <p style='text-align:center; color: #3f3f'>Built by <a href="https://www.linkedin.com/in/brad-farleigh" target="_blank">Brad Farleigh</a></p>.
+                    <p style='text-align:center; color: #000; text-spacing:2px; text-transform:uppercase; font-family:monospace;'>✨Made with <a href="https://www.linkedin.com/in/brad-farleigh" target="_blank">Bradgic</a>✨</p>.
                     """, unsafe_allow_html=True
                     )
 
