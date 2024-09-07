@@ -143,17 +143,6 @@ def group_ga4_tags(tags, trigger_names):
     return ga4_tags
 
 def group_fb_event_tags(tags: List[Dict[str, Any]], trigger_names: Dict[str, str], gtm_data: Dict[str, Any]) -> Tuple[List[Dict[str, str]], List[str]]:
-    """
-    Group Facebook event tags and detect issues.
-
-    Args:
-    tags (List[Dict[str, Any]]): List of all tags from GTM configuration.
-    trigger_names (Dict[str, str]): Dictionary mapping trigger IDs to their names.
-    gtm_data (Dict[str, Any]): The full GTM configuration data.
-
-    Returns:
-    Tuple[List[Dict[str, str]], List[str]]: List of Facebook event tags and list of issues.
-    """
     facebook_event_tags = []
     tag_check = {}
     issues = []
@@ -168,20 +157,27 @@ def group_fb_event_tags(tags: List[Dict[str, Any]], trigger_names: Dict[str, str
 
             trigger_names_str = get_trigger_names(tag.get('firingTriggerId', []), trigger_names)
             
-            tag_key = (event_name, tag_name, trigger_names_str)
+            # Use both event name and pixel ID as the key
+            tag_key = (event_name, fb_id)
             
             if tag_key in tag_check:
-                issues.append(f"**Facebook:** Duplicate Event Name - {event_name} for tag {tag_name}")
-
-            tag_check[tag_key] = tag_name
-
-            facebook_event_tags.append({
-                'Tag Name': tag_name,
-                'Facebook Pixel ID': fb_id or '✗ Not Found',
-                'Event Name': event_name,
-                'Trigger Name': trigger_names_str,
-                'Issue': "⚠️ Potential duplicate event name" if tag_key in tag_check else ""
-            })
+                issues.append(f"**Facebook:** Duplicate Event - '{event_name}' for Pixel ID '{fb_id}' in tags '{tag_name}' and '{tag_check[tag_key]}'")
+                facebook_event_tags.append({
+                    'Tag Name': tag_name,
+                    'Facebook Pixel ID': fb_id if fb_id else '✗ Not Found',
+                    'Event Name': event_name,
+                    'Trigger Name': trigger_names_str,
+                    'Issue': "⚠️ Duplicate event for this Pixel ID"
+                })
+            else:
+                tag_check[tag_key] = tag_name
+                facebook_event_tags.append({
+                    'Tag Name': tag_name,
+                    'Facebook Pixel ID': fb_id if fb_id else '✗ Not Found',
+                    'Event Name': event_name,
+                    'Trigger Name': trigger_names_str,
+                    'Issue': ""
+                })
 
     return facebook_event_tags, issues
 

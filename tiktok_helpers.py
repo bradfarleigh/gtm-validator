@@ -1,7 +1,6 @@
 # This is tiktok_helpers.py
 
 from typing import List, Dict, Any
-from id_extraction import extract_tiktok_id
 
 def group_tiktok_tags(tags: List[Dict[str, Any]], trigger_names: Dict[str, str], gtm_data: Dict[str, Any]) -> List[Dict[str, str]]:
     """
@@ -22,7 +21,7 @@ def group_tiktok_tags(tags: List[Dict[str, Any]], trigger_names: Dict[str, str],
         template_name = get_custom_template_name(tag, gtm_data)
 
         if template_name == "TikTok Pixel":
-            tiktok_id = extract_tiktok_id(tag)
+            tiktok_id = extract_tiktok_pixel_id(tag)
             event_name = get_event_name(tag)
             
             tiktok_tags.append({
@@ -33,6 +32,13 @@ def group_tiktok_tags(tags: List[Dict[str, Any]], trigger_names: Dict[str, str],
             })
 
     return tiktok_tags
+
+def extract_tiktok_pixel_id(tag: Dict[str, Any]) -> str:
+    """Extract TikTok pixel ID from tag parameters."""
+    for param in tag.get('parameter', []):
+        if param['key'] == 'pixel_code':
+            return param.get('value', 'No Pixel ID')
+    return 'No Pixel ID'
 
 def get_event_name(tag: Dict[str, Any]) -> str:
     """Extract event name from tag parameters."""
