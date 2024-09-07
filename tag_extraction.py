@@ -1,12 +1,9 @@
-# This is tag_extraction.py
-
 from typing import List, Dict, Any, Tuple, Set
 from collections import Counter
 import re
-import streamlit as st
-from id_extraction import extract_facebook_id, extract_ga4_id, extract_google_ads_id, extract_ua_id, extract_tiktok_id
+from id_extraction import extract_facebook_id, extract_ga4_id, extract_google_ads_id, extract_ua_id, extract_tiktok_id, resolve_variable
 
-def check_id_consistency(tags):
+def check_id_consistency(tags, variables):
     facebook_ids = set()
     ga4_ids = set()
     google_ads_ids = set()
@@ -16,7 +13,7 @@ def check_id_consistency(tags):
     inconsistencies = []
     
     for tag in tags:
-        if not isinstance(tag, dict):  # Ensure tag is a dictionary
+        if not isinstance(tag, dict):
             continue
 
         if tag.get('paused', False):
@@ -32,19 +29,20 @@ def check_id_consistency(tags):
                     ua_id = extract_ua_id(html_content)
                     if ua_id:
                         ua_ids.add(ua_id)
-                    tiktok_id = extract_tiktok_id(tag)
-                    if tiktok_id:
-                        tiktok_ids.add(tiktok_id)
         
         elif tag.get('type') in ['gaawe', 'googtag']:
             ga4_id = extract_ga4_id(tag)
-            if ga4_id:
+            if ga4_id.startswith('{{'):
+                ga4_id = resolve_variable(ga4_id.strip('{}'), variables) or ga4_id
+            if ga4_id != 'No Measurement ID':
                 ga4_ids.add(ga4_id)
         
         elif tag.get('type') in ['awct', 'sp']:
             ads_id = extract_google_ads_id(tag)
-            if ads_id:
+            if ads_id != 'No Conversion ID':
                 google_ads_ids.add(ads_id)
+
+        # Add TikTok detection here when needed
 
     if len(facebook_ids) > 1:
         inconsistencies.append(f"Multiple Facebook IDs found: {', '.join(facebook_ids)}")

@@ -3,31 +3,18 @@
 import re
 
 def extract_facebook_id(tag_or_content):
-    """
-    Extract Facebook Pixel ID from either HTML content or a tag dictionary.
-    
-    Args:
-    tag_or_content (Union[str, Dict]): Either HTML content as a string or a tag dictionary.
-    
-    Returns:
-    str: Extracted Facebook Pixel ID or None if not found.
-    """
     if isinstance(tag_or_content, dict):
-        # Handle tag dictionary
         for param in tag_or_content.get('parameter', []):
             if param.get('key') == 'pixelId':
                 return param.get('value')
-        return None
     elif isinstance(tag_or_content, str):
-        # Handle HTML content
         fb_id_match = re.search(r'fbq\(\'init\',\s*\'(\d{13,17})\'\)', tag_or_content)
         return fb_id_match.group(1) if fb_id_match else None
-    else:
-        return None
-    
+    return None
+
 def extract_ga4_id(tag):
     for param in tag.get('parameter', []):
-        if param['key'] == 'measurementId':
+        if param['key'] in ['measurementId', 'measurementIdOverride', 'tagId']:
             return param.get('value', 'No Measurement ID')
     return 'No Measurement ID'
 
@@ -46,3 +33,10 @@ def extract_tiktok_id(tag):
         if param['key'] == 'pixel_code':
             return param.get('value', 'No Pixel ID')
     return 'No Pixel ID'
+
+def resolve_variable(variable_name, variables):
+    for var in variables:
+        if var.get('name') == variable_name:
+            if var.get('type') == 'smm':
+                return var.get('defaultValue')
+    return None
