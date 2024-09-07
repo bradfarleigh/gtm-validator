@@ -1,3 +1,5 @@
+# Here variable_helpers.py
+
 # Function to extract variables from GTM data
 def extract_variables(gtm_data):
     variables = {}

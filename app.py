@@ -1,9 +1,14 @@
+# This is app.py
+
 import streamlit as st
 import pandas as pd
 from file_operations import load_gtm_json, extract_tags
 from id_extraction import extract_facebook_id, extract_ga4_id, extract_google_ads_id, extract_ua_id, extract_tiktok_id
 from display import display_tracking_id_summary, display_grouped_tags, display_action_points
-from utils import get_trigger_names, group_tags_by_type, check_id_consistency, generate_action_points, group_google_ads_tags, group_floodlight_tags, group_ga4_tags, group_tiktok_tags, group_fb_event_tags
+from utils import get_trigger_names, group_tags_by_type, check_id_consistency, generate_action_points
+from tag_extraction import group_google_ads_tags, group_ga4_tags, group_fb_event_tags
+from tiktok_helpers import group_tiktok_tags
+from floodlight_helpers import group_floodlight_tags
 
 # Set the page configuration to full width
 st.set_page_config(page_title="GTM Tag Explorer and Validator", layout="wide")
@@ -52,8 +57,8 @@ def main():
                 # Google Ads Conversion Tags and Issues
                 grouped_google_ads_tags, google_ads_issues = group_google_ads_tags(tags, trigger_names)
                 grouped_ga4_tags = group_ga4_tags(tags, trigger_names)
-                grouped_fb_event_tags, grouped_fb_event_issues = group_fb_event_tags(tags, trigger_names)
-                grouped_tiktok_tags = group_tiktok_tags(tags, trigger_names)
+                grouped_fb_event_tags, grouped_fb_event_issues = group_fb_event_tags(tags, trigger_names, gtm_data)
+                grouped_tiktok_tags = group_tiktok_tags(tags, trigger_names, gtm_data)
                 grouped_floodlight_tags = group_floodlight_tags(tags, trigger_names)
 
                 # Generate action points (including Google Ads issues)
