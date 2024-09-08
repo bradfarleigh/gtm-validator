@@ -1,0 +1,2179 @@
+{
+    "exportFormatVersion": 2,
+    "exportTime": "2024-09-05 12:43:35",
+    "containerVersion": {
+        "path": "accounts/95515427/containers/1327760/versions/0",
+        "accountId": "95515427",
+        "containerId": "1327760",
+        "containerVersionId": "0",
+        "container": {
+            "path": "accounts/95515427/containers/1327760",
+            "accountId": "95515427",
+            "containerId": "1327760",
+            "name": "Auspan",
+            "publicId": "GTM-K8KTJJ",
+            "usageContext": [
+                "WEB"
+            ],
+            "fingerprint": "1579682550405",
+            "tagManagerUrl": "https://tagmanager.google.com/#/container/accounts/95515427/containers/1327760/workspaces?apiLink=container",
+            "features": {
+                "supportUserPermissions": true,
+                "supportEnvironments": true,
+                "supportWorkspaces": true,
+                "supportGtagConfigs": false,
+                "supportBuiltInVariables": true,
+                "supportClients": false,
+                "supportFolders": true,
+                "supportTags": true,
+                "supportTemplates": true,
+                "supportTriggers": true,
+                "supportVariables": true,
+                "supportVersions": true,
+                "supportZones": true,
+                "supportTransformations": false
+            },
+            "tagIds": [
+                "GTM-K8KTJJ"
+            ]
+        },
+        "tag": [
+            {
+                "accountId": "95515427",
+                "containerId": "1327760",
+                "tagId": "2",
+                "name": "Email Link Click",
+                "type": "ua",
+                "parameter": [
+                    {
+                        "type": "TEMPLATE",
+                        "key": "trackingId",
+                        "value": "UA-41538527-1"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "trackType",
+                        "value": "TRACK_EVENT"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "nonInteraction",
+                        "value": "false"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "useDebugVersion",
+                        "value": "false"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "enableLinkId",
+                        "value": "false"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "doubleClick",
+                        "value": "false"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "advertisingFeaturesType",
+                        "value": "NONE"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "eventCategory",
+                        "value": "Email Link"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "eventAction",
+                        "value": "Click"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "enableEcommerce",
+                        "value": "false"
+                    }
+                ],
+                "fingerprint": "1689055297029",
+                "firingTriggerId": [
+                    "2"
+                ],
+                "parentFolderId": "61",
+                "tagFiringOption": "ONCE_PER_EVENT",
+                "consentSettings": {
+                    "consentStatus": "NOT_SET"
+                }
+            },
+            {
+                "accountId": "95515427",
+                "containerId": "1327760",
+                "tagId": "3",
+                "name": "Phone Click",
+                "type": "ua",
+                "parameter": [
+                    {
+                        "type": "TEMPLATE",
+                        "key": "trackingId",
+                        "value": "UA-41538527-1"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "trackType",
+                        "value": "TRACK_EVENT"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "nonInteraction",
+                        "value": "false"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "useDebugVersion",
+                        "value": "false"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "enableLinkId",
+                        "value": "false"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "doubleClick",
+                        "value": "false"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "advertisingFeaturesType",
+                        "value": "NONE"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "eventCategory",
+                        "value": "Phone Number"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "eventAction",
+                        "value": "Click"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "enableEcommerce",
+                        "value": "false"
+                    }
+                ],
+                "fingerprint": "1689055297030",
+                "firingTriggerId": [
+                    "3"
+                ],
+                "parentFolderId": "61",
+                "tagFiringOption": "ONCE_PER_EVENT",
+                "consentSettings": {
+                    "consentStatus": "NOT_SET"
+                }
+            },
+            {
+                "accountId": "95515427",
+                "containerId": "1327760",
+                "tagId": "4",
+                "name": "Contact Form",
+                "type": "ua",
+                "parameter": [
+                    {
+                        "type": "TEMPLATE",
+                        "key": "trackingId",
+                        "value": "UA-41538527-1"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "trackType",
+                        "value": "TRACK_EVENT"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "nonInteraction",
+                        "value": "false"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "useDebugVersion",
+                        "value": "false"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "enableLinkId",
+                        "value": "false"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "doubleClick",
+                        "value": "false"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "advertisingFeaturesType",
+                        "value": "NONE"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "eventCategory",
+                        "value": "Contact Form"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "eventAction",
+                        "value": "Submit"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "enableEcommerce",
+                        "value": "false"
+                    }
+                ],
+                "fingerprint": "1689055296991",
+                "firingTriggerId": [
+                    "4"
+                ],
+                "parentFolderId": "61",
+                "tagFiringOption": "ONCE_PER_EVENT",
+                "consentSettings": {
+                    "consentStatus": "NOT_SET"
+                }
+            },
+            {
+                "accountId": "95515427",
+                "containerId": "1327760",
+                "tagId": "6",
+                "name": "Click to Email",
+                "type": "ua",
+                "parameter": [
+                    {
+                        "type": "BOOLEAN",
+                        "key": "nonInteraction",
+                        "value": "false"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "overrideGaSettings",
+                        "value": "false"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "eventCategory",
+                        "value": "Email Link"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "trackType",
+                        "value": "TRACK_EVENT"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "gaSettings",
+                        "value": "{{GA}}"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "eventAction",
+                        "value": "Click"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "eventLabel",
+                        "value": "{{Click Text}} | {{Click URL}}"
+                    }
+                ],
+                "fingerprint": "1689055296991",
+                "firingTriggerId": [
+                    "10"
+                ],
+                "parentFolderId": "61",
+                "tagFiringOption": "ONCE_PER_EVENT",
+                "monitoringMetadata": {
+                    "type": "MAP"
+                },
+                "consentSettings": {
+                    "consentStatus": "NOT_SET"
+                }
+            },
+            {
+                "accountId": "95515427",
+                "containerId": "1327760",
+                "tagId": "7",
+                "name": "Crazy Egg",
+                "type": "cegg",
+                "parameter": [
+                    {
+                        "type": "TEMPLATE",
+                        "key": "usersNumericId",
+                        "value": "00582988"
+                    }
+                ],
+                "fingerprint": "1575351856786",
+                "firingTriggerId": [
+                    "2147479553"
+                ],
+                "tagFiringOption": "ONCE_PER_EVENT",
+                "consentSettings": {
+                    "consentStatus": "NOT_SET"
+                }
+            },
+            {
+                "accountId": "95515427",
+                "containerId": "1327760",
+                "tagId": "8",
+                "name": "HS Form - Contact",
+                "type": "ua",
+                "parameter": [
+                    {
+                        "type": "BOOLEAN",
+                        "key": "nonInteraction",
+                        "value": "false"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "overrideGaSettings",
+                        "value": "false"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "eventCategory",
+                        "value": "Contact Us Form"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "trackType",
+                        "value": "TRACK_EVENT"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "gaSettings",
+                        "value": "{{UA-41538527-1}}"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "eventAction",
+                        "value": "Submit"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "eventLabel",
+                        "value": "{{hs-form-guid}}"
+                    }
+                ],
+                "fingerprint": "1689055258954",
+                "firingTriggerId": [
+                    "11"
+                ],
+                "parentFolderId": "61",
+                "tagFiringOption": "ONCE_PER_EVENT",
+                "monitoringMetadata": {
+                    "type": "MAP"
+                },
+                "consentSettings": {
+                    "consentStatus": "NOT_SET"
+                }
+            },
+            {
+                "accountId": "95515427",
+                "containerId": "1327760",
+                "tagId": "9",
+                "name": "HS Form - Newsletter",
+                "type": "ua",
+                "parameter": [
+                    {
+                        "type": "BOOLEAN",
+                        "key": "nonInteraction",
+                        "value": "false"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "overrideGaSettings",
+                        "value": "false"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "eventCategory",
+                        "value": "Newsletter Form"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "trackType",
+                        "value": "TRACK_EVENT"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "gaSettings",
+                        "value": "{{UA-41538527-1}}"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "eventAction",
+                        "value": "Click"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "eventLabel",
+                        "value": "{{hs-form-guid}}"
+                    }
+                ],
+                "fingerprint": "1689055258953",
+                "firingTriggerId": [
+                    "12"
+                ],
+                "parentFolderId": "61",
+                "tagFiringOption": "ONCE_PER_EVENT",
+                "monitoringMetadata": {
+                    "type": "MAP"
+                },
+                "consentSettings": {
+                    "consentStatus": "NOT_SET"
+                }
+            },
+            {
+                "accountId": "95515427",
+                "containerId": "1327760",
+                "tagId": "11",
+                "name": "HubSpot Form Listener",
+                "type": "html",
+                "parameter": [
+                    {
+                        "type": "TEMPLATE",
+                        "key": "html",
+                        "value": "<script type=\"text/javascript\">\n  window.addEventListener(\"message\", function(event) {\n    if(event.data.type === 'hsFormCallback' && event.data.eventName === 'onFormSubmitted') {\n      window.dataLayer.push({\n        'event': 'hubspot-form-success',\n        'hs-form-guid': event.data.id\n      });\n    }\n  });\n</script>"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "supportDocumentWrite",
+                        "value": "false"
+                    }
+                ],
+                "fingerprint": "1575351856790",
+                "firingTriggerId": [
+                    "2147479553"
+                ],
+                "tagFiringOption": "ONCE_PER_EVENT",
+                "monitoringMetadata": {
+                    "type": "MAP"
+                },
+                "consentSettings": {
+                    "consentStatus": "NOT_SET"
+                }
+            },
+            {
+                "accountId": "95515427",
+                "containerId": "1327760",
+                "tagId": "13",
+                "name": "Website Click to call",
+                "type": "ua",
+                "parameter": [
+                    {
+                        "type": "BOOLEAN",
+                        "key": "nonInteraction",
+                        "value": "false"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "overrideGaSettings",
+                        "value": "false"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "eventCategory",
+                        "value": "Phone Number"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "trackType",
+                        "value": "TRACK_EVENT"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "gaSettings",
+                        "value": "{{GA}}"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "eventAction",
+                        "value": "Click"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "eventLabel",
+                        "value": "{{Click Text}} | {{Click URL}}"
+                    }
+                ],
+                "fingerprint": "1689055296989",
+                "firingTriggerId": [
+                    "14"
+                ],
+                "parentFolderId": "61",
+                "tagFiringOption": "ONCE_PER_EVENT",
+                "monitoringMetadata": {
+                    "type": "MAP"
+                },
+                "consentSettings": {
+                    "consentStatus": "NOT_SET"
+                }
+            },
+            {
+                "accountId": "95515427",
+                "containerId": "1327760",
+                "tagId": "42",
+                "name": "HS Form - Request Quote",
+                "type": "ua",
+                "parameter": [
+                    {
+                        "type": "BOOLEAN",
+                        "key": "nonInteraction",
+                        "value": "false"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "overrideGaSettings",
+                        "value": "false"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "eventCategory",
+                        "value": "Request a Quote"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "trackType",
+                        "value": "TRACK_EVENT"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "gaSettings",
+                        "value": "{{UA-41538527-1}}"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "eventAction",
+                        "value": "Submit"
+                    }
+                ],
+                "fingerprint": "1689055258955",
+                "firingTriggerId": [
+                    "32"
+                ],
+                "parentFolderId": "61",
+                "tagFiringOption": "ONCE_PER_EVENT",
+                "monitoringMetadata": {
+                    "type": "MAP"
+                },
+                "consentSettings": {
+                    "consentStatus": "NOT_SET"
+                }
+            },
+            {
+                "accountId": "95515427",
+                "containerId": "1327760",
+                "tagId": "44",
+                "name": "LinkedIn Insight Tag Rev 202211",
+                "type": "cvt_1327760_43",
+                "parameter": [
+                    {
+                        "type": "TEMPLATE",
+                        "key": "customUrl"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "partnerId",
+                        "value": "4285396"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "conversionId"
+                    }
+                ],
+                "fingerprint": "1667792191108",
+                "firingTriggerId": [
+                    "2147479553"
+                ],
+                "tagFiringOption": "ONCE_PER_EVENT",
+                "monitoringMetadata": {
+                    "type": "MAP"
+                },
+                "consentSettings": {
+                    "consentStatus": "NOT_SET"
+                }
+            },
+            {
+                "accountId": "95515427",
+                "containerId": "1327760",
+                "tagId": "46",
+                "name": "AVANSER",
+                "type": "html",
+                "parameter": [
+                    {
+                        "type": "TEMPLATE",
+                        "key": "html",
+                        "value": "<script id=\"AVANSERjs\" type=\"text/javascript\" src=\"https://adriano-au.avanser.com/aa.js\"></script>"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "supportDocumentWrite",
+                        "value": "false"
+                    }
+                ],
+                "fingerprint": "1681791837616",
+                "firingTriggerId": [
+                    "45"
+                ],
+                "tagFiringOption": "ONCE_PER_EVENT",
+                "monitoringMetadata": {
+                    "type": "MAP"
+                },
+                "consentSettings": {
+                    "consentStatus": "NOT_SET"
+                }
+            },
+            {
+                "accountId": "95515427",
+                "containerId": "1327760",
+                "tagId": "47",
+                "name": "Google Analytics GA4 Configuration",
+                "type": "googtag",
+                "parameter": [
+                    {
+                        "type": "TEMPLATE",
+                        "key": "tagId",
+                        "value": "G-QWLSBL3VZ3"
+                    },
+                    {
+                        "type": "LIST",
+                        "key": "configSettingsTable",
+                        "list": [
+                            {
+                                "type": "MAP",
+                                "map": [
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "parameter",
+                                        "value": "send_page_view"
+                                    },
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "parameterValue",
+                                        "value": "true"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "fingerprint": "1688717725126",
+                "firingTriggerId": [
+                    "2147479553"
+                ],
+                "tagFiringOption": "ONCE_PER_EVENT",
+                "monitoringMetadata": {
+                    "type": "MAP"
+                },
+                "consentSettings": {
+                    "consentStatus": "NOT_SET"
+                }
+            },
+            {
+                "accountId": "95515427",
+                "containerId": "1327760",
+                "tagId": "49",
+                "name": "New Lead - Budget Estimator Results (Agricultural)",
+                "type": "awct",
+                "parameter": [
+                    {
+                        "type": "BOOLEAN",
+                        "key": "enableNewCustomerReporting",
+                        "value": "false"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "enableConversionLinker",
+                        "value": "true"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "enableProductReporting",
+                        "value": "false"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "conversionValue",
+                        "value": "1"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "enableEnhancedConversion",
+                        "value": "false"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "conversionCookiePrefix",
+                        "value": "_gcl"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "enableShippingData",
+                        "value": "false"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "conversionId",
+                        "value": "949192790"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "conversionLabel",
+                        "value": "oAi2CJXN_7cYENaQzsQD"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "rdp",
+                        "value": "false"
+                    }
+                ],
+                "fingerprint": "1689043442606",
+                "firingTriggerId": [
+                    "48"
+                ],
+                "tagFiringOption": "ONCE_PER_EVENT",
+                "monitoringMetadata": {
+                    "type": "MAP"
+                },
+                "consentSettings": {
+                    "consentStatus": "NOT_SET"
+                }
+            },
+            {
+                "accountId": "95515427",
+                "containerId": "1327760",
+                "tagId": "50",
+                "name": "Google Conversion Linker",
+                "type": "gclidw",
+                "parameter": [
+                    {
+                        "type": "BOOLEAN",
+                        "key": "enableCrossDomain",
+                        "value": "false"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "enableUrlPassthrough",
+                        "value": "true"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "enableCookieOverrides",
+                        "value": "false"
+                    }
+                ],
+                "fingerprint": "1688720043567",
+                "firingTriggerId": [
+                    "2147479553"
+                ],
+                "tagFiringOption": "ONCE_PER_EVENT",
+                "monitoringMetadata": {
+                    "type": "MAP"
+                },
+                "consentSettings": {
+                    "consentStatus": "NOT_SET"
+                }
+            },
+            {
+                "accountId": "95515427",
+                "containerId": "1327760",
+                "tagId": "52",
+                "name": "New Lead - Thank You Page (Agricultural)",
+                "type": "awct",
+                "parameter": [
+                    {
+                        "type": "BOOLEAN",
+                        "key": "enableNewCustomerReporting",
+                        "value": "false"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "enableConversionLinker",
+                        "value": "true"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "enableProductReporting",
+                        "value": "false"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "conversionValue",
+                        "value": "1"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "enableEnhancedConversion",
+                        "value": "false"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "conversionCookiePrefix",
+                        "value": "_gcl"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "enableShippingData",
+                        "value": "false"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "conversionId",
+                        "value": "949192790"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "conversionLabel",
+                        "value": "k3g0CJzIhbgYENaQzsQD"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "rdp",
+                        "value": "false"
+                    }
+                ],
+                "fingerprint": "1688727619514",
+                "firingTriggerId": [
+                    "51"
+                ],
+                "tagFiringOption": "ONCE_PER_EVENT",
+                "monitoringMetadata": {
+                    "type": "MAP"
+                },
+                "consentSettings": {
+                    "consentStatus": "NOT_SET"
+                }
+            },
+            {
+                "accountId": "95515427",
+                "containerId": "1327760",
+                "tagId": "54",
+                "name": "New Lead - Thank You Page (Commercial)",
+                "type": "awct",
+                "parameter": [
+                    {
+                        "type": "BOOLEAN",
+                        "key": "enableNewCustomerReporting",
+                        "value": "false"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "enableConversionLinker",
+                        "value": "true"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "enableProductReporting",
+                        "value": "false"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "enableEnhancedConversion",
+                        "value": "false"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "conversionValue",
+                        "value": "1"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "conversionCookiePrefix",
+                        "value": "_gcl"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "enableShippingData",
+                        "value": "false"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "conversionId",
+                        "value": "949192790"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "conversionLabel",
+                        "value": "huwOCPSVpbkYENaQzsQD"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "rdp",
+                        "value": "false"
+                    }
+                ],
+                "fingerprint": "1689043457251",
+                "firingTriggerId": [
+                    "53"
+                ],
+                "tagFiringOption": "ONCE_PER_EVENT",
+                "monitoringMetadata": {
+                    "type": "MAP"
+                },
+                "consentSettings": {
+                    "consentStatus": "NOT_SET"
+                }
+            },
+            {
+                "accountId": "95515427",
+                "containerId": "1327760",
+                "tagId": "56",
+                "name": "New Lead - Budget Estimator Results (Commercial)",
+                "type": "awct",
+                "parameter": [
+                    {
+                        "type": "BOOLEAN",
+                        "key": "enableNewCustomerReporting",
+                        "value": "false"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "enableConversionLinker",
+                        "value": "true"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "enableProductReporting",
+                        "value": "false"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "conversionValue",
+                        "value": "1"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "enableEnhancedConversion",
+                        "value": "false"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "conversionCookiePrefix",
+                        "value": "_gcl"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "enableShippingData",
+                        "value": "false"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "conversionId",
+                        "value": "949192790"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "conversionLabel",
+                        "value": "N7niCKjloLkYENaQzsQD"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "rdp",
+                        "value": "false"
+                    }
+                ],
+                "fingerprint": "1689044295976",
+                "firingTriggerId": [
+                    "55"
+                ],
+                "tagFiringOption": "ONCE_PER_EVENT",
+                "monitoringMetadata": {
+                    "type": "MAP"
+                },
+                "consentSettings": {
+                    "consentStatus": "NOT_SET"
+                }
+            },
+            {
+                "accountId": "95515427",
+                "containerId": "1327760",
+                "tagId": "60",
+                "name": "GA4 - Event - form_submission",
+                "type": "gaawe",
+                "parameter": [
+                    {
+                        "type": "BOOLEAN",
+                        "key": "sendEcommerceData",
+                        "value": "false"
+                    },
+                    {
+                        "type": "LIST",
+                        "key": "eventSettingsTable",
+                        "list": [
+                            {
+                                "type": "MAP",
+                                "map": [
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "parameter",
+                                        "value": "form_id"
+                                    },
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "parameterValue",
+                                        "value": "{{dlv - hs-form-guid}}"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "eventName",
+                        "value": "form_submit"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "measurementIdOverride",
+                        "value": "G-QWLSBL3VZ3"
+                    }
+                ],
+                "fingerprint": "1689306635363",
+                "firingTriggerId": [
+                    "59"
+                ],
+                "tagFiringOption": "ONCE_PER_EVENT",
+                "monitoringMetadata": {
+                    "type": "MAP"
+                },
+                "consentSettings": {
+                    "consentStatus": "NOT_SET"
+                }
+            },
+            {
+                "accountId": "95515427",
+                "containerId": "1327760",
+                "tagId": "63",
+                "name": "GA4 - Event - Click",
+                "type": "gaawe",
+                "parameter": [
+                    {
+                        "type": "BOOLEAN",
+                        "key": "sendEcommerceData",
+                        "value": "false"
+                    },
+                    {
+                        "type": "LIST",
+                        "key": "eventSettingsTable",
+                        "list": [
+                            {
+                                "type": "MAP",
+                                "map": [
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "parameter",
+                                        "value": "link_url"
+                                    },
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "parameterValue",
+                                        "value": "{{Click URL}}"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "MAP",
+                                "map": [
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "parameter",
+                                        "value": "link_text"
+                                    },
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "parameterValue",
+                                        "value": "{{Click Text}}"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "eventName",
+                        "value": "click"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "measurementIdOverride",
+                        "value": "G-QWLSBL3VZ3"
+                    }
+                ],
+                "fingerprint": "1689317588170",
+                "firingTriggerId": [
+                    "62"
+                ],
+                "tagFiringOption": "ONCE_PER_EVENT",
+                "monitoringMetadata": {
+                    "type": "MAP"
+                },
+                "consentSettings": {
+                    "consentStatus": "NOT_SET"
+                }
+            }
+        ],
+        "trigger": [
+            {
+                "accountId": "95515427",
+                "containerId": "1327760",
+                "triggerId": "1",
+                "name": "Quote Form Trigger",
+                "type": "FORM_SUBMISSION",
+                "filter": [
+                    {
+                        "type": "EQUALS",
+                        "parameter": [
+                            {
+                                "type": "TEMPLATE",
+                                "key": "arg0",
+                                "value": "{{Page URL}}"
+                            },
+                            {
+                                "type": "TEMPLATE",
+                                "key": "arg1",
+                                "value": "http://auspangroup.com.au/request-a-quote/#gf_4"
+                            }
+                        ]
+                    }
+                ],
+                "waitForTags": {
+                    "type": "TEMPLATE"
+                },
+                "checkValidation": {
+                    "type": "BOOLEAN",
+                    "value": "false"
+                },
+                "waitForTagsTimeout": {
+                    "type": "TEMPLATE",
+                    "value": "2000"
+                },
+                "uniqueTriggerId": {
+                    "type": "TEMPLATE"
+                },
+                "fingerprint": "1435802056823"
+            },
+            {
+                "accountId": "95515427",
+                "containerId": "1327760",
+                "triggerId": "2",
+                "name": "Email Link Click Trigger",
+                "type": "LINK_CLICK",
+                "filter": [
+                    {
+                        "type": "CONTAINS",
+                        "parameter": [
+                            {
+                                "type": "TEMPLATE",
+                                "key": "arg0",
+                                "value": "{{Auto-Event Variable}}"
+                            },
+                            {
+                                "type": "TEMPLATE",
+                                "key": "arg1",
+                                "value": "mailto:"
+                            }
+                        ]
+                    }
+                ],
+                "autoEventFilter": [
+                    {
+                        "type": "CONTAINS",
+                        "parameter": [
+                            {
+                                "type": "TEMPLATE",
+                                "key": "arg0",
+                                "value": "{{Page URL}}"
+                            },
+                            {
+                                "type": "TEMPLATE",
+                                "key": "arg1",
+                                "value": "auspan"
+                            }
+                        ]
+                    }
+                ],
+                "waitForTags": {
+                    "type": "BOOLEAN",
+                    "value": "true"
+                },
+                "checkValidation": {
+                    "type": "BOOLEAN",
+                    "value": "true"
+                },
+                "waitForTagsTimeout": {
+                    "type": "TEMPLATE",
+                    "value": "2000"
+                },
+                "uniqueTriggerId": {
+                    "type": "TEMPLATE"
+                },
+                "fingerprint": "1434968431865"
+            },
+            {
+                "accountId": "95515427",
+                "containerId": "1327760",
+                "triggerId": "3",
+                "name": "Phone Number Trigger",
+                "type": "LINK_CLICK",
+                "filter": [
+                    {
+                        "type": "CONTAINS",
+                        "parameter": [
+                            {
+                                "type": "TEMPLATE",
+                                "key": "arg0",
+                                "value": "{{Auto-Event Variable}}"
+                            },
+                            {
+                                "type": "TEMPLATE",
+                                "key": "arg1",
+                                "value": "tel:"
+                            }
+                        ]
+                    }
+                ],
+                "autoEventFilter": [
+                    {
+                        "type": "CONTAINS",
+                        "parameter": [
+                            {
+                                "type": "TEMPLATE",
+                                "key": "arg0",
+                                "value": "{{Page URL}}"
+                            },
+                            {
+                                "type": "TEMPLATE",
+                                "key": "arg1",
+                                "value": "auspan"
+                            }
+                        ]
+                    }
+                ],
+                "waitForTags": {
+                    "type": "BOOLEAN",
+                    "value": "true"
+                },
+                "checkValidation": {
+                    "type": "BOOLEAN",
+                    "value": "true"
+                },
+                "waitForTagsTimeout": {
+                    "type": "TEMPLATE",
+                    "value": "2000"
+                },
+                "uniqueTriggerId": {
+                    "type": "TEMPLATE"
+                },
+                "fingerprint": "1434968493856"
+            },
+            {
+                "accountId": "95515427",
+                "containerId": "1327760",
+                "triggerId": "4",
+                "name": "Contact Form Submit Trigger",
+                "type": "CLICK",
+                "filter": [
+                    {
+                        "type": "EQUALS",
+                        "parameter": [
+                            {
+                                "type": "TEMPLATE",
+                                "key": "arg0",
+                                "value": "{{Element Id}}"
+                            },
+                            {
+                                "type": "TEMPLATE",
+                                "key": "arg1",
+                                "value": "gform_submit_button_2"
+                            }
+                        ]
+                    }
+                ],
+                "fingerprint": "1435802684970"
+            },
+            {
+                "accountId": "95515427",
+                "containerId": "1327760",
+                "triggerId": "10",
+                "name": "Email Click",
+                "type": "LINK_CLICK",
+                "filter": [
+                    {
+                        "type": "CONTAINS",
+                        "parameter": [
+                            {
+                                "type": "TEMPLATE",
+                                "key": "arg0",
+                                "value": "{{Click URL}}"
+                            },
+                            {
+                                "type": "TEMPLATE",
+                                "key": "arg1",
+                                "value": "mailto:"
+                            }
+                        ]
+                    }
+                ],
+                "waitForTags": {
+                    "type": "BOOLEAN",
+                    "value": "false"
+                },
+                "checkValidation": {
+                    "type": "BOOLEAN",
+                    "value": "false"
+                },
+                "waitForTagsTimeout": {
+                    "type": "TEMPLATE",
+                    "value": "2000"
+                },
+                "uniqueTriggerId": {
+                    "type": "TEMPLATE"
+                },
+                "fingerprint": "1575351856781"
+            },
+            {
+                "accountId": "95515427",
+                "containerId": "1327760",
+                "triggerId": "11",
+                "name": "Form Confirmation - Contact",
+                "type": "CUSTOM_EVENT",
+                "customEventFilter": [
+                    {
+                        "type": "EQUALS",
+                        "parameter": [
+                            {
+                                "type": "TEMPLATE",
+                                "key": "arg0",
+                                "value": "{{_event}}"
+                            },
+                            {
+                                "type": "TEMPLATE",
+                                "key": "arg1",
+                                "value": "hubspot-form-success"
+                            }
+                        ]
+                    }
+                ],
+                "filter": [
+                    {
+                        "type": "CONTAINS",
+                        "parameter": [
+                            {
+                                "type": "TEMPLATE",
+                                "key": "arg0",
+                                "value": "{{Page URL}}"
+                            },
+                            {
+                                "type": "TEMPLATE",
+                                "key": "arg1",
+                                "value": "contact"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "CONTAINS",
+                        "parameter": [
+                            {
+                                "type": "TEMPLATE",
+                                "key": "arg0",
+                                "value": "{{Page URL}}"
+                            },
+                            {
+                                "type": "TEMPLATE",
+                                "key": "arg1",
+                                "value": "request"
+                            },
+                            {
+                                "type": "BOOLEAN",
+                                "key": "negate",
+                                "value": "true"
+                            }
+                        ]
+                    }
+                ],
+                "fingerprint": "1620722910527"
+            },
+            {
+                "accountId": "95515427",
+                "containerId": "1327760",
+                "triggerId": "12",
+                "name": "Form Confirmation - Newsletter",
+                "type": "CUSTOM_EVENT",
+                "customEventFilter": [
+                    {
+                        "type": "EQUALS",
+                        "parameter": [
+                            {
+                                "type": "TEMPLATE",
+                                "key": "arg0",
+                                "value": "{{_event}}"
+                            },
+                            {
+                                "type": "TEMPLATE",
+                                "key": "arg1",
+                                "value": "hubspot-form-success"
+                            }
+                        ]
+                    }
+                ],
+                "filter": [
+                    {
+                        "type": "CONTAINS",
+                        "parameter": [
+                            {
+                                "type": "TEMPLATE",
+                                "key": "arg0",
+                                "value": "{{Page URL}}"
+                            },
+                            {
+                                "type": "TEMPLATE",
+                                "key": "arg1",
+                                "value": "contact"
+                            },
+                            {
+                                "type": "BOOLEAN",
+                                "key": "negate",
+                                "value": "true"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "CONTAINS",
+                        "parameter": [
+                            {
+                                "type": "TEMPLATE",
+                                "key": "arg0",
+                                "value": "{{Page URL}}"
+                            },
+                            {
+                                "type": "TEMPLATE",
+                                "key": "arg1",
+                                "value": "request"
+                            },
+                            {
+                                "type": "BOOLEAN",
+                                "key": "negate",
+                                "value": "true"
+                            }
+                        ]
+                    }
+                ],
+                "fingerprint": "1620722931308"
+            },
+            {
+                "accountId": "95515427",
+                "containerId": "1327760",
+                "triggerId": "13",
+                "name": "Form Confirmation - Request A Quote",
+                "type": "CUSTOM_EVENT",
+                "customEventFilter": [
+                    {
+                        "type": "EQUALS",
+                        "parameter": [
+                            {
+                                "type": "TEMPLATE",
+                                "key": "arg0",
+                                "value": "{{_event}}"
+                            },
+                            {
+                                "type": "TEMPLATE",
+                                "key": "arg1",
+                                "value": "hubspot-form-success"
+                            }
+                        ]
+                    }
+                ],
+                "filter": [
+                    {
+                        "type": "EQUALS",
+                        "parameter": [
+                            {
+                                "type": "TEMPLATE",
+                                "key": "arg0",
+                                "value": "{{hs-form-guid}}"
+                            },
+                            {
+                                "type": "TEMPLATE",
+                                "key": "arg1",
+                                "value": "b3718262-597f-41f9-9bf6-4cb95766c7eb"
+                            }
+                        ]
+                    }
+                ],
+                "fingerprint": "1575351856783"
+            },
+            {
+                "accountId": "95515427",
+                "containerId": "1327760",
+                "triggerId": "14",
+                "name": "Website Call Click",
+                "type": "LINK_CLICK",
+                "filter": [
+                    {
+                        "type": "CONTAINS",
+                        "parameter": [
+                            {
+                                "type": "TEMPLATE",
+                                "key": "arg0",
+                                "value": "{{Click URL}}"
+                            },
+                            {
+                                "type": "TEMPLATE",
+                                "key": "arg1",
+                                "value": "tel:"
+                            }
+                        ]
+                    }
+                ],
+                "waitForTags": {
+                    "type": "BOOLEAN",
+                    "value": "false"
+                },
+                "checkValidation": {
+                    "type": "BOOLEAN",
+                    "value": "false"
+                },
+                "waitForTagsTimeout": {
+                    "type": "TEMPLATE",
+                    "value": "2000"
+                },
+                "uniqueTriggerId": {
+                    "type": "TEMPLATE"
+                },
+                "fingerprint": "1575351856783"
+            },
+            {
+                "accountId": "95515427",
+                "containerId": "1327760",
+                "triggerId": "20",
+                "name": "Visibility",
+                "type": "ELEMENT_VISIBILITY",
+                "fingerprint": "1579680518686",
+                "parameter": [
+                    {
+                        "type": "BOOLEAN",
+                        "key": "useOnScreenDuration",
+                        "value": "false"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "useDomChangeListener",
+                        "value": "false"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "elementSelector",
+                        "value": ".hs_form_target_form_160309140"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "firingFrequency",
+                        "value": "MANY_PER_ELEMENT"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "selectorType",
+                        "value": "CSS"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "onScreenRatio",
+                        "value": "50"
+                    }
+                ]
+            },
+            {
+                "accountId": "95515427",
+                "containerId": "1327760",
+                "triggerId": "26",
+                "name": "Quote",
+                "type": "PAGEVIEW",
+                "filter": [
+                    {
+                        "type": "CONTAINS",
+                        "parameter": [
+                            {
+                                "type": "TEMPLATE",
+                                "key": "arg0",
+                                "value": "{{Page URL}}"
+                            },
+                            {
+                                "type": "TEMPLATE",
+                                "key": "arg1",
+                                "value": "/request-a-quote-step2?submissionGuid="
+                            }
+                        ]
+                    }
+                ],
+                "fingerprint": "1579682541764"
+            },
+            {
+                "accountId": "95515427",
+                "containerId": "1327760",
+                "triggerId": "32",
+                "name": "Request Quote Trigger",
+                "type": "ELEMENT_VISIBILITY",
+                "fingerprint": "1620116033267",
+                "parameter": [
+                    {
+                        "type": "BOOLEAN",
+                        "key": "useOnScreenDuration",
+                        "value": "false"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "useDomChangeListener",
+                        "value": "false"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "elementSelector",
+                        "value": ".thankyou-banner"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "firingFrequency",
+                        "value": "ONCE"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "selectorType",
+                        "value": "CSS"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "onScreenRatio",
+                        "value": "50"
+                    }
+                ]
+            },
+            {
+                "accountId": "95515427",
+                "containerId": "1327760",
+                "triggerId": "45",
+                "name": "DOM Ready",
+                "type": "DOM_READY",
+                "fingerprint": "1669600664735"
+            },
+            {
+                "accountId": "95515427",
+                "containerId": "1327760",
+                "triggerId": "48",
+                "name": "PageView - Budget Estimator Result (Agricultural)",
+                "type": "PAGEVIEW",
+                "filter": [
+                    {
+                        "type": "CONTAINS",
+                        "parameter": [
+                            {
+                                "type": "TEMPLATE",
+                                "key": "arg0",
+                                "value": "{{Page URL}}"
+                            },
+                            {
+                                "type": "TEMPLATE",
+                                "key": "arg1",
+                                "value": "agriculture/budget-estimator-result"
+                            }
+                        ]
+                    }
+                ],
+                "fingerprint": "1688719655368"
+            },
+            {
+                "accountId": "95515427",
+                "containerId": "1327760",
+                "triggerId": "51",
+                "name": "PageView - Thank You Page (Agriculture)",
+                "type": "PAGEVIEW",
+                "filter": [
+                    {
+                        "type": "CONTAINS",
+                        "parameter": [
+                            {
+                                "type": "TEMPLATE",
+                                "key": "arg0",
+                                "value": "{{Page URL}}"
+                            },
+                            {
+                                "type": "TEMPLATE",
+                                "key": "arg1",
+                                "value": "agriculture/thank-you"
+                            }
+                        ]
+                    }
+                ],
+                "fingerprint": "1688727610025"
+            },
+            {
+                "accountId": "95515427",
+                "containerId": "1327760",
+                "triggerId": "53",
+                "name": "PageView - Thank You Page (Commercial)",
+                "type": "PAGEVIEW",
+                "filter": [
+                    {
+                        "type": "CONTAINS",
+                        "parameter": [
+                            {
+                                "type": "TEMPLATE",
+                                "key": "arg0",
+                                "value": "{{Page URL}}"
+                            },
+                            {
+                                "type": "TEMPLATE",
+                                "key": "arg1",
+                                "value": "commercial/thank-you"
+                            }
+                        ]
+                    }
+                ],
+                "fingerprint": "1689043423510"
+            },
+            {
+                "accountId": "95515427",
+                "containerId": "1327760",
+                "triggerId": "55",
+                "name": "PageView - Budget Estimator Result (Commercial)",
+                "type": "PAGEVIEW",
+                "filter": [
+                    {
+                        "type": "CONTAINS",
+                        "parameter": [
+                            {
+                                "type": "TEMPLATE",
+                                "key": "arg0",
+                                "value": "{{Page URL}}"
+                            },
+                            {
+                                "type": "TEMPLATE",
+                                "key": "arg1",
+                                "value": "commercial/budget-estimator-result"
+                            }
+                        ]
+                    }
+                ],
+                "fingerprint": "1689044198483"
+            },
+            {
+                "accountId": "95515427",
+                "containerId": "1327760",
+                "triggerId": "59",
+                "name": "custom - hubspot-form-success",
+                "type": "CUSTOM_EVENT",
+                "customEventFilter": [
+                    {
+                        "type": "EQUALS",
+                        "parameter": [
+                            {
+                                "type": "TEMPLATE",
+                                "key": "arg0",
+                                "value": "{{_event}}"
+                            },
+                            {
+                                "type": "TEMPLATE",
+                                "key": "arg1",
+                                "value": "hubspot-form-success"
+                            }
+                        ]
+                    }
+                ],
+                "fingerprint": "1689055186304"
+            },
+            {
+                "accountId": "95515427",
+                "containerId": "1327760",
+                "triggerId": "62",
+                "name": "Link Click All Links",
+                "type": "LINK_CLICK",
+                "waitForTags": {
+                    "type": "BOOLEAN",
+                    "value": "false"
+                },
+                "checkValidation": {
+                    "type": "BOOLEAN",
+                    "value": "false"
+                },
+                "waitForTagsTimeout": {
+                    "type": "TEMPLATE",
+                    "value": "2000"
+                },
+                "uniqueTriggerId": {
+                    "type": "TEMPLATE"
+                },
+                "fingerprint": "1689317585254"
+            }
+        ],
+        "variable": [
+            {
+                "accountId": "95515427",
+                "containerId": "1327760",
+                "variableId": "1",
+                "name": "Auto-Event Variable",
+                "type": "aev",
+                "parameter": [
+                    {
+                        "type": "TEMPLATE",
+                        "key": "varType",
+                        "value": "URL"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "component",
+                        "value": "URL"
+                    }
+                ],
+                "fingerprint": "1434968412660"
+            },
+            {
+                "accountId": "95515427",
+                "containerId": "1327760",
+                "variableId": "2",
+                "name": "Element Class",
+                "type": "aev",
+                "parameter": [
+                    {
+                        "type": "TEMPLATE",
+                        "key": "varType",
+                        "value": "CLASSES"
+                    }
+                ],
+                "fingerprint": "1434969192216"
+            },
+            {
+                "accountId": "95515427",
+                "containerId": "1327760",
+                "variableId": "3",
+                "name": "Element text",
+                "type": "aev",
+                "parameter": [
+                    {
+                        "type": "TEMPLATE",
+                        "key": "varType",
+                        "value": "TEXT"
+                    }
+                ],
+                "fingerprint": "1434969419733"
+            },
+            {
+                "accountId": "95515427",
+                "containerId": "1327760",
+                "variableId": "4",
+                "name": "Element Id",
+                "type": "aev",
+                "parameter": [
+                    {
+                        "type": "TEMPLATE",
+                        "key": "varType",
+                        "value": "ID"
+                    }
+                ],
+                "fingerprint": "1435802666594"
+            },
+            {
+                "accountId": "95515427",
+                "containerId": "1327760",
+                "variableId": "5",
+                "name": "hs-form-guid",
+                "type": "v",
+                "parameter": [
+                    {
+                        "type": "INTEGER",
+                        "key": "dataLayerVersion",
+                        "value": "2"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "setDefaultValue",
+                        "value": "false"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "name",
+                        "value": "hs-form-guid"
+                    }
+                ],
+                "fingerprint": "1575351856781",
+                "formatValue": {}
+            },
+            {
+                "accountId": "95515427",
+                "containerId": "1327760",
+                "variableId": "6",
+                "name": "GA",
+                "type": "gas",
+                "parameter": [
+                    {
+                        "type": "TEMPLATE",
+                        "key": "cookieDomain",
+                        "value": "auto"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "doubleClick",
+                        "value": "false"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "setTrackerName",
+                        "value": "false"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "useDebugVersion",
+                        "value": "false"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "useHashAutoLink",
+                        "value": "false"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "decorateFormsAutoLink",
+                        "value": "false"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "enableLinkId",
+                        "value": "false"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "enableEcommerce",
+                        "value": "false"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "trackingId",
+                        "value": "UA-41538527-1"
+                    }
+                ],
+                "fingerprint": "1575351856784"
+            },
+            {
+                "accountId": "95515427",
+                "containerId": "1327760",
+                "variableId": "7",
+                "name": "UA-41538527-1",
+                "type": "gas",
+                "parameter": [
+                    {
+                        "type": "TEMPLATE",
+                        "key": "cookieDomain",
+                        "value": "auto"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "doubleClick",
+                        "value": "false"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "setTrackerName",
+                        "value": "false"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "useDebugVersion",
+                        "value": "false"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "useHashAutoLink",
+                        "value": "false"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "decorateFormsAutoLink",
+                        "value": "false"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "enableLinkId",
+                        "value": "false"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "enableEcommerce",
+                        "value": "false"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "trackingId",
+                        "value": "UA-41538527-1"
+                    }
+                ],
+                "fingerprint": "1579680028445"
+            },
+            {
+                "accountId": "95515427",
+                "containerId": "1327760",
+                "variableId": "58",
+                "name": "dlv - hs-form-guid",
+                "type": "v",
+                "parameter": [
+                    {
+                        "type": "INTEGER",
+                        "key": "dataLayerVersion",
+                        "value": "2"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "setDefaultValue",
+                        "value": "false"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "name",
+                        "value": "hs-form-guid"
+                    }
+                ],
+                "fingerprint": "1689055186303",
+                "formatValue": {}
+            }
+        ],
+        "folder": [
+            {
+                "accountId": "95515427",
+                "containerId": "1327760",
+                "folderId": "61",
+                "name": "Old Tags For Updating",
+                "fingerprint": "1689055257618"
+            }
+        ],
+        "builtInVariable": [
+            {
+                "accountId": "95515427",
+                "containerId": "1327760",
+                "type": "PAGE_URL",
+                "name": "Page URL"
+            },
+            {
+                "accountId": "95515427",
+                "containerId": "1327760",
+                "type": "PAGE_HOSTNAME",
+                "name": "Page Hostname"
+            },
+            {
+                "accountId": "95515427",
+                "containerId": "1327760",
+                "type": "PAGE_PATH",
+                "name": "Page Path"
+            },
+            {
+                "accountId": "95515427",
+                "containerId": "1327760",
+                "type": "REFERRER",
+                "name": "Referrer"
+            },
+            {
+                "accountId": "95515427",
+                "containerId": "1327760",
+                "type": "EVENT",
+                "name": "Event"
+            },
+            {
+                "accountId": "95515427",
+                "containerId": "1327760",
+                "type": "CLICK_ELEMENT",
+                "name": "Click Element"
+            },
+            {
+                "accountId": "95515427",
+                "containerId": "1327760",
+                "type": "CLICK_CLASSES",
+                "name": "Click Classes"
+            },
+            {
+                "accountId": "95515427",
+                "containerId": "1327760",
+                "type": "CLICK_ID",
+                "name": "Click ID"
+            },
+            {
+                "accountId": "95515427",
+                "containerId": "1327760",
+                "type": "CLICK_TARGET",
+                "name": "Click Target"
+            },
+            {
+                "accountId": "95515427",
+                "containerId": "1327760",
+                "type": "CLICK_URL",
+                "name": "Click URL"
+            },
+            {
+                "accountId": "95515427",
+                "containerId": "1327760",
+                "type": "CLICK_TEXT",
+                "name": "Click Text"
+            },
+            {
+                "accountId": "95515427",
+                "containerId": "1327760",
+                "type": "FORM_ELEMENT",
+                "name": "Form Element"
+            },
+            {
+                "accountId": "95515427",
+                "containerId": "1327760",
+                "type": "FORM_CLASSES",
+                "name": "Form Classes"
+            },
+            {
+                "accountId": "95515427",
+                "containerId": "1327760",
+                "type": "FORM_ID",
+                "name": "Form ID"
+            },
+            {
+                "accountId": "95515427",
+                "containerId": "1327760",
+                "type": "FORM_TARGET",
+                "name": "Form Target"
+            },
+            {
+                "accountId": "95515427",
+                "containerId": "1327760",
+                "type": "FORM_URL",
+                "name": "Form URL"
+            },
+            {
+                "accountId": "95515427",
+                "containerId": "1327760",
+                "type": "FORM_TEXT",
+                "name": "Form Text"
+            }
+        ],
+        "fingerprint": "1725540215438",
+        "tagManagerUrl": "https://tagmanager.google.com/#/versions/accounts/95515427/containers/1327760/versions/0?apiLink=version",
+        "customTemplate": [
+            {
+                "accountId": "95515427",
+                "containerId": "1327760",
+                "templateId": "43",
+                "name": "LinkedIn InsightTag 2.0",
+                "fingerprint": "1667791825269",
+                "templateData": "___TERMS_OF_SERVICE___\n\nBy creating or modifying this file you agree to Google Tag Manager's Community\nTemplate Gallery Developer Terms of Service available at\nhttps://developers.google.com/tag-manager/gallery-tos (or such other URL as\nGoogle may provide), as modified from time to time.\n\n\n___INFO___\n\n{\n  \"type\": \"TAG\",\n  \"id\": \"cvt_temp_public_id\",\n  \"version\": 1,\n  \"securityGroups\": [],\n  \"displayName\": \"LinkedIn InsightTag 2.0\",\n  \"brand\": {\n    \"id\": \"github.com_linkedin\",\n    \"displayName\": \"linkedin\",\n    \"thumbnail\": \"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQAAAAEACAMAAABrrFhUAAAB7FBMVEUAAAAKZswMaMQLZ8ILZ8MLZsMKZ8IKZsIkbdsMZsMKZsMKZsOAgP8LaMMKZsMRZsQKZ8MNaMILZ8MMaMIKZsMKZ8ILZsMLZsILZ8ILZ8MMaMQMZ8UOZ8gMZ8IPacMLZ8ILZ8MLaMYLZ8IaZswKZ8MLaMINZsILZ8MMZsIzZswNZ8UKZ8MKZ8INa8MKZsMRZswLZsMLZsQMZ8QVatULZ8MSbcgLZsMKZsIOacQKZ8MMZ8MLZsQKZsINZ8ULZ8QLZ8MLZsULZsMLZsMPbMkKZsIKZ8MLZ8MNasYLaspVqv8rgNUPacMTaMYNZsQLaMQKaMMKZ8MKZ8MKZ8MMaMQLacJAgP8LasUKZ8MLZ8MKZ8ILZ8MMaMMLZsQKZ8ILZ8MOccYNZ8MLZsMLZ8MKacMKZ8QKZ8MQa8ULZ8IOasUMascKZsP///8MZ8MXdNEMbcIKZ8QLZ8INacQLZ8MNaMMKZsIKZsMMZsQLZsQKZ8MLZ8ILb8gKZsMOasYOZsMMZ8MMaMULZsMKZ8INa8kMa8QPZsUKZsMKZ8MKZ8MLZsILZsMKZ8IKZsILZ8IKZsMKZ8MLZsILZsIMZ8QLZ8IKZsIMZsMNacQLZsQSbcgLZsMLZ8MNZswLZ8McccYLZ8QMZ8ILZ8MLZsIKZsIKZsMLZsPDZ/nSAAAApHRSTlMAGWekv9nz/wduyP4CXeAeyzvpWPnJpdaPb1Y+JW0iwdNHqAr9dlBymwU5rfsm+g+7dVcMug6nrDjHmnD8T3SmRsC+IfeZdzoYAwYRGzxbe8T2smwuBDBm7vipQI7i0BJNtpwzkqsfnzUp3AFqCxVjij3xUfT1QV+VzheYJDeDLNR+Eysj4eSuoOrfxbWvzPDmUrixa05aHOizFEgJoyqItNvl8nYMZNQAAAUGSURBVHgB7NZToiVRDIXhVUzx2Lat+c+s3dfIc5JvCP9Gglcc1/ODkMQKA99zHXwiipOUFEiTOMJ7WV4gNQp5hjeKJVKlVMQr5QopUynjhWqN1KlVX5x/jRSqlZ/ef4VUqhTxR1YipUoZfstJrRy/RAVSqxABiEmxGECdFKsDTkqKpQ5cUs1Fg1RrwCfVfASkWoCQVAtBylkAC8BiASyABbAAFsACWAALYAEsgAWwABag2Wp3ur1et9NuNfUF8PsDvDDo+6oCDMt4pzxUE2A0xofGIx0BJlN8YjpREGA2xxfmM+kBZgt8aTETHmCJbyxlB1jhWyvJAZI1vrVOBAfYgGEjN8AWLFupAXZ7sOx3QgNMwDQRGqAKpqrMAIcjmI4HkQFOYDuJDHAG21lkgAvYLiIDdMHWFRmgB7aeyABXsF0tgD0B+wRtDNoiJC3ADWw3kQEOdzDdDyID0EXuF8AL8ADTQ2iAXQ8svZ3QAPSTXXtokCuIojh+whvbxlirsW3btm3bcTIxvmhs9a3uDm7V+60f/9s6QWAJIl0DUDAYgknfACGcg5EQjQNQKGwK1ftwNAw2hJHeAcIj8FsRLpoHoPBI/EZkuAETmahfT2SiDBlJReOnouWPpLhifjaTiyHBQIpiL8bhK3EXY4nMm8ru/TCV3av/VFZ/VgArgOGsAFYAw1kBrACGswJYAaTTP0D8yYTE40mXkgNSUtPSfTMyszyyc4wJsDs3L78APygoLNpRrH+AktKrnvilgrLyCq0DVO6tgg0Hqmtc/lIAsNh7J/3Ap7YOLHH1J3QM0OALtsamcN0CxDZDSUusVgFar0JVW/tufQKEdsAOcTs1CXCsGvZJKdciQG4n7NblJz9Adxsc0FMsPIBLHhzT3Cs6QE4fHHW0X3CAgR44bjBHbIAT0XCGTLEBhuAcw0IDlMNJUk+KDDDiCWc5XCwwQHg+nKdIYABXONGBk7ICOF+di+EBMGx6gNF4wwNgzPQA4y6GB0CD6QEmTA+AXaYHmDQ9wJTpATBteoAZLQK0zc7NB8AuR6UHODAxmb1wgt46sbjU7gtVe0pEB/BaXqFvrObtgZo1wQHq1ulHi+2pUNEtNsD8Bv3cZjoUREgNUH2DfuVmM/iSZQY4MLmffi3+Fvj6JQbouE2/VXIUbFcEBjiQSzasjILrjsAAZ8imJf7D5AW4SwzVYNorLkBPODFUtoHnnrQAbZvE4gae89IC3CeeGvDUCQuw5xDxuDwAS4uwAJHE1Q6Ww7ICpGwR10OwPJIV4DGx9aeA44msAE+Jbw4ssgIcI75MDQM8IwXPNQxQRAqiNAxwhhRc1jDAC1LwUsMAp0nBloYBXpGCXg0D9JKCN+3dhYkEURiEwX903SV/2EDP3Q9nu14GXWPY8B2vEOB//z9eIcBfpwMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMjvAwAAAAAAAAAAAAAAAAAAAAAAAABwyd5/qSEbYKg+G6CvLhugqzYboK1mkbx/0VSdkgHmVTVLBpg9Jp5iz/qhZbvKBVg9dh63qfu3y3o4m33m/v3mJdR9TNx/fFNwPQQKHA/vYu37uPv/Q8F3sw17/20+NX9X66Dv/2r5VfRydlokrF+cZt+2/Jv23A/j9W4fh75rm3eTbwGgEZTnsjA44QAAAABJRU5ErkJggg\\u003d\\u003d\"\n  },\n  \"description\": \"LinkedIn’s official updated tag template allows for both page-level and event-level tracking via easily configurable options.\",\n  \"containerContexts\": [\n    \"WEB\"\n  ]\n}\n\n\n___TEMPLATE_PARAMETERS___\n\n[\n  {\n    \"type\": \"TEXT\",\n    \"name\": \"partnerId\",\n    \"displayName\": \"Partner ID / Insight Tag ID\",\n    \"simpleValueType\": true,\n    \"notSetText\": \"4285396\",\n    \"valueValidators\": [\n      {\n        \"type\": \"REGEX\",\n        \"args\": [\n          \"^\\\\d+(,\\\\s?\\\\d+)*$\"\n        ]\n      }\n    ]\n  },\n  {\n    \"type\": \"TEXT\",\n    \"name\": \"conversionId\",\n    \"displayName\": \"Conversion IDs (max. 3)\",\n    \"simpleValueType\": true,\n    \"help\": \"Enter 1-3 conversion ids separated by comma. Only first 3 conversion ids will be sent. This field is optional\",\n    \"canBeEmptyString\": true,\n    \"valueValidators\": [\n      {\n        \"type\": \"REGEX\",\n        \"args\": [\n          \"^\\\\s*|\\\\d+(,\\\\s?\\\\d+)*$\"\n        ]\n      }\n    ]\n  },\n  {\n    \"type\": \"TEXT\",\n    \"name\": \"customUrl\",\n    \"displayName\": \"Custom URL override\",\n    \"simpleValueType\": true,\n    \"help\": \"(Override) This is different than Match rules. Enter a URL only if you were specifically provided one by LinkedIn team to override.\",\n    \"canBeEmptyString\": true\n  }\n]\n\n\n___SANDBOXED_JS_FOR_WEB_TEMPLATE___\n\nconst getUrl = require('getUrl');\nconst log = require('logToConsole');\nconst sendPixel = require('sendPixel');\nconst assertThat = require('assertThat');\nconst setInWindow = require('setInWindow');\nconst getTimestamp = require('getTimestamp');\nconst injectScript = require('injectScript');\nconst copyFromWindow = require('copyFromWindow');\nconst encodeUriComponent = require('encodeUriComponent');\n\n/**\n * Globals\n */\nconst conversionIds = data.conversionId ?\n      data.conversionId.split(',').slice(0,3).map(id => id.trim())\n      : '';\nconst allPids = [];\nconst pageUrl = data.customUrl ? data.customUrl : getUrl();\n\n/**\n * Checks presence of LinkedIn Insight tag code.\n */\nconst isInsightTagAPIAvailable = () => typeof copyFromWindow('lintrk') === 'function';\n\n/**\n * Reads and Sets in global namespace all applicable PIDs on the page\n */\nconst setAllPids = (function() {\n  const partnerIds = {};\n  const bizoId = copyFromWindow('_bizo_data_partner_id');\n  const bizoIds = copyFromWindow('_bizo_data_partner_ids') || [];\n  const linkedInPartnerId = copyFromWindow('_linkedin_data_partner_id');\n  const linkedInPartnerIds = copyFromWindow('_linkedin_data_partner_ids') || [];\n\n  const addPid = pid => {\n    if (pid && !partnerIds[pid]) {\n      partnerIds[pid] = true;\n      allPids.push(pid);\n    }\n  };\n\n  // add the partner ids set via this GTM installation\n  const inputPids = data.partnerId.split(',');\n  inputPids.forEach(id => addPid(id.trim()));\n\n  // Add all PIDs that may have updated the global, helps skipping following adds.\n  addPid(linkedInPartnerId);\n  linkedInPartnerIds.forEach(id => addPid(id));\n\n  // add other PIDs from page\n  addPid(bizoId);\n  bizoIds.forEach(id => addPid(id));\n\n  // Update the main namespace for future tracking by InsightTag to include the partner IDs\n  setInWindow('_linkedin_data_partner_ids', allPids, true);\n}());\n\n/**\n * Generate query params only for GTM based tracking\n */\nfunction generateQueryParamsForGTM(cid) {\n  const encodedPIDs = encodeUriComponent(allPids.join(','));\n\n  let result = 'pid=' + encodedPIDs;\n  result += '&tm=gtmv2';\n  result += cid ? '&conversionId=' + encodeUriComponent(cid) : '';\n  result += '&url=' + encodeUriComponent(pageUrl);\n  result += '&v=2&fmt=js&time=' + getTimestamp();\n  return result;\n}\n\n// Success call back to InsightTag injection\nfunction didInjectInsightTag() {\n  trackByInsightTag();\n  data.gtmOnSuccess();\n}\n\n// Callback to plain GTM when InsightTag code failed to inject\nfunction didFailInsightTag() {\n  trackByPlainGTM();\n  data.gtmOnFailure();\n}\n\nfunction trackByPlainGTM() {\n  if (conversionIds.length && conversionIds.length <= 3) {\n    conversionIds.forEach(id => {\n      const trackingUrl = 'https://px.ads.linkedin.com/collect?' + generateQueryParamsForGTM(id);\n      sendPixel(trackingUrl, data.gtmOnSuccess, data.gtmOnFailure);\n    });\n  } else {\n    sendPixel('https://px.ads.linkedin.com/collect?' + generateQueryParamsForGTM(), data.gtmOnSuccess, data.gtmOnFailure);\n  }\n}\n\n/**\n * Download LinkedIn Insight tag core code if `window.lintrk` is not available\n * Also ensure it doesn’t default fire.\n */\nfunction trackByInsightTag() {\n  if (isInsightTagAPIAvailable()) {\n    const lintrk = copyFromWindow('lintrk');\n    const options = { tmsource: 'gtmv2' };\n    options.conversion_url = pageUrl;\n\n    if (conversionIds.length && conversionIds.length <= 3) {\n      conversionIds.forEach(id => {\n        options.conversion_id = id;\n        lintrk('track', options);\n      });\n    } else {\n      lintrk('track', options);\n    }\n  } else {\n    setInWindow('_already_called_lintrk', true, true);\n    injectScript('https://snap.licdn.com/li.lms-analytics/insight.min.js', didInjectInsightTag, didFailInsightTag);\n  }\n}\n\n/**\n * Enable `trackByPlainGTM` for test purposes, and disable `trackByInsightTag`.\n * trackByPlainGTM();\n */\ntrackByInsightTag();\n\n\n___WEB_PERMISSIONS___\n\n[\n  {\n    \"instance\": {\n      \"key\": {\n        \"publicId\": \"logging\",\n        \"versionId\": \"1\"\n      },\n      \"param\": [\n        {\n          \"key\": \"environments\",\n          \"value\": {\n            \"type\": 1,\n            \"string\": \"debug\"\n          }\n        }\n      ]\n    },\n    \"clientAnnotations\": {\n      \"isEditedByUser\": true\n    },\n    \"isRequired\": true\n  },\n  {\n    \"instance\": {\n      \"key\": {\n        \"publicId\": \"send_pixel\",\n        \"versionId\": \"1\"\n      },\n      \"param\": [\n        {\n          \"key\": \"allowedUrls\",\n          \"value\": {\n            \"type\": 1,\n            \"string\": \"specific\"\n          }\n        },\n        {\n          \"key\": \"urls\",\n          \"value\": {\n            \"type\": 2,\n            \"listItem\": [\n              {\n                \"type\": 1,\n                \"string\": \"https://*.linkedin.com/*\"\n              }\n            ]\n          }\n        }\n      ]\n    },\n    \"clientAnnotations\": {\n      \"isEditedByUser\": true\n    },\n    \"isRequired\": true\n  },\n  {\n    \"instance\": {\n      \"key\": {\n        \"publicId\": \"access_globals\",\n        \"versionId\": \"1\"\n      },\n      \"param\": [\n        {\n          \"key\": \"keys\",\n          \"value\": {\n            \"type\": 2,\n            \"listItem\": [\n              {\n                \"type\": 3,\n                \"mapKey\": [\n                  {\n                    \"type\": 1,\n                    \"string\": \"key\"\n                  },\n                  {\n                    \"type\": 1,\n                    \"string\": \"read\"\n                  },\n                  {\n                    \"type\": 1,\n                    \"string\": \"write\"\n                  },\n                  {\n                    \"type\": 1,\n                    \"string\": \"execute\"\n                  }\n                ],\n                \"mapValue\": [\n                  {\n                    \"type\": 1,\n                    \"string\": \"_bizo_data_partner_id\"\n                  },\n                  {\n                    \"type\": 8,\n                    \"boolean\": true\n                  },\n                  {\n                    \"type\": 8,\n                    \"boolean\": false\n                  },\n                  {\n                    \"type\": 8,\n                    \"boolean\": false\n                  }\n                ]\n              },\n              {\n                \"type\": 3,\n                \"mapKey\": [\n                  {\n                    \"type\": 1,\n                    \"string\": \"key\"\n                  },\n                  {\n                    \"type\": 1,\n                    \"string\": \"read\"\n                  },\n                  {\n                    \"type\": 1,\n                    \"string\": \"write\"\n                  },\n                  {\n                    \"type\": 1,\n                    \"string\": \"execute\"\n                  }\n                ],\n                \"mapValue\": [\n                  {\n                    \"type\": 1,\n                    \"string\": \"_bizo_data_partner_ids\"\n                  },\n                  {\n                    \"type\": 8,\n                    \"boolean\": true\n                  },\n                  {\n                    \"type\": 8,\n                    \"boolean\": false\n                  },\n                  {\n                    \"type\": 8,\n                    \"boolean\": false\n                  }\n                ]\n              },\n              {\n                \"type\": 3,\n                \"mapKey\": [\n                  {\n                    \"type\": 1,\n                    \"string\": \"key\"\n                  },\n                  {\n                    \"type\": 1,\n                    \"string\": \"read\"\n                  },\n                  {\n                    \"type\": 1,\n                    \"string\": \"write\"\n                  },\n                  {\n                    \"type\": 1,\n                    \"string\": \"execute\"\n                  }\n                ],\n                \"mapValue\": [\n                  {\n                    \"type\": 1,\n                    \"string\": \"_linkedin_data_partner_id\"\n                  },\n                  {\n                    \"type\": 8,\n                    \"boolean\": true\n                  },\n                  {\n                    \"type\": 8,\n                    \"boolean\": false\n                  },\n                  {\n                    \"type\": 8,\n                    \"boolean\": false\n                  }\n                ]\n              },\n              {\n                \"type\": 3,\n                \"mapKey\": [\n                  {\n                    \"type\": 1,\n                    \"string\": \"key\"\n                  },\n                  {\n                    \"type\": 1,\n                    \"string\": \"read\"\n                  },\n                  {\n                    \"type\": 1,\n                    \"string\": \"write\"\n                  },\n                  {\n                    \"type\": 1,\n                    \"string\": \"execute\"\n                  }\n                ],\n                \"mapValue\": [\n                  {\n                    \"type\": 1,\n                    \"string\": \"_linkedin_data_partner_ids\"\n                  },\n                  {\n                    \"type\": 8,\n                    \"boolean\": true\n                  },\n                  {\n                    \"type\": 8,\n                    \"boolean\": true\n                  },\n                  {\n                    \"type\": 8,\n                    \"boolean\": false\n                  }\n                ]\n              },\n              {\n                \"type\": 3,\n                \"mapKey\": [\n                  {\n                    \"type\": 1,\n                    \"string\": \"key\"\n                  },\n                  {\n                    \"type\": 1,\n                    \"string\": \"read\"\n                  },\n                  {\n                    \"type\": 1,\n                    \"string\": \"write\"\n                  },\n                  {\n                    \"type\": 1,\n                    \"string\": \"execute\"\n                  }\n                ],\n                \"mapValue\": [\n                  {\n                    \"type\": 1,\n                    \"string\": \"lintrk\"\n                  },\n                  {\n                    \"type\": 8,\n                    \"boolean\": true\n                  },\n                  {\n                    \"type\": 8,\n                    \"boolean\": false\n                  },\n                  {\n                    \"type\": 8,\n                    \"boolean\": false\n                  }\n                ]\n              },\n              {\n                \"type\": 3,\n                \"mapKey\": [\n                  {\n                    \"type\": 1,\n                    \"string\": \"key\"\n                  },\n                  {\n                    \"type\": 1,\n                    \"string\": \"read\"\n                  },\n                  {\n                    \"type\": 1,\n                    \"string\": \"write\"\n                  },\n                  {\n                    \"type\": 1,\n                    \"string\": \"execute\"\n                  }\n                ],\n                \"mapValue\": [\n                  {\n                    \"type\": 1,\n                    \"string\": \"_already_called_lintrk\"\n                  },\n                  {\n                    \"type\": 8,\n                    \"boolean\": true\n                  },\n                  {\n                    \"type\": 8,\n                    \"boolean\": true\n                  },\n                  {\n                    \"type\": 8,\n                    \"boolean\": false\n                  }\n                ]\n              }\n            ]\n          }\n        }\n      ]\n    },\n    \"clientAnnotations\": {\n      \"isEditedByUser\": true\n    },\n    \"isRequired\": true\n  },\n  {\n    \"instance\": {\n      \"key\": {\n        \"publicId\": \"get_url\",\n        \"versionId\": \"1\"\n      },\n      \"param\": [\n        {\n          \"key\": \"urlParts\",\n          \"value\": {\n            \"type\": 1,\n            \"string\": \"any\"\n          }\n        },\n        {\n          \"key\": \"queriesAllowed\",\n          \"value\": {\n            \"type\": 1,\n            \"string\": \"any\"\n          }\n        }\n      ]\n    },\n    \"clientAnnotations\": {\n      \"isEditedByUser\": true\n    },\n    \"isRequired\": true\n  },\n  {\n    \"instance\": {\n      \"key\": {\n        \"publicId\": \"inject_script\",\n        \"versionId\": \"1\"\n      },\n      \"param\": [\n        {\n          \"key\": \"urls\",\n          \"value\": {\n            \"type\": 2,\n            \"listItem\": [\n              {\n                \"type\": 1,\n                \"string\": \"https://snap.licdn.com/*\"\n              }\n            ]\n          }\n        }\n      ]\n    },\n    \"clientAnnotations\": {\n      \"isEditedByUser\": true\n    },\n    \"isRequired\": true\n  }\n]\n\n\n___TESTS___\n\nscenarios:\n- name: No API - Test sendPixel with custom URL and single conversionId\n  code: |-\n    const mockData = {\n      partnerId: '123',\n      customUrl: 'google.com',\n      conversionId: '12576358'\n    };\n\n    mock('sendPixel', (url, onSuccess, onFailure) => {\n      assertThat(url).contains('https://px.ads.linkedin.com/collect?pid=123&tm=gtmv2&conversionId=12576358&url=google.com&v=2&fmt=js&time=');\n      onSuccess();\n    });\n\n    runCode(mockData);\n    assertApi('gtmOnSuccess').wasCalled();\n- name: No API - Test sendPixel with page URL and no conversionId\n  code: |-\n    const encodeUriComponent = require('encodeUriComponent');\n    const getUrl = require('getUrl');\n    const mockData = { partnerId: '123' };\n\n    mock('sendPixel', (url, onSuccess, onFailure) => {\n      assertThat(url).contains('https://px.ads.linkedin.com/collect?pid=123&tm=gtmv2&url=' + encodeUriComponent(getUrl()) + '&v=2&fmt=js&time=');\n      onSuccess();\n    });\n\n    runCode(mockData);\n    assertApi('gtmOnSuccess').wasCalled();\n- name: With API - test script injection\n  code: |-\n    const getUrl = require('getUrl');\n    const mockData = { partnerId: '123' };\n    const copyFromWindow = require('copyFromWindow');\n\n    mock('injectScript', (url) => {\n      assertThat(url, 'correct script download URL is called').isEqualTo('https://snap.licdn.com/li.lms-analytics/insight.min.js');\n    });\n\n    runCode(mockData);\n- name: No API - Multiple partnerIds and conversion ids\n  code: \"const mockData = {\\n  partnerId: '123,456, 789, 299',\\n  customUrl: 'google.com',\\n\\\n    \\  conversionId: '1, 2, 3, 4, 5'\\n};\\nconst callStack = [];\\nmock('sendPixel',\\\n    \\ (url, onSuccess, onFailure) => {\\n  callStack.push(url);\\n  \\n  // Call success\\\n    \\ only once when stack is full\\n  if (callStack.length === 3) {\\n    onSuccess();\\n\\\n    \\  }\\n});\\n\\nrunCode(mockData);\\n\\nassertThat(callStack.length).isEqualTo(3);\\n\\\n    \\nassertThat(callStack[0]).contains('https://px.ads.linkedin.com/collect?pid=123%2C456%2C789%2C299&tm=gtmv2&conversionId=1&url=google.com&v=2&fmt=js&time=');\\n\\\n    \\nassertThat(callStack[1]).contains('https://px.ads.linkedin.com/collect?pid=123%2C456%2C789%2C299&tm=gtmv2&conversionId=2&url=google.com&v=2&fmt=js&time=');\\n\\\n    \\nassertThat(callStack[2]).contains('https://px.ads.linkedin.com/collect?pid=123%2C456%2C789%2C299&tm=gtmv2&conversionId=3&url=google.com&v=2&fmt=js&time=');\\n\\\n    \\nassertApi('gtmOnSuccess').wasCalled();\"\n\n\n___NOTES___\n\nCreated on 11/17/2021, 11:34:21 AM\n\n\n",
+                "galleryReference": {
+                    "host": "github.com",
+                    "owner": "linkedin",
+                    "repository": "linkedin-gtm-community-template",
+                    "version": "61d7d7cf207c62b05d8e3595288c4bccf8517dab",
+                    "isModified": true,
+                    "signature": "0fe43a81ecc2a69b3b57dbf1a2315c8422d366aa083164628b26e3680ae7ccb1"
+                }
+            }
+        ]
+    }
+}
