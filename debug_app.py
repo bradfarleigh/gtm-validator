@@ -77,7 +77,7 @@ def main():
                 st.json(result)
             elif isinstance(result, list):
                 if result:
-                    st.table(result)
+                    st.dataframe(result, use_container_width=True,hide_index=True)
                 else:
                     st.write("No results found.")
             st.markdown("---")
