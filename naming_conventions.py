@@ -10,18 +10,11 @@ VALID_PLATFORMS = {
     'DCM': 'DoubleClick',
     'TTD': 'The Trade Desk',
     'FL' : 'Floodlight',
-    'FB' : 'Facebook'
-    # Add more platform prefixes as needed
-}
-
-# Define valid platform prefixes
-VALID_PLATFORMS = {
-    'FB': 'Facebook',
-    'GA': 'Google Analytics',
-    'AW': 'Google Ads',
-    'TT': 'TikTok',
-    'DCM': 'DoubleClick',
-    'TTD': 'The Trade Desk',
+    'FB' : 'Facebook',
+    'HS' : 'Hubspot',
+    'HS' : 'HubSpot',
+    'GA4' : 'Google Analytics 4',
+    'LI' : 'LinkedIn'
     # Add more platform prefixes as needed
 }
 
