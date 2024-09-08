@@ -15,7 +15,8 @@ Our tool simplifies the process of reviewing and validating your Google Tag Mana
 # 🚀 **Getting Started**
 
 1. **Export** your GTM configuration (Google Tag Manager > Admin > Export Container).
-2. **Upload** the `.json` file here.
+2. **Upload** the `.json` file to the field below.
+3. **Review your setup*** using the various analyses
 
 Tip: We can **analyse** both published and draft workspaces to help you spot-check and verify your setup before publishing.
 """
