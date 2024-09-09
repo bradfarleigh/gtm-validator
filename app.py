@@ -84,10 +84,6 @@ def main():
                     # Display Tracking ID Summary if any inconsistencies or IDs exist
                     if any([facebook_ids, ga4_ids, google_ads_ids, ua_tags, tiktok_ids]):
                         display_tracking_id_summary(facebook_ids, ga4_ids, google_ads_ids, ua_tags, tiktok_ids, inconsistencies)
-                    
-                    # Display Tag Naming Conventions
-                    if tag_naming_info:
-                        display_tag_naming_conventions(tag_naming_info)
 
                     # Display Google Ads Conversion Tags if available
                     if grouped_google_ads_tags:
@@ -108,6 +104,11 @@ def main():
                     # Display Floodlight Tags if available
                     if grouped_floodlight_tags:
                         display_floodlight_tags(grouped_floodlight_tags)
+
+                        
+                    # Display Tag Naming Conventions
+                    if tag_naming_info:
+                        display_tag_naming_conventions(tag_naming_info)
 
                     # Display Tag Summary if available
                     grouped_tags = group_tags_by_type(tags)

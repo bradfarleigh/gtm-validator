@@ -13,7 +13,9 @@ VALID_PLATFORMS = {
     'FL': 'Floodlight',
     'HS': 'HubSpot',
     'LI': 'LinkedIn',
-    'Clarity': 'Microsoft Clarity'
+    'Clarity': 'Microsoft Clarity',
+    'Microsoft Clarity' : 'Microsoft Clarity',
+    'Conversion Linker' : 'Conversion Linker',
     # Add more platform prefixes as needed
 }
 
@@ -23,18 +25,24 @@ TAG_TYPE_TO_PREFIX = {
     'gaawc': 'GA4',
     'gaawe': 'GA4',
     'awct': 'Google Ads',
-    'sp': 'FB',
+    'sp': 'Google Ads - Remarketing',
     'flc': 'FL',
-    'tiktok': 'TT',
-    'linkedin': 'LinkedIn',
-    'hs': 'HS',
-    'clarity': 'Clarity',
     # Add more mappings as needed
+}
+
+# Define whitelisted tags
+WHITELISTED_TAGS = {
+    'Conversion Linker',
+    # Add more whitelisted tag names here
 }
 
 def assess_naming_convention(tag_name: str, tag_type: str) -> Dict[str, str]:
     if not tag_name or tag_name == 'Unnamed Tag':
         return {"overall": "❌ Missing name", "details": "Tag name is missing or unnamed."}
+
+    # Check if the tag is whitelisted
+    if tag_name in WHITELISTED_TAGS:
+        return {"overall": "✅ Whitelisted", "details": "This tag name is whitelisted and exempt from naming convention checks."}
 
     # Check for separators
     if '|' in tag_name:
@@ -88,3 +96,5 @@ def gather_tag_naming_info(tags: List[Dict[str, Any]], trigger_names: Dict[str, 
         })
     
     return tag_naming_info
+
+__all__ = ['gather_tag_naming_info', 'assess_naming_convention', 'WHITELISTED_TAGS']
