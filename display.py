@@ -8,7 +8,7 @@ from id_extraction import extract_facebook_id, extract_ga4_id, extract_google_ad
 
 
 def display_tracking_id_summary(facebook_ids, ga4_ids, google_ads_ids, ua_ids, tiktok_ids, inconsistencies):
-    st.header("Summary of tracking ID's detected")
+    st.header("Detected tracking ID's")
     st.markdown(
         """    
         We analyse your Tags and extract the various tracking ID's being used.
@@ -116,7 +116,7 @@ def display_action_points(action_points):
     action_points = list(set(action_points))
 
     with st.container(border=True):
-        st.header("🔎 Our findings")
+        st.subheader("Summary")
 
         if action_points:
             for point in action_points:
@@ -193,11 +193,11 @@ def display_tag_naming_conventions(tag_naming_info: List[Dict[str, str]]):
     st.dataframe(df, use_container_width=True, hide_index=True)
 
     # Display detailed explanations for tags with issues
-    st.subheader("Detailed Naming Convention Issues")
-    for tag in tag_naming_info:
-        if tag['Naming Convention'] != "✅ Acceptable":
-            st.markdown(f"**{tag['Tag Name']}**: {tag['Naming Convention']}")
-            st.markdown(f"- {tag['Details']}")
+    # st.subheader("Detailed Naming Convention Issues")
+    # for tag in tag_naming_info:
+    #    if tag['Naming Convention'] != "✅ Acceptable":
+    #        st.markdown(f"**{tag['Tag Name']}**: {tag['Naming Convention']}")
+    #        st.markdown(f"- {tag['Details']}")
 
 def assess_naming_convention(tag_name: str) -> str:
     # This is a basic assessment. You can expand this function to include more specific rules.
