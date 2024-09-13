@@ -35,10 +35,9 @@ def summarize_config(config):
 
 def analyze_with_gpt(config_summary, tags, client):
     prompt = f"""
-
     This tool is being used by marketing professionals who will be in charge of reviewing and publishing GTM changes made by 3rd parties and will help them audit and find issues.
 
-    Analyze the following Google Tag Manager (GTM) configuration summary and tags:
+    Analyse the following Google Tag Manager (GTM) configuration summary and tags:
 
     Container Name: {config_summary['container_name']}
     Tag Manager URL: {config_summary['tag_manager_url']}
@@ -61,25 +60,25 @@ def analyze_with_gpt(config_summary, tags, client):
     4. Identify paused and redundant tags
     5. Folder Structure: Check if tags are placed in appropriate folders (Analytics, Advertising, Conversion Tracking, Utilities)
     6. Conversion Linker: Verify if it's set to fire on all pages and check enableCrossDomain and enableUrlPassthrough settings
-    7. Include a signoff section which encourages users to reach out to me on linkedin (linkedin.com/in/brad-farleigh) if they need help with anything GTM or tracking related, or would like to customise or build a similar apps or tools to help streamline their business processe.
+    7. Include a signoff section which encourages users to reach out to me on linkedin (linkedin.com/in/brad-farleigh) if they need help with anything GTM or tracking related, or would like to customise or build similar apps or tools to help streamline their business processes.
     
     Rules to follow:
     1. If a Universal Analytics tag is found, only suggest that it should be deleted. Do not provide any other suggestions for Universal Analytics tags.
-    2. If we mention that we should check and ID or tag - make sure we display what the ID or tag is (so we know what to check for)
+    2. If we mention that we should check an ID or tag - make sure we display what the ID or tag is (so we know what to check for)
     3. I repeat - if we see a Universal Analytics tag we should only ever recommend it be deleted because UA was turned off in 2024, provide no other output.
     4. Provide concise feedback on issues and suggest improvements for each tag.
     5. Output the analysis for each tag with feedback on improvements.
-    6.Use Australian English.
+    6. Use Australian English.
     7. Do not say "conclusion" or "mate".
-    8. Try not to be too verbose when explaning action points.
+    8. Try not to be too verbose when explaining action points.
     9. Write like Sam Parr
-    10. Write from the context of Brad Farleigh - the CTO at Bang Digtial
+    10. Write from the context of Brad Farleigh - the CTO at Bang Digital
 
     """
 
     try:
         response = client.chat.completions.create(
-            model="gpt-4o-mini",
+            model="gpt-4-1106-preview",
             messages=[
                 {"role": "system", "content": "You are a GTM expert providing concise, actionable feedback."},
                 {"role": "user", "content": prompt}
@@ -90,45 +89,26 @@ def analyze_with_gpt(config_summary, tags, client):
         return f"An error occurred: {str(e)}"
 
 def main():
+    st.set_page_config(layout="wide")
     st.title("Bradgic - GTM Auditor")
 
     st.markdown(INTRO_TEXT)
 
-    # api_key = st.text_input("Enter your OpenAI API Key", value=DEFAULT_API_KEY, type="password")
     api_key = DEFAULT_API_KEY
 
     if not api_key:
-        st.warning("Please enter your OpenAI API key to proceed.")
+        st.warning("Please set your OpenAI API key in the .env file to proceed.")
         return
 
     client = OpenAI(api_key=api_key)
 
     st.subheader("Choose your GTM export file")
 
-    source = st.radio("Select source:", ("Upload JSON File", "Use JSON Folder"))
+    uploaded_file = st.file_uploader("Choose a GTM configuration JSON file", type="json")
 
-    if source == "Upload JSON File":
-        uploaded_file = st.file_uploader("Choose a GTM configuration JSON file", type="json")
-        if uploaded_file is not None:
-            config = load_gtm_config(uploaded_file)
-            analyze_config(config, client)
-    else:
-        json_folder = 'json'
-        if not os.path.exists(json_folder):
-            st.error(f"The '{json_folder}' folder does not exist. Please create it and add your JSON files.")
-            return
-
-        json_files = [f for f in os.listdir(json_folder) if f.endswith('.json')]
-        if not json_files:
-            st.warning(f"No JSON files found in the '{json_folder}' folder. Please add your GTM configuration files.")
-            return
-
-        selected_file = st.selectbox("Choose a file to analyze", json_files)
-        if st.button("Analyze Selected File"):
-            file_path = os.path.join(json_folder, selected_file)
-            with open(file_path, 'r') as file:
-                config = load_gtm_config(file)
-            analyze_config(config, client)
+    if uploaded_file is not None:
+        config = load_gtm_config(uploaded_file)
+        analyze_config(config, client)
 
 def analyze_config(config, client):
     config_summary = summarize_config(config)
@@ -138,13 +118,33 @@ def analyze_config(config, client):
     
     tags = config['containerVersion'].get('tag', [])
     
-
     with st.container():
-        with st.spinner("Analyzing tags..."):
+        st.markdown("""
+        <style>
+        .output-container {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+        
+        st.markdown('<div class="output-container">', unsafe_allow_html=True)
+        
+        with st.spinner("Analysing tags..."):
             analysis = analyze_with_gpt(config_summary, tags, client)
    
         st.markdown(analysis)
+        
+        st.markdown('</div>', unsafe_allow_html=True)
 
+    # Add collapsible section for tag details
+    with st.expander("Tag Details (Debugger/Investigator Tool)"):
+        for i, tag in enumerate(tags, 1):
+            st.subheader(f"Tag {i}: {tag.get('name', 'Unnamed Tag')}")
+            st.json(tag)
+            st.markdown("---")
 
 if __name__ == "__main__":
     main()
