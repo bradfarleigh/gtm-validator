@@ -97,7 +97,9 @@ def analyze_with_gpt(config_summary, tags, client):
         return f"An error occurred: {str(e)}"
 
 def main():
-    st.set_page_config(layout="wide")
+
+    st.set_page_config(page_title="GTM Auditor by Brad Farleigh", page_icon=None, layout="centered", initial_sidebar_state="auto", menu_items=None)
+
     st.title("GTM Auditor")
 
     st.markdown(INTRO_TEXT)
