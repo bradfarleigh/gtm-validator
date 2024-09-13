@@ -125,7 +125,7 @@ def main():
 
     st.divider()
 
-    st.markdown("Some Bradgic built by [Brad Farleigh](https://www.linkedin.com/in/brad-farleigh)")
+    st.markdown("Bradgic by [Brad Farleigh](https://www.linkedin.com/in/brad-farleigh)")
 
 def analyze_config(config, client):
     config_summary = summarize_config(config)
