@@ -1,0 +1,236 @@
+{
+    "exportFormatVersion": 2,
+    "exportTime": "2024-09-05 12:43:45",
+    "containerVersion": {
+        "path": "accounts/6001261803/containers/98078929/versions/0",
+        "accountId": "6001261803",
+        "containerId": "98078929",
+        "containerVersionId": "0",
+        "container": {
+            "path": "accounts/6001261803/containers/98078929",
+            "accountId": "6001261803",
+            "containerId": "98078929",
+            "name": "www.innovation.wa.gov.au",
+            "publicId": "GTM-MXNNNFT",
+            "usageContext": [
+                "WEB"
+            ],
+            "fingerprint": "1669946814282",
+            "tagManagerUrl": "https://tagmanager.google.com/#/container/accounts/6001261803/containers/98078929/workspaces?apiLink=container",
+            "features": {
+                "supportUserPermissions": true,
+                "supportEnvironments": true,
+                "supportWorkspaces": true,
+                "supportGtagConfigs": false,
+                "supportBuiltInVariables": true,
+                "supportClients": false,
+                "supportFolders": true,
+                "supportTags": true,
+                "supportTemplates": true,
+                "supportTriggers": true,
+                "supportVariables": true,
+                "supportVersions": true,
+                "supportZones": true,
+                "supportTransformations": false
+            },
+            "tagIds": [
+                "GTM-MXNNNFT"
+            ]
+        },
+        "tag": [
+            {
+                "accountId": "6001261803",
+                "containerId": "98078929",
+                "tagId": "4",
+                "name": "Google Analytics Universal Analytics",
+                "type": "ua",
+                "parameter": [
+                    {
+                        "type": "BOOLEAN",
+                        "key": "overrideGaSettings",
+                        "value": "false"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "trackType",
+                        "value": "TRACK_PAGEVIEW"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "gaSettings",
+                        "value": "{{Google Analytics Settings}}"
+                    }
+                ],
+                "fingerprint": "1669951538300",
+                "firingTriggerId": [
+                    "2147479553"
+                ],
+                "tagFiringOption": "ONCE_PER_EVENT",
+                "monitoringMetadata": {
+                    "type": "MAP"
+                },
+                "consentSettings": {
+                    "consentStatus": "NOT_SET"
+                }
+            },
+            {
+                "accountId": "6001261803",
+                "containerId": "98078929",
+                "tagId": "5",
+                "name": "Google Analytics GA4 Configuration",
+                "type": "googtag",
+                "parameter": [
+                    {
+                        "type": "TEMPLATE",
+                        "key": "tagId",
+                        "value": "G-5XWF1NFQNM"
+                    },
+                    {
+                        "type": "LIST",
+                        "key": "configSettingsTable",
+                        "list": [
+                            {
+                                "type": "MAP",
+                                "map": [
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "parameter",
+                                        "value": "send_page_view"
+                                    },
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "parameterValue",
+                                        "value": "true"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "fingerprint": "1669957140882",
+                "firingTriggerId": [
+                    "2147479553"
+                ],
+                "tagFiringOption": "ONCE_PER_EVENT",
+                "monitoringMetadata": {
+                    "type": "MAP"
+                },
+                "consentSettings": {
+                    "consentStatus": "NOT_SET"
+                }
+            },
+            {
+                "accountId": "6001261803",
+                "containerId": "98078929",
+                "tagId": "6",
+                "name": "AUTO Hotjar Tracking Code",
+                "type": "hjtc",
+                "parameter": [
+                    {
+                        "type": "TEMPLATE",
+                        "key": "hotjar_site_id",
+                        "value": "3455315"
+                    }
+                ],
+                "fingerprint": "1687847488763",
+                "firingTriggerId": [
+                    "2147479553"
+                ],
+                "consentSettings": {
+                    "consentStatus": "NOT_SET"
+                }
+            }
+        ],
+        "variable": [
+            {
+                "accountId": "6001261803",
+                "containerId": "98078929",
+                "variableId": "3",
+                "name": "Google Analytics Settings",
+                "type": "gas",
+                "parameter": [
+                    {
+                        "type": "TEMPLATE",
+                        "key": "cookieDomain",
+                        "value": "auto"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "doubleClick",
+                        "value": "false"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "setTrackerName",
+                        "value": "false"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "useDebugVersion",
+                        "value": "false"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "useHashAutoLink",
+                        "value": "false"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "decorateFormsAutoLink",
+                        "value": "false"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "enableLinkId",
+                        "value": "false"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "enableEcommerce",
+                        "value": "false"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "trackingId",
+                        "value": "UA-123147447-2"
+                    }
+                ],
+                "fingerprint": "1669951509522"
+            }
+        ],
+        "builtInVariable": [
+            {
+                "accountId": "6001261803",
+                "containerId": "98078929",
+                "type": "PAGE_URL",
+                "name": "Page URL"
+            },
+            {
+                "accountId": "6001261803",
+                "containerId": "98078929",
+                "type": "PAGE_HOSTNAME",
+                "name": "Page Hostname"
+            },
+            {
+                "accountId": "6001261803",
+                "containerId": "98078929",
+                "type": "PAGE_PATH",
+                "name": "Page Path"
+            },
+            {
+                "accountId": "6001261803",
+                "containerId": "98078929",
+                "type": "REFERRER",
+                "name": "Referrer"
+            },
+            {
+                "accountId": "6001261803",
+                "containerId": "98078929",
+                "type": "EVENT",
+                "name": "Event"
+            }
+        ],
+        "fingerprint": "1725540225500",
+        "tagManagerUrl": "https://tagmanager.google.com/#/versions/accounts/6001261803/containers/98078929/versions/0?apiLink=version"
+    }
+}

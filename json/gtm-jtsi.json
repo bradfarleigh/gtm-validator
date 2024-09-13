@@ -1,0 +1,150 @@
+{
+    "exportFormatVersion": 2,
+    "exportTime": "2024-09-05 12:44:19",
+    "containerVersion": {
+        "path": "accounts/6001261803/containers/116603080/versions/0",
+        "accountId": "6001261803",
+        "containerId": "116603080",
+        "containerVersionId": "0",
+        "container": {
+            "path": "accounts/6001261803/containers/116603080",
+            "accountId": "6001261803",
+            "containerId": "116603080",
+            "name": "www.jtsi.wa.gov.au",
+            "publicId": "GTM-WBHX6ZW",
+            "usageContext": [
+                "WEB"
+            ],
+            "fingerprint": "1683531022592",
+            "tagManagerUrl": "https://tagmanager.google.com/#/container/accounts/6001261803/containers/116603080/workspaces?apiLink=container",
+            "features": {
+                "supportUserPermissions": true,
+                "supportEnvironments": true,
+                "supportWorkspaces": true,
+                "supportGtagConfigs": false,
+                "supportBuiltInVariables": true,
+                "supportClients": false,
+                "supportFolders": true,
+                "supportTags": true,
+                "supportTemplates": true,
+                "supportTriggers": true,
+                "supportVariables": true,
+                "supportVersions": true,
+                "supportZones": true,
+                "supportTransformations": false
+            },
+            "tagIds": [
+                "GTM-WBHX6ZW"
+            ]
+        },
+        "tag": [
+            {
+                "accountId": "6001261803",
+                "containerId": "116603080",
+                "tagId": "4",
+                "name": "Google Analytics GA4 Configuration",
+                "type": "googtag",
+                "parameter": [
+                    {
+                        "type": "TEMPLATE",
+                        "key": "tagId",
+                        "value": "G-XE7SJ7T040"
+                    },
+                    {
+                        "type": "LIST",
+                        "key": "configSettingsTable",
+                        "list": [
+                            {
+                                "type": "MAP",
+                                "map": [
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "parameter",
+                                        "value": "send_page_view"
+                                    },
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "parameterValue",
+                                        "value": "true"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "fingerprint": "1683531400863",
+                "firingTriggerId": [
+                    "2147479553"
+                ],
+                "tagFiringOption": "ONCE_PER_EVENT",
+                "monitoringMetadata": {
+                    "type": "MAP"
+                },
+                "consentSettings": {
+                    "consentStatus": "NOT_SET"
+                }
+            },
+            {
+                "accountId": "6001261803",
+                "containerId": "116603080",
+                "tagId": "5",
+                "name": "Microsoft Clarity - Official",
+                "type": "html",
+                "parameter": [
+                    {
+                        "type": "TEMPLATE",
+                        "key": "html",
+                        "value": "<script type=\"text/javascript\">(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src=\"https://www.clarity.ms/tag/\"+i+\"?ref=gtm2\";y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,\"clarity\",\"script\",\"mc9cm1j02o\");</script>"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "supportDocumentWrite",
+                        "value": "false"
+                    }
+                ],
+                "fingerprint": "1715752757954",
+                "firingTriggerId": [
+                    "2147479553"
+                ],
+                "tagFiringOption": "ONCE_PER_EVENT",
+                "consentSettings": {
+                    "consentStatus": "NOT_SET"
+                }
+            }
+        ],
+        "builtInVariable": [
+            {
+                "accountId": "6001261803",
+                "containerId": "116603080",
+                "type": "PAGE_URL",
+                "name": "Page URL"
+            },
+            {
+                "accountId": "6001261803",
+                "containerId": "116603080",
+                "type": "PAGE_HOSTNAME",
+                "name": "Page Hostname"
+            },
+            {
+                "accountId": "6001261803",
+                "containerId": "116603080",
+                "type": "PAGE_PATH",
+                "name": "Page Path"
+            },
+            {
+                "accountId": "6001261803",
+                "containerId": "116603080",
+                "type": "REFERRER",
+                "name": "Referrer"
+            },
+            {
+                "accountId": "6001261803",
+                "containerId": "116603080",
+                "type": "EVENT",
+                "name": "Event"
+            }
+        ],
+        "fingerprint": "1725540258942",
+        "tagManagerUrl": "https://tagmanager.google.com/#/versions/accounts/6001261803/containers/116603080/versions/0?apiLink=version"
+    }
+}
