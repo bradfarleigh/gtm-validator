@@ -78,7 +78,7 @@ def analyze_with_gpt(config_summary, tags, client):
 
     try:
         response = client.chat.completions.create(
-            model="gpt-4-1106-preview",
+            model="gpt-4o-mini",
             messages=[
                 {"role": "system", "content": "You are a GTM expert providing concise, actionable feedback."},
                 {"role": "user", "content": prompt}
@@ -118,33 +118,18 @@ def analyze_config(config, client):
     
     tags = config['containerVersion'].get('tag', [])
     
-    with st.container():
-        st.markdown("""
-        <style>
-        .output-container {
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            padding: 20px;
-            margin-top: 20px;
-        }
-        </style>
-        """, unsafe_allow_html=True)
+    with st.spinner("Analysing tags..."):
+        analysis = analyze_with_gpt(config_summary, tags, client)
+
+    st.markdown(analysis)
         
-        st.markdown('<div class="output-container">', unsafe_allow_html=True)
-        
-        with st.spinner("Analysing tags..."):
-            analysis = analyze_with_gpt(config_summary, tags, client)
-   
-        st.markdown(analysis)
-        
-        st.markdown('</div>', unsafe_allow_html=True)
 
     # Add collapsible section for tag details
-    with st.expander("Tag Details (Debugger/Investigator Tool)"):
-        for i, tag in enumerate(tags, 1):
-            st.subheader(f"Tag {i}: {tag.get('name', 'Unnamed Tag')}")
+    st.divider()
+    st.header("Tag Inspector")
+    for i, tag in enumerate(tags, 1):
+        with st.expander(f"Tag {i}: {tag.get('name', 'Unnamed Tag')}"):
             st.json(tag)
-            st.markdown("---")
 
 if __name__ == "__main__":
     main()
