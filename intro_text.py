@@ -19,7 +19,7 @@ Ready to roll? Let’s start by uploading your GTM container!
 
 1. **Export** your GTM configuration (Google Tag Manager > Admin > Export Container).
 2. **Upload** the `.json` file to the field below.
-3. **Review your setup*** using the various analyses
+3. **Review the findings**
 
 Tip: We can process draft workspaces to help you spot-check and verify your setup before publishing.
 """
