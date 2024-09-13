@@ -1,16 +1,19 @@
 # This is intro_text.py
 
 INTRO_TEXT = """
-Our tool simplifies the process of reviewing and validating your Google Tag Manager (GTM) configuration. 
+***Cut through the noise. Spot the issues. Hit publish with confidence.***
 
-### Use it to:
+Ever feel like Google Tag Manager is out to get you? Yeah, we’ve all been there.  
 
-- 🔍 **Get a summary** of the tags firing in your GTM container.
-- 📊 **Check platform tracking IDs** (e.g., Facebook Pixel, GA4, TikTok Pixel) to ensure alignment with your measurement plan and quickly catch any misconfigurations.
-- 🚨 **Detect multiple IDs** being used across tags (e.g., multiple Facebook accounts used incorrectly).
-- 🔄 **Identify redundant Universal Analytics (UA) tags**.
-- ❗ **Flag duplicate Google Conversion Tags**, which might indicate incorrect ID usage.
-- 🌐 **Examine Floodlight tag usage** and detect duplicates.
+When someone else (looking at you, third-party agencies) makes changes, and you’re stuck making sure everything’s perfect before you hit publish—it’s stressful.
+
+**That’s where our GTM Auditor steps in.**
+
+It highlights all the weird stuff—duplicate tags, wrong tracking IDs, misconfigurations—so you can clean up the mess before it becomes a real problem.
+
+No deep technical dives needed, just a quicker way to make sure your setup is ready to go.
+
+Ready to roll? Let’s start by uploading your GTM container!
 
 # 🚀 **Getting Started**
 
@@ -18,5 +21,5 @@ Our tool simplifies the process of reviewing and validating your Google Tag Mana
 2. **Upload** the `.json` file to the field below.
 3. **Review your setup*** using the various analyses
 
-Tip: We can **analyse** both published and draft workspaces to help you spot-check and verify your setup before publishing.
+Tip: We can process draft workspaces to help you spot-check and verify your setup before publishing.
 """

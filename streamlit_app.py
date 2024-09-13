@@ -10,7 +10,14 @@ load_dotenv()
 DEFAULT_API_KEY = os.getenv("CHATGPT_API_KEY")
 
 def load_gtm_config(file):
-    return json.load(file)
+    try:
+        config = json.load(file)
+        # Check for essential GTM export structure
+        if 'containerVersion' not in config or 'tag' not in config['containerVersion']:
+            raise ValueError("Invalid GTM export format")
+        return config
+    except json.JSONDecodeError:
+        raise ValueError("Invalid JSON file")
 
 def summarize_config(config):
     container_version = config['containerVersion']
@@ -34,6 +41,10 @@ def summarize_config(config):
     return summary
 
 def analyze_with_gpt(config_summary, tags, client):
+    # Sanitize input to prevent prompt injection
+    sanitized_summary = json.dumps(config_summary, indent=2)
+    sanitized_tags = json.dumps([{k: v for k, v in tag.items() if k in ['name', 'type', 'parameter']} for tag in tags], indent=2)
+
     prompt = f"""
     This tool is being used by marketing professionals who will be in charge of reviewing and publishing GTM changes made by 3rd parties and will help them audit and find issues.
 
@@ -43,10 +54,10 @@ def analyze_with_gpt(config_summary, tags, client):
     Tag Manager URL: {config_summary['tag_manager_url']}
 
     Configuration Summary:
-    {json.dumps(config_summary, indent=2)}
+    {sanitized_summary}
 
     Tags:
-    {json.dumps(tags, indent=2)}
+    {sanitized_tags}
 
     Focus on:
     1. Naming Conventions:
@@ -60,7 +71,6 @@ def analyze_with_gpt(config_summary, tags, client):
     4. Identify paused and redundant tags
     5. Folder Structure: Check if tags are placed in appropriate folders (Analytics, Advertising, Conversion Tracking, Utilities)
     6. Conversion Linker: Verify if it's set to fire on all pages and check enableCrossDomain and enableUrlPassthrough settings
-    7. Include a signoff section which encourages users to reach out to me on linkedin (linkedin.com/in/brad-farleigh) if they need help with anything GTM or tracking related, or would like to customise or build similar apps or tools to help streamline their business processes.
     
     Rules to follow:
     1. If a Universal Analytics tag is found, only suggest that it should be deleted. Do not provide any other suggestions for Universal Analytics tags.
@@ -88,7 +98,7 @@ def analyze_with_gpt(config_summary, tags, client):
 
 def main():
     st.set_page_config(layout="wide")
-    st.title("Bradgic - GTM Auditor")
+    st.title("GTM Auditor")
 
     st.markdown(INTRO_TEXT)
 
@@ -105,8 +115,15 @@ def main():
     uploaded_file = st.file_uploader("Choose a GTM configuration JSON file", type="json")
 
     if uploaded_file is not None:
-        config = load_gtm_config(uploaded_file)
-        analyze_config(config, client)
+        try:
+            config = load_gtm_config(uploaded_file)
+            analyze_config(config, client)
+        except ValueError as e:
+            st.error(f"Error: {str(e)}. Please upload a valid GTM export JSON file.")
+
+    st.divider()
+
+    st.markdown("Some Bradgic built by [Brad Farleigh](https://www.linkedin.com/in/brad-farleigh)")
 
 def analyze_config(config, client):
     config_summary = summarize_config(config)
@@ -116,14 +133,10 @@ def analyze_config(config, client):
     
     tags = config['containerVersion'].get('tag', [])
     
-    with st.spinner("Analysing tags..."):
+    with st.spinner("Apply Bradgic..."):
         analysis = analyze_with_gpt(config_summary, tags, client)
 
     st.markdown(analysis)
-        
-    st.divider()
-    st.header("Like this tool?")
-    st.markdown("Do you need a hand with GTM, GA4, tracking, reporting, or building tools to streamline your business? [Hit me up on LinkedIn](https://www.linkedin.com/in/brad-farleigh).")
 
     # Add collapsible section for tag details
     st.divider()
