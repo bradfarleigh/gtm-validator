@@ -71,8 +71,6 @@ def analyze_with_gpt(config_summary, tags, client):
     6. Use Australian English.
     7. Do not say "conclusion" or "mate".
     8. Try not to be too verbose when explaining action points.
-    9. Write like Sam Parr
-    10. Write from the context of Brad Farleigh - the CTO at Bang Digital
 
     """
 
@@ -123,6 +121,9 @@ def analyze_config(config, client):
 
     st.markdown(analysis)
         
+    st.divider()
+    st.header("Like this tool?")
+    st.markdown("Do you need a hand with GTM, GA4, tracking, reporting, or building tools to streamline your business? [Hit me up on LinkedIn](https://www.linkedin.com/in/brad-farleigh).")
 
     # Add collapsible section for tag details
     st.divider()
