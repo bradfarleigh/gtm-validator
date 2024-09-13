@@ -135,7 +135,7 @@ def analyze_config(config, client):
     
     tags = config['containerVersion'].get('tag', [])
     
-    with st.spinner("Apply Bradgic..."):
+    with st.spinner("Processing..."):
         analysis = analyze_with_gpt(config_summary, tags, client)
 
     st.markdown(analysis)
