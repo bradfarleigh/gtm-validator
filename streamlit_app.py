@@ -182,73 +182,173 @@ def login_signup():
                 st.success("User created successfully! Please log in.")
             else:
                 st.error("Error creating user")
+def is_logged_in():
+    return 'user' in st.session_state and st.session_state['user'] is not None and hasattr(st.session_state['user'], 'id')
+
+def get_user_id():
+    return st.session_state['user'].id if is_logged_in() else None
+
+def signup(email, password):
+    try:
+        response = supabase.auth.sign_up({"email": email, "password": password})
+        return response
+    except Exception as e:
+        handle_error(e)
+        return None
+
+def login(email, password):
+    try:
+        response = supabase.auth.sign_in_with_password({"email": email, "password": password})
+        return response
+    except Exception as e:
+        handle_error(e)
+        return None
+
+def save_project(user_id, name, config, analysis):
+    try:
+        data, count = supabase.table('projects').insert({
+            "user_id": user_id,
+            "name": name,
+            "config": json.dumps(config),
+            "analysis": analysis,
+            "created_at": datetime.now().isoformat()
+        }).execute()
+        return data
+    except Exception as e:
+        handle_error(e)
+        return None
+
+def get_projects(user_id):
+    try:
+        data, count = supabase.table('projects').select("*").eq('user_id', user_id).order('created_at', desc=True).execute()
+        return data[1]
+    except Exception as e:
+        handle_error(e)
+        return []
+
+def get_project(project_id):
+    try:
+        data, count = supabase.table('projects').select("*").eq('id', project_id).execute()
+        return data[1][0] if data[1] else None
+    except Exception as e:
+        handle_error(e)
+        return None
+
+def login_modal():
+    with st.modal("Login/Signup"):
+        tab1, tab2 = st.tabs(["Login", "Sign Up"])
+        
+        with tab1:
+            email = st.text_input("Email", key="login_email")
+            password = st.text_input("Password", type="password", key="login_password")
+            if st.button("Login", key="login_button"):
+                response = login(email, password)
+                if response:
+                    st.session_state['user'] = response.user
+                    st.success("Logged in successfully!")
+                    st.experimental_rerun()
+                else:
+                    st.error("Invalid email or password")
+
+        with tab2:
+            new_email = st.text_input("New Email", key="signup_email")
+            new_password = st.text_input("New Password", type="password", key="signup_password")
+            if st.button("Sign Up", key="signup_button"):
+                response = signup(new_email, new_password)
+                if response:
+                    st.success("User created successfully! Please log in.")
+                else:
+                    st.error("Error creating user")
+
+def sidebar_menu():
+    st.sidebar.title("GTM Auditor")
+    menu = ["New Analysis", "Projects"]
+    choice = st.sidebar.selectbox("Menu", menu)
+    
+    if is_logged_in():
+        if st.sidebar.button("Logout"):
+            del st.session_state['user']
+            st.experimental_rerun()
+    else:
+        if st.sidebar.button("Login/Signup"):
+            st.session_state['show_login_modal'] = True
+    
+    return choice
+
+def new_analysis_page():
+    st.title("New GTM Analysis")
+    uploaded_file = st.file_uploader("Choose a GTM configuration JSON file", type="json")
+
+    if uploaded_file is not None:
+        if 'config' not in st.session_state or 'analysis' not in st.session_state:
+            try:
+                config = load_gtm_config(uploaded_file)
+                analysis = analyze_config(config)
+                st.session_state['config'] = config
+                st.session_state['analysis'] = analysis
+            except ValueError as e:
+                handle_error(e)
+                return
+
+        if is_logged_in():
+            project_name = st.text_input("Project Name")
+            if project_name and st.button("Save Project"):
+                save_project(get_user_id(), project_name, st.session_state['config'], st.session_state['analysis'])
+                st.success("Project saved successfully!")
+
+        display_analysis(st.session_state['config'], st.session_state['analysis'], full_access=is_logged_in())
+
+        if not is_logged_in():
+            st.warning("Sign up or log in to save your project and see the full analysis")
+            if st.button("Login/Signup"):
+                st.session_state['show_login_modal'] = True
+                st.experimental_rerun()
+
+def projects_page():
+    st.title("My Projects")
+    if not is_logged_in():
+        st.warning("Please log in to view your projects")
+        return
+
+    projects = get_projects(get_user_id())
+    if not projects:
+        st.info("You don't have any saved projects yet.")
+        return
+
+    for project in projects:
+        col1, col2 = st.columns([3, 1])
+        with col1:
+            st.subheader(project['name'])
+            st.text(f"Created at: {project['created_at']}")
+        with col2:
+            if st.button("View", key=f"view_{project['id']}"):
+                st.session_state['selected_project'] = project['id']
+                st.experimental_rerun()
+
+    if 'selected_project' in st.session_state:
+        project = get_project(st.session_state['selected_project'])
+        if project:
+            st.subheader(f"Project: {project['name']}")
+            config = json.loads(project['config'])
+            analysis = project['analysis']
+            display_analysis(config, analysis, full_access=True)
 
 def main():
     st.set_page_config(page_title="GTM Auditor by Brad Farleigh", page_icon=None, layout="wide", initial_sidebar_state="auto", menu_items=None)
 
-    st.title("GTM Auditor")
-    st.markdown(INTRO_TEXT)
+    if 'show_login_modal' in st.session_state and st.session_state['show_login_modal']:
+        login_modal()
+        st.session_state['show_login_modal'] = False
 
-    # User authentication section
-    if 'user' not in st.session_state:
-        col1, col2, col3 = st.columns([1, 1, 1])
-        with col1:
-            if st.button("Login/Signup"):
-                st.session_state['auth_action'] = 'login_signup'
-        with col2:
-            if st.button("Continue as Guest"):
-                st.session_state['user'] = {'id': 'guest', 'email': 'guest'}
+    choice = sidebar_menu()
 
-    if 'auth_action' in st.session_state and st.session_state['auth_action'] == 'login_signup':
-        login_signup()
-        if 'user' in st.session_state:
-            del st.session_state['auth_action']
-            st.experimental_rerun()
+    if choice == "New Analysis":
+        new_analysis_page()
+    elif choice == "Projects":
+        projects_page()
 
-    # Main app logic
-    if 'user' in st.session_state:
-        user = st.session_state['user']
-        
-        if getattr(user, 'id', 'guest') != 'guest':
-            st.sidebar.header(f"Welcome, {getattr(user, 'email', 'User')}")
-            if st.sidebar.button("Logout"):
-                del st.session_state['user']
-                st.experimental_rerun()
-
-            # Display projects in sidebar
-            projects = get_projects(user.id)
-            project_names = [f"{p['name']} - {p['created_at']}" for p in projects]
-            selected_project = st.sidebar.selectbox("Select a project", ["New Project"] + project_names)
-
-            if selected_project != "New Project":
-                project_id = projects[project_names.index(selected_project) - 1]['id']
-                project = get_project(project_id)
-                config = json.loads(project['config'])
-                analysis = project['analysis']
-                display_analysis(config, analysis, full_access=True)
-                st.stop()
-
-        # New project section
-        project_name = st.text_input("Project Name (optional)")
-        uploaded_file = st.file_uploader("Choose a GTM configuration JSON file", type="json")
-
-        if uploaded_file is not None:
-            try:
-                config = load_gtm_config(uploaded_file)
-                analysis = analyze_config(config)
-
-                if getattr(user, 'id', 'guest') != 'guest':
-                    if project_name and st.button("Save Project"):
-                        save_project(getattr(user, 'id', 'guest'), project_name, config, analysis)
-                        st.success("Project saved successfully!")
-
-                display_analysis(config, analysis, full_access=(getattr(user, 'id', 'guest') != 'guest'))
-
-            except ValueError as e:
-                handle_error(e)
-
-    st.divider()
-    st.markdown("Bradgic by [Brad Farleigh](https://www.linkedin.com/in/brad-farleigh)")
+    st.sidebar.divider()
+    st.sidebar.markdown("Bradgic by [Brad Farleigh](https://www.linkedin.com/in/brad-farleigh)")
 
 def analyze_config(config):
     client = OpenAI(api_key=DEFAULT_API_KEY)
