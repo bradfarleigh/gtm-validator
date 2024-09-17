@@ -135,36 +135,31 @@ def login(email, password):
         handle_error(e)
         return None
 
-def save_project(user_id, name, config, analysis):
-    """Save a new project to the Supabase 'projects' table."""
-    try:
-        data, count = supabase.table('projects').insert({
-            "user_id": user_id,
-            "name": name,
-            "config": json.dumps(config),
-            "analysis": analysis,
-            "created_at": datetime.now().isoformat()
-        }).execute()
-        return data
-    except Exception as e:
-        handle_error(e)
-        return None
-
 def get_projects(user_id):
-    """Retrieve all projects for a specific user."""
+    """Retrieve all projects for a specific user with debugging."""
     try:
+        st.write(f"Retrieving projects for User ID: {user_id}")
         data, count = supabase.table('projects').select("*").eq('user_id', user_id).order('created_at', desc=True).execute()
+        
+        st.write(f"Supabase Select Response Data: {data}, Count: {count}")
         return data[1]
     except Exception as e:
+        st.write("Error in get_projects:")
+        st.write(str(e))
         handle_error(e)
         return []
 
 def get_project(project_id):
-    """Retrieve a specific project by its ID."""
+    """Retrieve a specific project by its ID with debugging."""
     try:
+        st.write(f"Retrieving project for Project ID: {project_id}")
         data, count = supabase.table('projects').select("*").eq('id', project_id).execute()
+        
+        st.write(f"Supabase Select Response Data: {data}, Count: {count}")
         return data[1][0] if data[1] else None
     except Exception as e:
+        st.write("Error in get_project:")
+        st.write(str(e))
         handle_error(e)
         return None
 
@@ -222,7 +217,7 @@ def sidebar_menu():
     return choice
 
 def new_analysis_page():
-    """Render the New Analysis page."""
+    """Render the New Analysis page with automatic project saving based on containerId."""
     st.title("New GTM Analysis")
     uploaded_file = st.file_uploader("Choose a GTM configuration JSON file", type="json")
 
@@ -237,32 +232,120 @@ def new_analysis_page():
                 handle_error(e)
                 return
 
+        # Extract containerId for automatic project saving
+        container_id = st.session_state['config'].get('containerVersion', {}).get('containerId', 'Unknown')
+
         if is_logged_in():
-            project_name = st.text_input("Project Name")
-            if project_name and st.button("Save Project"):
-                save_response = save_project(get_user_id(), project_name, st.session_state['config'], st.session_state['analysis'])
+            # Check if the project with the same containerId already exists
+            existing_projects = get_projects_by_container_id(get_user_id(), container_id)
+            if not existing_projects:
+                # Automatically save the project if it doesn't already exist
+                save_response = save_project(get_user_id(), container_id, st.session_state['config'], st.session_state['analysis'])
                 if save_response:
-                    st.success("Project saved successfully!")
+                    st.success(f"Project with Container ID {container_id} saved successfully!")
                 else:
                     st.error("Failed to save the project.")
+            else:
+                st.info(f"A project with Container ID {container_id} already exists.")
 
         display_analysis(st.session_state['config'], st.session_state['analysis'], full_access=is_logged_in())
 
         if not is_logged_in():
             st.warning("Sign up or log in to save your project and see the full analysis")
 
+def get_projects_by_container_id(user_id, container_id):
+    """Retrieve projects by containerId for a specific user."""
+    try:
+        st.write(f"Checking for existing projects with Container ID: {container_id} for User ID: {user_id}")
+        data, count = supabase.table('projects').select("*").eq('user_id', user_id).eq('container_id', container_id).execute()
+        
+        st.write(f"Supabase Select Response Data: {data}, Count: {count}")
+        return data[1] if data else []
+    except Exception as e:
+        st.write("Error in get_projects_by_container_id:")
+        st.write(str(e))
+        handle_error(e)
+        return []
+
+def save_project(user_id, container_id, config, analysis):
+    """Save a new project to the Supabase 'projects' table using containerId."""
+    try:
+        st.write("Attempting to save project with Container ID:", container_id)
+        st.write(f"User ID: {user_id}, Container ID: {container_id}")
+        # st.write("Config:", json.dumps(config, indent=2))
+        # st.write("Analysis:", analysis)
+
+        # Check if the user ID matches the expected value
+        if not user_id:
+            st.error("User ID is None. Please ensure the user is logged in.")
+            return None
+
+        # Attempt to insert the project into the projects table
+        data, count = supabase.table('projects').insert({
+            "user_id": user_id,  # Ensure this matches auth.uid() in Supabase
+            "container_id": container_id,
+            "config": json.dumps(config),
+            "analysis": analysis,
+            "created_at": datetime.now().isoformat()
+        }).execute()
+        
+        st.write(f"Supabase Insert Response Data: {data}, Count: {count}")
+        return data
+    except Exception as e:
+        st.write("Error in save_project:")
+        st.write(str(e))
+        handle_error(e)
+        return None
+
 def projects_page():
-    """Render the Projects page."""
+    """Render the Projects page with the ability to add projects."""
     st.title("My Projects")
+    
+    # Ensure the user is logged in before allowing project actions
     if not is_logged_in():
-        st.warning("Please log in to view your projects")
+        st.warning("Please log in to view or add your projects")
         return
 
+    # Show current user ID
+    st.info(f"Your user id: {get_user_id()}")
+
+    # Form to add new projects
+    st.subheader("Add New Project")
+    
+    with st.form("new_project_form"):
+        project_name = st.text_input("Project Name")
+        uploaded_file = st.file_uploader("Upload GTM configuration (JSON)", type="json")
+        submit_button = st.form_submit_button("Save Project")
+
+        if submit_button:
+            if project_name and uploaded_file is not None:
+                try:
+                    # Load and process GTM configuration
+                    config = load_gtm_config(uploaded_file)
+                    analysis = analyze_config(config)
+                    container_id = config.get('containerVersion', {}).get('containerId', 'Unknown')
+                    
+                    # Save the project
+                    save_response = save_project(get_user_id(), container_id, config, analysis)
+                    
+                    if save_response:
+                        st.success(f"Project '{project_name}' with Container ID {container_id} saved successfully!")
+                    else:
+                        st.error("Failed to save the project.")
+                except ValueError as e:
+                    handle_error(e)
+            else:
+                st.error("Please provide a project name and upload a valid GTM configuration file.")
+
+    # Display existing projects
+    st.subheader("My Existing Projects")
     projects = get_projects(get_user_id())
+    
     if not projects:
         st.info("You don't have any saved projects yet.")
         return
 
+    # List existing projects
     for project in projects:
         col1, col2 = st.columns([3, 1])
         with col1:
@@ -273,6 +356,7 @@ def projects_page():
                 st.session_state['selected_project'] = project['id']
                 st.experimental_rerun()
 
+    # View selected project details
     if 'selected_project' in st.session_state:
         project = get_project(st.session_state['selected_project'])
         if project:
@@ -280,6 +364,7 @@ def projects_page():
             config = json.loads(project['config'])
             analysis = project['analysis']
             display_analysis(config, analysis, full_access=True)
+
 
 def main():
     """Main function to run the Streamlit app."""
