@@ -1,11 +1,18 @@
 import streamlit as st
 import json
 import os
+import logging
+import hashlib
 from openai import OpenAI
 from dotenv import load_dotenv
 import pandas as pd
 from supabase import create_client, Client
 from datetime import datetime
+import traceback
+
+# Set up logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # Load environment variables
 load_dotenv()
@@ -19,11 +26,26 @@ BRAD_LINKEDIN_URL = "https://www.linkedin.com/in/brad-farleigh"
 # Initialize Supabase client
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
+def get_supabase_client():
+    if 'session' in st.session_state and st.session_state['session'] is not None:
+        client = create_client(SUPABASE_URL, SUPABASE_KEY)
+        client.auth.set_session(
+            access_token=st.session_state['session'].access_token,
+            refresh_token=st.session_state['session'].refresh_token
+        )
+        return client
+    else:
+        return create_client(SUPABASE_URL, SUPABASE_KEY)
+
 def handle_error(e):
-    """Handle errors by displaying an error message with a unique code."""
-    error_code = hash(str(e)) % 10000  # Generate a 4-digit error code
-    st.error(f"An error occurred. Error Code: {error_code}")
-    st.markdown(f"If you're experiencing issues, please reach out to Brad on [LinkedIn]({BRAD_LINKEDIN_URL}).")
+    error_message = f"An error occurred: {str(e)}"
+    stack_trace = traceback.format_exc()
+    
+    st.error(error_message)
+    st.code(stack_trace, language="python")
+    
+    logger.error(f"Error: {error_message}\n{stack_trace}")
+    st.markdown(f"If you're experiencing issues, please reach out to Brad on [LinkedIn]({BRAD_LINKEDIN_URL}) and provide the error details above.")
 
 def load_gtm_config(file):
     """Load and validate GTM configuration from a JSON file."""
@@ -121,6 +143,7 @@ def signup(email, password):
     """Sign up a new user using Supabase authentication."""
     try:
         response = supabase.auth.sign_up({"email": email, "password": password})
+        logger.info(f"User signed up: {email}")
         return response
     except Exception as e:
         handle_error(e)
@@ -130,261 +153,177 @@ def login(email, password):
     """Log in an existing user using Supabase authentication."""
     try:
         response = supabase.auth.sign_in_with_password({"email": email, "password": password})
+        if response.user and response.session:
+            st.session_state['user'] = response.user
+            st.session_state['session'] = response.session
+        logger.info(f"User logged in: {email}")
         return response
     except Exception as e:
         handle_error(e)
         return None
 
-def get_projects(user_id):
-    """Retrieve all projects for a specific user with debugging."""
+def get_projects(user_id, limit=None):
+    """Retrieve projects for a specific user."""
     try:
-        st.write(f"Retrieving projects for User ID: {user_id}")
-        data, count = supabase.table('projects').select("*").eq('user_id', user_id).order('created_at', desc=True).execute()
-        
-        st.write(f"Supabase Select Response Data: {data}, Count: {count}")
-        return data[1]
+        logger.info(f"Fetching projects for user: {user_id}")
+        client = get_supabase_client()
+        query = client.table('projects').select("*").eq('user_id', str(user_id)).order('created_at', desc=True)
+        if limit:
+            query = query.limit(limit)
+        result = query.execute()
+        projects = result.data if result else []
+        logger.info(f"Projects fetched: {len(projects)}")
+        return projects
     except Exception as e:
-        st.write("Error in get_projects:")
-        st.write(str(e))
+        logger.error(f"Error fetching projects for user {user_id}: {str(e)}")
         handle_error(e)
         return []
 
 def get_project(project_id):
-    """Retrieve a specific project by its ID with debugging."""
+    """Retrieve a specific project by its ID."""
     try:
-        st.write(f"Retrieving project for Project ID: {project_id}")
-        data, count = supabase.table('projects').select("*").eq('id', project_id).execute()
+        logger.info(f"Fetching project with ID: {project_id}")
+        client = get_supabase_client()
+        result = client.table('projects').select("*").eq('id', project_id).execute()
         
-        st.write(f"Supabase Select Response Data: {data}, Count: {count}")
-        return data[1][0] if data[1] else None
+        if result and result.data:
+            project = result.data[0]
+            logger.info(f"Project fetched successfully: {project['name']}")
+            return project
+        else:
+            logger.warning(f"No project found with ID: {project_id}")
+            return None
     except Exception as e:
-        st.write("Error in get_project:")
-        st.write(str(e))
+        logger.error(f"Error fetching project with ID {project_id}: {str(e)}")
         handle_error(e)
         return None
 
 def is_logged_in():
     """Check if a user is logged in."""
-    return 'user' in st.session_state and st.session_state['user'] is not None and hasattr(st.session_state['user'], 'id')
+    return 'user' in st.session_state and 'session' in st.session_state and st.session_state['user'] is not None and st.session_state['session'] is not None
 
 def get_user_id():
     """Get the current logged-in user's ID."""
     return st.session_state['user'].id if is_logged_in() else None
 
+def on_project_select():
+    if st.session_state.selected_project != "Select a project":
+        project = next((p for p in st.session_state.projects if p['name'] == st.session_state.selected_project), None)
+        if project:
+            st.session_state['selected_project_id'] = project['id']
+            st.session_state['page'] = 'project_details'
+
 def sidebar_menu():
-    """Render the sidebar with authentication and navigation options."""
     st.sidebar.title("GTM Auditor")
 
-    # Navigation Menu
-    menu = ["New Analysis", "Projects"]
-    choice = st.sidebar.selectbox("Menu", menu)
-
-    # Authentication Section
-    if not is_logged_in():
+    if is_logged_in():
+        st.sidebar.write(f"G'day, {st.session_state['user'].email}")
         
-            st.sidebar.markdown("### Login or signup")
-            email = st.sidebar.text_input("Email", key="email")
-            password = st.sidebar.text_input("Password", type="password", key="password")
-            if st.sidebar.button("Login", type="primary",key="login_button"):
-                if email and password:
-                    response = login(email, password)
-                    if response and response.user:
-                        st.session_state['user'] = response.user
-                        st.sidebar.success("Logged in successfully!")
-                    else:
-                        st.sidebar.error("Invalid email or password")
-                else:
-                    st.sidebar.error("Please enter both email and password.")
+        st.sidebar.subheader("Recent Projects")
+        
+        projects = get_projects(get_user_id(), limit=5)
+        st.session_state.projects = projects  # Store projects in session state
+        project_names = ["Select a project"] + [project['name'] for project in projects]
+        
+        if 'selected_project' not in st.session_state:
+            st.session_state.selected_project = "Select a project"
+        
+        st.sidebar.selectbox("", project_names, key="selected_project", on_change=on_project_select)
 
-            if st.sidebar.button("Sign Up", key="signup_button"):
-                if email and password:
-                    response = signup(signup_email, signup_password)
-                    if response:
-                        st.sidebar.success("User created successfully! Please log in.")
-                    else:
-                        st.sidebar.error("Error creating user")
+        if st.sidebar.button("See All Projects"):
+            st.session_state['page'] = 'all_projects'
+
+    else:
+        st.sidebar.markdown("### Login or signup")
+        email = st.sidebar.text_input("Email", key="email")
+        password = st.sidebar.text_input("Password", type="password", key="password")
+        if st.sidebar.button("Login", type="primary", key="login_button"):
+            if email and password:
+                response = login(email, password)
+                if response and response.user:
+                    st.sidebar.success("Logged in successfully!")
+                    st.rerun()
                 else:
-                    st.sidebar.error("Please enter both email and password.")
+                    st.sidebar.error("Invalid email or password")
+                    logger.warning(f"Failed login attempt: {email}")
+            else:
+                st.sidebar.error("Please enter both email and password.")
+
+        if st.sidebar.button("Sign Up", key="signup_button"):
+            if email and password:
+                response = signup(email, password)
+                if response:
+                    st.sidebar.success("User created successfully! Please log in.")
+                    logger.info(f"New user signed up: {email}")
+                else:
+                    st.sidebar.error("Error creating user")
+                    logger.error(f"Failed to create user: {email}")
+            else:
+                st.sidebar.error("Please enter both email and password.")
 
     st.sidebar.divider()
+            
     if is_logged_in():
         if st.sidebar.button("Logout"):
             del st.session_state['user']
+            del st.session_state['session']
             st.sidebar.success("Logged out successfully!")
+            st.rerun()
+            logger.info("User logged out")
+            
+    st.sidebar.caption("Bradgic by [Brad Farleigh](https://www.linkedin.com/in/brad-farleigh)")
 
-    st.sidebar.markdown("Bradgic by [Brad Farleigh](https://www.linkedin.com/in/brad-farleigh)")
+def list_json_examples():
+    """List all JSON files in the /json-examples directory."""
+    json_dir = "./json-examples"
+    json_files = [f for f in os.listdir(json_dir) if f.endswith('.json')]
+    return json_files
 
-    return choice
+def load_json_example(filename):
+    """Load a JSON example file from the /json-examples directory."""
+    with open(os.path.join("./json-examples", filename), 'r') as file:
+        return json.load(file)
 
-def new_analysis_page():
-    """Render the New Analysis page with automatic project saving based on containerId."""
-    st.title("New GTM Analysis")
-    uploaded_file = st.file_uploader("Choose a GTM configuration JSON file", type="json")
+def hash_json(json_content):
+    """Create a hash of the JSON content."""
+    return hashlib.md5(json.dumps(json_content, sort_keys=True).encode()).hexdigest()
 
-    if uploaded_file is not None:
-        if 'config' not in st.session_state or 'analysis' not in st.session_state:
-            try:
-                config = load_gtm_config(uploaded_file)
-                analysis = analyze_config(config)
-                st.session_state['config'] = config
-                st.session_state['analysis'] = analysis
-            except ValueError as e:
-                handle_error(e)
-                return
-
-        # Extract containerId for automatic project saving
-        container_id = st.session_state['config'].get('containerVersion', {}).get('containerId', 'Unknown')
-
-        if is_logged_in():
-            # Check if the project with the same containerId already exists
-            existing_projects = get_projects_by_container_id(get_user_id(), container_id)
-            if not existing_projects:
-                # Automatically save the project if it doesn't already exist
-                save_response = save_project(get_user_id(), container_id, st.session_state['config'], st.session_state['analysis'])
-                if save_response:
-                    st.success(f"Project with Container ID {container_id} saved successfully!")
-                else:
-                    st.error("Failed to save the project.")
-            else:
-                st.info(f"A project with Container ID {container_id} already exists.")
-
-        display_analysis(st.session_state['config'], st.session_state['analysis'], full_access=is_logged_in())
-
-        if not is_logged_in():
-            st.warning("Sign up or log in to save your project and see the full analysis")
-
-def get_projects_by_container_id(user_id, container_id):
-    """Retrieve projects by containerId for a specific user."""
+def get_cached_analysis(hash_value):
+    """Retrieve cached analysis from Supabase."""
     try:
-        st.write(f"Checking for existing projects with Container ID: {container_id} for User ID: {user_id}")
-        data, count = supabase.table('projects').select("*").eq('user_id', user_id).eq('container_id', container_id).execute()
-        
-        st.write(f"Supabase Select Response Data: {data}, Count: {count}")
-        return data[1] if data else []
+        client = get_supabase_client()
+        result = client.table('analysis_cache').select("*").eq('hash', hash_value).execute()
+        return result.data[0] if result and result.data else None
     except Exception as e:
-        st.write("Error in get_projects_by_container_id:")
-        st.write(str(e))
-        handle_error(e)
-        return []
-
-def save_project(user_id, container_id, config, analysis):
-    """Save a new project to the Supabase 'projects' table using containerId."""
-    try:
-        st.write("Attempting to save project with Container ID:", container_id)
-        st.write(f"User ID: {user_id}, Container ID: {container_id}")
-        # st.write("Config:", json.dumps(config, indent=2))
-        # st.write("Analysis:", analysis)
-
-        # Check if the user ID matches the expected value
-        if not user_id:
-            st.error("User ID is None. Please ensure the user is logged in.")
-            return None
-
-        # Attempt to insert the project into the projects table
-        data, count = supabase.table('projects').insert({
-            "user_id": user_id,  # Ensure this matches auth.uid() in Supabase
-            "container_id": container_id,
-            "config": json.dumps(config),
-            "analysis": analysis,
-            "created_at": datetime.now().isoformat()
-        }).execute()
-        
-        st.write(f"Supabase Insert Response Data: {data}, Count: {count}")
-        return data
-    except Exception as e:
-        st.write("Error in save_project:")
-        st.write(str(e))
+        logger.error(f"Error retrieving cached analysis for hash {hash_value}: {str(e)}")
         handle_error(e)
         return None
 
-def projects_page():
-    """Render the Projects page with the ability to add projects."""
-    st.title("My Projects")
-    
-    # Ensure the user is logged in before allowing project actions
-    if not is_logged_in():
-        st.warning("Please log in to view or add your projects")
-        return
-
-    # Show current user ID
-    st.info(f"Your user id: {get_user_id()}")
-
-    # Form to add new projects
-    st.subheader("Add New Project")
-    
-    with st.form("new_project_form"):
-        project_name = st.text_input("Project Name")
-        uploaded_file = st.file_uploader("Upload GTM configuration (JSON)", type="json")
-        submit_button = st.form_submit_button("Save Project")
-
-        if submit_button:
-            if project_name and uploaded_file is not None:
-                try:
-                    # Load and process GTM configuration
-                    config = load_gtm_config(uploaded_file)
-                    analysis = analyze_config(config)
-                    container_id = config.get('containerVersion', {}).get('containerId', 'Unknown')
-                    
-                    # Save the project
-                    save_response = save_project(get_user_id(), container_id, config, analysis)
-                    
-                    if save_response:
-                        st.success(f"Project '{project_name}' with Container ID {container_id} saved successfully!")
-                    else:
-                        st.error("Failed to save the project.")
-                except ValueError as e:
-                    handle_error(e)
-            else:
-                st.error("Please provide a project name and upload a valid GTM configuration file.")
-
-    # Display existing projects
-    st.subheader("My Existing Projects")
-    projects = get_projects(get_user_id())
-    
-    if not projects:
-        st.info("You don't have any saved projects yet.")
-        return
-
-    # List existing projects
-    for project in projects:
-        col1, col2 = st.columns([3, 1])
-        with col1:
-            st.subheader(project['name'])
-            st.text(f"Created at: {project['created_at']}")
-        with col2:
-            if st.button("View", key=f"view_{project['id']}"):
-                st.session_state['selected_project'] = project['id']
-                st.experimental_rerun()
-
-    # View selected project details
-    if 'selected_project' in st.session_state:
-        project = get_project(st.session_state['selected_project'])
-        if project:
-            st.subheader(f"Project: {project['name']}")
-            config = json.loads(project['config'])
-            analysis = project['analysis']
-            display_analysis(config, analysis, full_access=True)
-
-
-def main():
-    """Main function to run the Streamlit app."""
-    st.set_page_config(
-        page_title="GTM Auditor by Brad Farleigh",
-        page_icon="🔍",
-        layout="wide",
-        initial_sidebar_state="expanded",
-        menu_items=None
-    )
-
-    choice = sidebar_menu()
-
-    if choice == "New Analysis":
-        new_analysis_page()
-    elif choice == "Projects":
-        projects_page()
+def save_cached_analysis(hash_value, analysis):
+    """Save analysis to Supabase cache."""
+    try:
+        client = get_supabase_client()
+        data = client.table('analysis_cache').insert({
+            "hash": hash_value,
+            "analysis": analysis,
+            "created_at": datetime.now().isoformat()
+        }).execute()
+        logger.info(f"Analysis cached for hash: {hash_value}")
+        return data.data[0] if data and data.data else None
+    except Exception as e:
+        logger.error(f"Error saving cached analysis for hash {hash_value}: {str(e)}")
+        handle_error(e)
+        return None
 
 def analyze_config(config):
-    """Analyze the GTM configuration and return the analysis."""
+    """Analyze the GTM configuration and return the analysis, using cache if available."""
+    hash_value = hash_json(config)
+    cached_analysis = get_cached_analysis(hash_value)
+
+    if cached_analysis:
+        st.info("This configuration has been analysed before. Showing cached results.")
+        return cached_analysis['analysis']
+
     client = OpenAI(api_key=DEFAULT_API_KEY)
     config_summary = summarize_config(config)
     tags = config['containerVersion'].get('tag', [])
@@ -394,7 +333,104 @@ def analyze_config(config):
     with st.spinner("Analysing GTM configuration..."):
         analysis = analyze_with_gpt(config_summary, tags, variables, triggers, client)
 
+    save_cached_analysis(hash_value, analysis)
     return analysis
+
+def new_analysis_page():
+    st.title("New GTM Analysis")
+    
+    if st.button("Upload New JSON"):
+        st.session_state['analysis_option'] = 'upload'
+    
+    analysis_option = st.session_state.get('analysis_option', 'choose')
+    
+    if analysis_option == 'choose':
+        analysis_option = st.radio(
+            "Choose analysis source:",
+            ("Upload JSON file", "Select from examples")
+        )
+    
+    if analysis_option == "Upload JSON file":
+        uploaded_file = st.file_uploader("Choose a GTM configuration JSON file", type="json")
+        if uploaded_file is not None:
+            config = load_gtm_config(uploaded_file)
+    elif analysis_option == "Select from examples":
+        json_examples = list_json_examples()
+        selected_example = st.selectbox("Select a JSON example", json_examples)
+        if selected_example:
+            config = load_json_example(selected_example)
+    
+    if 'config' in locals():
+        try:
+            analysis = analyze_config(config)
+            display_analysis(config, analysis, full_access=is_logged_in())
+
+            if is_logged_in():
+                # Automatically save the project
+                container_name = config['containerVersion']['container']['name']
+                save_project(get_user_id(), container_name, config, analysis)
+                st.success(f"Project '{container_name}' saved automatically!")
+            else:
+                st.warning("Sign up or log in to save your project and see the full analysis")
+        except ValueError as e:
+            handle_error(e)
+
+def all_projects_page():
+    st.title("All Projects")
+    projects = get_projects(get_user_id())
+    
+    for project in projects:
+        col1, col2 = st.columns([3, 1])
+        with col1:
+            st.subheader(f"**{project['name']}**")
+            st.caption(f"Created: {project['created_at']}")
+        with col2:
+            if st.button("View", key=f"view_project_{project['id']}"):
+                st.session_state['selected_project'] = project['id']
+                st.session_state['page'] = 'project_details'
+                st.rerun()
+    
+
+def save_project(user_id, name, config, analysis):
+    """Save a new project to the Supabase 'projects' table."""
+    try:
+        logger.info(f"Attempting to save project for user: {user_id}, name: {name}")
+        client = get_supabase_client()
+        
+        # Check if a project with the same name already exists for this user
+        result = client.table('projects').select("*").eq('user_id', str(user_id)).eq('name', name).execute()
+        
+        existing_projects = result.data if result else []
+        
+        logger.info(f"Existing projects: {existing_projects}")
+
+        if existing_projects:
+            # Update existing project
+            project_id = existing_projects[0]['id']
+            logger.info(f"Updating existing project with id: {project_id}")
+            data = client.table('projects').update({
+                "config": json.dumps(config),
+                "analysis": analysis,
+                "updated_at": datetime.now().isoformat()
+            }).eq('id', project_id).execute()
+            logger.info(f"Project updated for user: {user_id}, name: {name}")
+        else:
+            # Insert new project
+            logger.info(f"Inserting new project for user: {user_id}, name: {name}")
+            data = client.table('projects').insert({
+                "user_id": user_id,
+                "name": name,
+                "config": json.dumps(config),
+                "analysis": analysis,
+                "created_at": datetime.now().isoformat()
+            }).execute()
+            logger.info(f"New project saved for user: {user_id}, name: {name}")
+        
+        return data.data[0] if data and data.data else None
+    except Exception as e:
+        logger.error(f"Error saving project for user {user_id}, name {name}: {str(e)}")
+        handle_error(e)
+        return None
 
 def display_analysis(config, analysis, full_access=True):
     """Display the analysis of the GTM configuration."""
@@ -420,7 +456,7 @@ def display_analysis(config, analysis, full_access=True):
         st.warning("Sign up or log in to see the full analysis")
 
     if full_access:
-        if st.button("Export Findings"):
+        if st.button("Generate export of findings",type='primary'):
             export_findings(config_summary, analysis)
 
         st.divider()
@@ -456,11 +492,54 @@ def export_findings(config_summary, analysis):
     df = pd.DataFrame(data)
     csv = df.to_csv(index=False)
     st.download_button(
-        label="Download CSV",
+        label="Download the findings",
         data=csv,
         file_name="gtm_audit_findings.csv",
         mime="text/csv",
     )
+    logger.info("Findings exported as CSV")
+
+def main():
+    st.set_page_config(
+        page_title="GTM Auditor by Brad Farleigh",
+        page_icon="🔍",
+        layout="wide",
+        initial_sidebar_state="expanded",
+        menu_items=None
+    )
+
+    if not supabase:
+        st.error("Supabase client is not initialized")
+        return
+
+    sidebar_menu()
+
+    if 'page' not in st.session_state:
+        st.session_state['page'] = 'home'
+
+    if st.session_state['page'] == 'home':
+        new_analysis_page()
+    elif st.session_state['page'] == 'all_projects':
+        all_projects_page()
+    elif st.session_state['page'] == 'project_details':
+        if 'selected_project_id' in st.session_state:
+            project = get_project(st.session_state['selected_project_id'])
+            if project:
+                st.title(f"Project: {project['name']}")
+                config = json.loads(project['config'])
+                analysis = project['analysis']
+                display_analysis(config, analysis, full_access=True)
+                if st.button("Back to All Projects"):
+                    st.session_state['page'] = 'all_projects'
+            else:
+                st.error("Project not found")
+        else:
+            st.error("No project selected")
+    
+    st.divider()
+    if st.session_state['page'] != 'home':
+        if st.button("Back to Home",type="secondary"):
+            st.session_state['page'] = 'home'
 
 if __name__ == "__main__":
     main()
