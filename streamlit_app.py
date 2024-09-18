@@ -234,17 +234,35 @@ def sidebar_menu():
         st.sidebar.subheader("Recent Projects")
         
         projects = get_projects(get_user_id(), limit=5)
-        st.session_state.projects = projects  # Store projects in session state
         project_names = ["Select a project"] + [project['name'] for project in projects]
         
-        if 'selected_project' not in st.session_state:
-            st.session_state.selected_project = "Select a project"
-        
-        st.sidebar.selectbox("", project_names, key="selected_project", on_change=on_project_select)
+        selected_index = st.sidebar.selectbox(
+            "",
+            range(len(project_names)),
+            format_func=lambda i: project_names[i],
+            key="selected_project_index"
+        )
+
+        if selected_index > 0:  # If a project is selected (not "Select a project")
+            selected_project = projects[selected_index - 1]
+            st.session_state['selected_project_id'] = selected_project['id']
+            st.session_state['page'] = 'project_details'
+            st.rerun()
 
         if st.sidebar.button("See All Projects"):
             st.session_state['page'] = 'all_projects'
-
+            st.rerun()
+        
+        if st.sidebar.button("Logout"):
+            del st.session_state['user']
+            del st.session_state['session']
+            if 'selected_project_index' in st.session_state:
+                del st.session_state['selected_project_index']
+            if 'selected_project_id' in st.session_state:
+                del st.session_state['selected_project_id']
+            st.sidebar.success("Logged out successfully!")
+            st.rerun()
+            logger.info("User logged out")
     else:
         st.sidebar.markdown("### Login or signup")
         email = st.sidebar.text_input("Email", key="email")
@@ -349,10 +367,9 @@ def analyze_config(config):
     return analysis
 
 def new_analysis_page():
-    st.title("New GTM Analysis")
-    
-    if st.button("Upload New JSON"):
-        st.session_state['analysis_option'] = 'upload'
+    st.title("New GTM audit")
+    st.markdown("Generate your JSON file at [Google Tag Manager](https://tagmanager.google.com) > Admin > Export Container then upload below.")
+
     
     analysis_option = st.session_state.get('analysis_option', 'choose')
     
@@ -394,15 +411,18 @@ def all_projects_page():
     for project in projects:
         col1, col2 = st.columns([3, 1])
         with col1:
-            st.subheader(f"**{project['name']}**")
+            st.write(f"**{project['name']}**")
             st.caption(f"Created: {project['created_at']}")
         with col2:
             if st.button("View", key=f"view_project_{project['id']}"):
-                st.session_state['selected_project'] = project['id']
+                st.session_state['selected_project_id'] = project['id']
                 st.session_state['page'] = 'project_details'
                 st.rerun()
     
-
+    if st.button("Back to Home"):
+        st.session_state['page'] = 'home'
+        st.rerun()
+        
 def save_project(user_id, name, config, analysis):
     """Save a new project to the Supabase 'projects' table."""
     try:
@@ -589,7 +609,7 @@ def export_findings(config_summary, analysis):
         mime="application/pdf",
     )
     logger.info("Findings exported as PDF")
-    
+
 def main():
     st.set_page_config(
         page_title="GTM Auditor by Brad Farleigh",
@@ -622,15 +642,16 @@ def main():
                 display_analysis(config, analysis, full_access=True)
                 if st.button("Back to All Projects"):
                     st.session_state['page'] = 'all_projects'
+                    st.rerun()
             else:
                 st.error("Project not found")
         else:
             st.error("No project selected")
     
-    st.divider()
     if st.session_state['page'] != 'home':
-        if st.button("Back to Home",type="secondary"):
+        if st.button("Back to Home"):
             st.session_state['page'] = 'home'
-
+            st.rerun()
+            
 if __name__ == "__main__":
     main()
