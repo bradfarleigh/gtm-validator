@@ -137,6 +137,7 @@ def analyze_with_gpt(config_summary, tags, variables, triggers, client):
     3. Use Australian English.
     4. Provide concise, actionable feedback for each tag, variable, and trigger.
     5. Highlight potential issues or improvements in the overall setup.
+    6. For Clarity the prefix should be Clarity, not MISC
     """
 
     try:
@@ -230,31 +231,32 @@ def sidebar_menu():
     st.sidebar.title("GTM Auditor")
 
     if is_logged_in():
+        
         st.sidebar.write(f"G'day, {st.session_state['user'].email}")
         
-        st.sidebar.subheader("Your Recent Projects")
-        
+        # Retrieve the projects for the user and create the dropdown with "New Analysis" at the top
         projects = get_projects(get_user_id(), limit=5)
-        project_names = ["Select a project"] + [project['name'] for project in projects]
+        project_names = ["Start New Analysis"] + [project['name'] for project in projects]
         
         selected_index = st.sidebar.selectbox(
-            "",
+            "Select a project",
             range(len(project_names)),
             format_func=lambda i: project_names[i],
             key="selected_project_index"
         )
-
-        if selected_index > 0:  # If a project is selected (not "Select a project")
-            selected_project = projects[selected_index - 1]
+        
+        if selected_index == 0:  # If "Start New Analysis" is selected
+            # Reset session state and navigate to the new analysis page
+            st.session_state.pop('selected_project_index', None)
+            st.session_state.pop('selected_project_id', None)
+            st.session_state['page'] = 'home'
+            # st.rerun()  # Rerun to apply the changes
+        
+        elif selected_index > 0:  # If a specific project is selected
+            selected_project = projects[selected_index - 1]  # Adjust index due to "Start New Analysis"
             st.session_state['selected_project_id'] = selected_project['id']
             st.session_state['page'] = 'project_details'
-            #st.rerun()
-
-        if st.sidebar.button("See All Projects"):
-            st.session_state['page'] = 'all_projects'
-            
-            st.rerun()
-  
+    
     else:
         st.sidebar.markdown("### Login or signup")
         email = st.sidebar.text_input("Email", key="email")
@@ -284,19 +286,21 @@ def sidebar_menu():
                 st.sidebar.error("Please enter both email and password.")
 
     st.sidebar.divider()
-            
-      
-    if st.sidebar.button("Logout"):
-        del st.session_state['user']
-        del st.session_state['session']
-        if 'selected_project_index' in st.session_state:
-            del st.session_state['selected_project_index']
-        if 'selected_project_id' in st.session_state:
-            del st.session_state['selected_project_id']
-        st.sidebar.success("Logged out successfully!")
-        st.rerun()
-        logger.info("User logged out")
-            
+
+    if is_logged_in():
+        # Logout button to clear session state
+        if st.sidebar.button("Logout"):
+            del st.session_state['user']
+            del st.session_state['session']
+            if 'selected_project_index' in st.session_state:
+                del st.session_state['selected_project_index']
+            if 'selected_project_id' in st.session_state:
+                del st.session_state['selected_project_id']
+            st.sidebar.success("Logged out successfully!")
+            st.rerun()
+            logger.info("User logged out")
+
+    # Add the footer with your LinkedIn profile
     st.sidebar.caption("Bradgic by [Brad Farleigh](https://www.linkedin.com/in/brad-farleigh)")
 
 def list_json_examples():
@@ -372,11 +376,12 @@ def new_analysis_page():
         st.markdown("Generate your JSON file at [Google Tag Manager](https://tagmanager.google.com) > Admin > Export Container then upload below.")
         analysis_option = st.session_state.get('analysis_option', 'choose')
         
-        if analysis_option == 'choose':
-            analysis_option = st.radio(
-                "Choose analysis source:",
-                ("Upload JSON file", "Select from examples")
-            )
+        # if analysis_option == 'choose':
+        #    analysis_option = st.radio(
+        #        "Choose analysis source:",
+        #        ("Upload JSON file", "Select from examples")
+        
+        analysis_option = "Upload JSON file"
         
         if analysis_option == "Upload JSON file":
             uploaded_file = st.file_uploader("Choose a GTM configuration JSON file", type="json")
@@ -417,9 +422,7 @@ def all_projects_page():
                 st.session_state['selected_project_id'] = project['id']
                 st.session_state['page'] = 'project_details'
                 st.rerun()
-    
 
-        
 def save_project(user_id, name, config, analysis):
     """Save a new project to the Supabase 'projects' table."""
     try:
@@ -440,7 +443,8 @@ def save_project(user_id, name, config, analysis):
             data = client.table('projects').update({
                 "config": json.dumps(config),
                 "analysis": analysis,
-                "updated_at": datetime.now().isoformat()
+                # Remove this line if the 'updated_at' column doesn't exist
+                # "updated_at": datetime.now().isoformat()
             }).eq('id', project_id).execute()
             logger.info(f"Project updated for user: {user_id}, name: {name}")
         else:
@@ -530,6 +534,7 @@ class NumberedCanvas(canvas.Canvas):
         self.drawRightString(20*cm, 1*cm, f"Page {self._pageNumber} of {page_count}")
         self.drawString(1*cm, 1*cm, "Generated by GTM Auditor by Brad Farleigh - bradfarleigh.com")
 
+
 def export_findings(config_summary, analysis):
     """Export the analysis findings as a PDF file."""
     buffer = BytesIO()
@@ -567,31 +572,26 @@ def export_findings(config_summary, analysis):
     elements.append(Paragraph("Analysis", heading_style))
     elements.append(Spacer(1, 12))
 
-    # Convert markdown to HTML
-    html_analysis = markdown2.markdown(analysis, extras=["fenced-code-blocks"])
+    # Convert markdown to HTML and sanitize it
+    try:
+        html_analysis = markdown2.markdown(analysis, extras=["fenced-code-blocks"])
+    except Exception as e:
+        st.error(f"Error converting markdown to HTML: {e}")
+        return
+    
+    # Safely handle HTML, ensuring no unclosed tags are passed to Paragraph
+    sanitized_html = re.sub(r'<(strong|em|b|i)>', '', html_analysis)  # Remove potential unclosed tags for simplicity
+    sanitized_html = re.sub(r'</(strong|em|b|i)>', '', sanitized_html)
 
-    # Process the HTML content
-    in_code_block = False
-    code_block = []
-    for line in html_analysis.split('\n'):
-        if line.strip().startswith('<pre><code>'):
-            in_code_block = True
-            code_block = []
-        elif line.strip() == '</code></pre>':
-            in_code_block = False
-            code_text = '\n'.join(code_block)
-            elements.append(Preformatted(code_text, code_style))
-            elements.append(Spacer(1, 10))
-        elif in_code_block:
-            code_block.append(line)
-        else:
-            if line.strip().startswith('<ul>') or line.strip().startswith('<ol>'):
-                elements.append(Spacer(1, 6))
-            elif line.strip().startswith('<li>'):
-                line = '• ' + line[4:-5]  # Replace <li> with bullet point
-            if line.strip():
+    # Convert the sanitized HTML into paragraphs
+    for line in sanitized_html.split('\n'):
+        if line.strip():  # Only process non-empty lines
+            try:
                 elements.append(Paragraph(line, normal_style))
                 elements.append(Spacer(1, 6))
+            except ValueError as e:
+                st.error(f"Error processing line for PDF export: {e}")
+                continue
 
     # Build PDF
     doc.build(elements, canvasmaker=NumberedCanvas)
@@ -606,6 +606,7 @@ def export_findings(config_summary, analysis):
         mime="application/pdf",
     )
     logger.info("Findings exported as PDF")
+
 
 def main():
     st.set_page_config(
