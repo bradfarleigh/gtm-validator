@@ -121,30 +121,22 @@ def analyze_with_gpt(config_summary, tags, variables, triggers, client):
     Triggers:
     {sanitized_triggers}
 
-    Focus on:
-    1. Naming Conventions: [Platform] | [Type] - [Description]
-    2. Configuration Consistency: Check IDs (GA4 Measurement ID, Floodlight Advertiser ID, etc.)
-    3. Event Tracking configuration
-    4. Identify paused and redundant tags
-    5. Folder Structure: Check if tags are in appropriate folders
-    6. Conversion Linker: Verify settings
-    7. Variable usage and consistency
-    8. Trigger setup and efficiency
-    
-    Rules:
-    1. For Universal Analytics tags, only suggest deletion.
-    2. Display IDs or tags mentioned for checking.
-    3. Use Australian English.
-    4. Provide concise, actionable feedback for each tag, variable, and trigger.
-    5. Highlight potential issues or improvements in the overall setup.
-    6. For Clarity the prefix should be Clarity, not MISC
+    Output your analysis following the guidelines below:
+    1. List tag that have problems  - one section for each tag, output tag name in format "Tag Name: XXXX" in bold heading (not large)
+    2. For each tag provide a dot-point analysis on improvements based on best practice
+    3. We should anlyse tag names based on best practice naming convention -  [Platform] - [Type] - [Description] or [Platform] | [Type] - [Description] - if they are not, we should provide a suggestion for a rename
+    4. Any UA tags should be deleted - for these do not mention any other output except for the fact they should be deleted because UA is no longer active
+    5. Any paused tags should be reviewed and removed if unnessary
+    6. Do not number headings
+    7. When outputting tracking ID's or tag names in content wrap them in code tags for better readability
+
     """
 
     try:
         response = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[
-                {"role": "system", "content": "You are a GTM expert providing concise, actionable feedback."},
+                {"role": "system", "content": "You are a marketing expert responsible for reviewing and providing feedback on Google Tag Manager configurations."},
                 {"role": "user", "content": prompt}
             ]
         )
@@ -232,7 +224,7 @@ def sidebar_menu():
 
     if is_logged_in():
         
-        st.sidebar.write(f"G'day, {st.session_state['user'].email}")
+        # st.sidebar.write(f"G'day, {st.session_state['user'].email}")
         
         # Retrieve the projects for the user and create the dropdown with "New Analysis" at the top
         projects = get_projects(get_user_id(), limit=5)
@@ -347,23 +339,32 @@ def save_cached_analysis(hash_value, analysis):
 
 def analyze_config(config):
     """Analyze the GTM configuration and return the analysis, using cache if available."""
+    
+    # Add a checkbox to allow bypassing the cache (hash check)
+    bypass_cache = st.checkbox("Bypass cache and re-run analysis")
+    
     hash_value = hash_json(config)
     cached_analysis = get_cached_analysis(hash_value)
 
-    if cached_analysis:
-        st.info("This configuration has been analysed before. Showing cached results.")
+    # If bypass is not checked and cached analysis exists, use the cached result
+    if cached_analysis and not bypass_cache:
+        st.info("This configuration has been analyzed before. Showing cached results.")
         return cached_analysis['analysis']
-
+    
+    # If bypass is checked or no cached analysis exists, perform a new analysis
     client = OpenAI(api_key=DEFAULT_API_KEY)
     config_summary = summarize_config(config)
     tags = config['containerVersion'].get('tag', [])
     variables = config['containerVersion'].get('variable', [])
     triggers = config['containerVersion'].get('trigger', [])
 
-    with st.spinner("Analysing GTM configuration..."):
+    with st.spinner("Analyzing GTM configuration..."):
         analysis = analyze_with_gpt(config_summary, tags, variables, triggers, client)
 
-    save_cached_analysis(hash_value, analysis)
+    # Save the new analysis to cache if the hash was not bypassed
+    if not bypass_cache:
+        save_cached_analysis(hash_value, analysis)
+
     return analysis
 
 def new_analysis_page():
@@ -376,12 +377,13 @@ def new_analysis_page():
         st.markdown("Generate your JSON file at [Google Tag Manager](https://tagmanager.google.com) > Admin > Export Container then upload below.")
         analysis_option = st.session_state.get('analysis_option', 'choose')
         
-        # if analysis_option == 'choose':
-        #    analysis_option = st.radio(
-        #        "Choose analysis source:",
-        #        ("Upload JSON file", "Select from examples")
+        if analysis_option == 'choose':
+            analysis_option = st.radio(
+                "Choose analysis source:",
+                ("Upload JSON file", "Select from examples")
+            )
         
-        analysis_option = "Upload JSON file"
+        #analysis_option = "Upload JSON file"
         
         if analysis_option == "Upload JSON file":
             uploaded_file = st.file_uploader("Choose a GTM configuration JSON file", type="json")
@@ -469,6 +471,11 @@ def display_analysis(config, analysis, full_access=True):
     """Display the analysis of the GTM configuration."""
     config_summary = summarize_config(config)
 
+    st.divider()
+
+
+    st.subheader("Analysis")
+
     st.markdown(f"**Container Name:** {config_summary['container_name']}")
     st.markdown(f"**Tag Manager URL:** {config_summary['tag_manager_url']}")
 
@@ -480,7 +487,6 @@ def display_analysis(config, analysis, full_access=True):
     with col3:
         st.metric("Triggers", config_summary['trigger_count'])
 
-    st.subheader("Analysis")
     if full_access:
         st.markdown(analysis)
     else:
