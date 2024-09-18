@@ -129,6 +129,12 @@ def analyze_with_gpt(config_summary, tags, variables, triggers, client):
     5. Any paused tags should be reviewed and removed if unnessary
     6. Do not number headings
     7. When outputting tracking ID's or tag names in content wrap them in code tags for better readability
+    8. Skip the UA output analysis if no UA tags were found - this applies with all tags (we should limit redundant output)
+    9. If a tag type starts with CVT_ then it is a custom template tag - you should find the matching template ID in the JSON and find the "name" of the template to determine the tag type
+
+    Finally - output a summary of the tracking ID's used for each of the platforms detected so we can sanity check vs our measurement plan. We should also check to see if there are any discrepancies between ID's used in tags - which could be cause for concern. Recommend the user checks the ID's vs their tracking plans.
+
+
 
     """
 
@@ -553,6 +559,7 @@ def export_findings(config_summary, analysis):
     heading_style = styles['Heading2']
     normal_style = ParagraphStyle('Normal', fontSize=10, leading=14, alignment=TA_JUSTIFY)
     value_style = ParagraphStyle('Value', fontSize=10, leading=14, textColor=grey)
+    bullet_style = ParagraphStyle('Bullet', fontSize=10, leading=14, alignment=TA_JUSTIFY, bulletFontName='Helvetica', bulletIndent=0, bulletFontSize=10)
     code_style = ParagraphStyle('Code', fontName='Courier', fontSize=8, leading=10)
 
     # Add title
@@ -580,39 +587,49 @@ def export_findings(config_summary, analysis):
 
     # Convert markdown to HTML and sanitize it
     try:
-        html_analysis = markdown2.markdown(analysis, extras=["fenced-code-blocks"])
+        html_analysis = markdown2.markdown(analysis, extras=["fenced-code-blocks", "footnotes", "toc", "cuddled-lists", "tables", "strike"])
     except Exception as e:
         st.error(f"Error converting markdown to HTML: {e}")
         return
-    
+
     # Safely handle HTML, ensuring no unclosed tags are passed to Paragraph
     sanitized_html = re.sub(r'<(strong|em|b|i)>', '', html_analysis)  # Remove potential unclosed tags for simplicity
     sanitized_html = re.sub(r'</(strong|em|b|i)>', '', sanitized_html)
 
-    # Convert the sanitized HTML into paragraphs
+    # Convert the sanitized HTML into paragraphs, supporting bullet points
     for line in sanitized_html.split('\n'):
-        if line.strip():  # Only process non-empty lines
-            try:
-                elements.append(Paragraph(line, normal_style))
+        if line.strip():
+            if line.strip().startswith("<ul>") or line.strip().startswith("<ol>"):  # Detect bullet point lists
                 elements.append(Spacer(1, 6))
-            except ValueError as e:
-                st.error(f"Error processing line for PDF export: {e}")
-                continue
+            elif line.strip().startswith("<li>"):  # Handle list items
+                bullet_text = line[4:-5].strip()  # Strip <li> and </li> tags
+                elements.append(Paragraph(f"• {bullet_text}", bullet_style))  # Add bullet point
+                elements.append(Spacer(1, 6))
+            else:
+                try:
+                    elements.append(Paragraph(line, normal_style))
+                    elements.append(Spacer(1, 6))
+                except ValueError as e:
+                    st.error(f"Error processing line for PDF export: {e}")
+                    continue
 
     # Build PDF
     doc.build(elements, canvasmaker=NumberedCanvas)
     pdf = buffer.getvalue()
     buffer.close()
 
-    # Provide download button
+    # Generate filename from container name
+    container_name = config_summary['container_name']
+    clean_container_name = re.sub(r'[\s.]+', '-', container_name)  # Replace spaces and periods with hyphens
+
+    # Provide download button with custom filename
     st.download_button(
         label="Download the findings (PDF)",
         data=pdf,
-        file_name="gtm_audit_findings.pdf",
+        file_name=f"{clean_container_name}.pdf",
         mime="application/pdf",
     )
     logger.info("Findings exported as PDF")
-
 
 def main():
     st.set_page_config(
