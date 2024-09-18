@@ -1,6 +1,7 @@
 # This is intro_text.py
 
 INTRO_TEXT = """
+# GTM Auditor
 ***Cut through the noise. Spot the issues. Hit publish with confidence.***
 
 Ever feel like Google Tag Manager is out to get you? Yeah, we’ve all been there.  
@@ -15,11 +16,13 @@ No deep technical dives needed, just a quicker way to make sure your setup is re
 
 Ready to roll? Let’s start by uploading your GTM container!
 
-# 🚀 **Getting Started**
+## 🚀 Getting Started
 
+1. **Login** or **signup** using the form in the sidebar
 1. **Export** your GTM configuration (Google Tag Manager > Admin > Export Container).
-2. **Upload** the `.json` file to the field below.
-3. **Review the findings**
+2. **Upload** your `.json`
+3. **Analysis** we'll run our your file against our algorithm
+4. **Review the findings**
 
 Tip: We can process draft workspaces to help you spot-check and verify your setup before publishing.
 """

@@ -3,6 +3,7 @@ import json
 import os
 import logging
 import hashlib
+from intro_text import INTRO_TEXT
 from openai import OpenAI
 from dotenv import load_dotenv
 import pandas as pd
@@ -231,7 +232,7 @@ def sidebar_menu():
     if is_logged_in():
         st.sidebar.write(f"G'day, {st.session_state['user'].email}")
         
-        st.sidebar.subheader("Recent Projects")
+        st.sidebar.subheader("Your Recent Projects")
         
         projects = get_projects(get_user_id(), limit=5)
         project_names = ["Select a project"] + [project['name'] for project in projects]
@@ -247,22 +248,13 @@ def sidebar_menu():
             selected_project = projects[selected_index - 1]
             st.session_state['selected_project_id'] = selected_project['id']
             st.session_state['page'] = 'project_details'
-            st.rerun()
+            #st.rerun()
 
         if st.sidebar.button("See All Projects"):
             st.session_state['page'] = 'all_projects'
+            
             st.rerun()
-        
-        if st.sidebar.button("Logout"):
-            del st.session_state['user']
-            del st.session_state['session']
-            if 'selected_project_index' in st.session_state:
-                del st.session_state['selected_project_index']
-            if 'selected_project_id' in st.session_state:
-                del st.session_state['selected_project_id']
-            st.sidebar.success("Logged out successfully!")
-            st.rerun()
-            logger.info("User logged out")
+  
     else:
         st.sidebar.markdown("### Login or signup")
         email = st.sidebar.text_input("Email", key="email")
@@ -293,13 +285,17 @@ def sidebar_menu():
 
     st.sidebar.divider()
             
-    if is_logged_in():
-        if st.sidebar.button("Logout"):
-            del st.session_state['user']
-            del st.session_state['session']
-            st.sidebar.success("Logged out successfully!")
-            st.rerun()
-            logger.info("User logged out")
+      
+    if st.sidebar.button("Logout"):
+        del st.session_state['user']
+        del st.session_state['session']
+        if 'selected_project_index' in st.session_state:
+            del st.session_state['selected_project_index']
+        if 'selected_project_id' in st.session_state:
+            del st.session_state['selected_project_id']
+        st.sidebar.success("Logged out successfully!")
+        st.rerun()
+        logger.info("User logged out")
             
     st.sidebar.caption("Bradgic by [Brad Farleigh](https://www.linkedin.com/in/brad-farleigh)")
 
@@ -367,42 +363,45 @@ def analyze_config(config):
     return analysis
 
 def new_analysis_page():
-    st.title("New GTM audit")
-    st.markdown("Generate your JSON file at [Google Tag Manager](https://tagmanager.google.com) > Admin > Export Container then upload below.")
+    if not is_logged_in():
+        st.markdown(INTRO_TEXT)
+    else:
 
-    
-    analysis_option = st.session_state.get('analysis_option', 'choose')
-    
-    if analysis_option == 'choose':
-        analysis_option = st.radio(
-            "Choose analysis source:",
-            ("Upload JSON file", "Select from examples")
-        )
-    
-    if analysis_option == "Upload JSON file":
-        uploaded_file = st.file_uploader("Choose a GTM configuration JSON file", type="json")
-        if uploaded_file is not None:
-            config = load_gtm_config(uploaded_file)
-    elif analysis_option == "Select from examples":
-        json_examples = list_json_examples()
-        selected_example = st.selectbox("Select a JSON example", json_examples)
-        if selected_example:
-            config = load_json_example(selected_example)
-    
-    if 'config' in locals():
-        try:
-            analysis = analyze_config(config)
-            display_analysis(config, analysis, full_access=is_logged_in())
+        st.title("New GTM audit")
 
-            if is_logged_in():
-                # Automatically save the project
-                container_name = config['containerVersion']['container']['name']
-                save_project(get_user_id(), container_name, config, analysis)
-                st.success(f"Project '{container_name}' saved automatically!")
-            else:
-                st.warning("Sign up or log in to save your project and see the full analysis")
-        except ValueError as e:
-            handle_error(e)
+        st.markdown("Generate your JSON file at [Google Tag Manager](https://tagmanager.google.com) > Admin > Export Container then upload below.")
+        analysis_option = st.session_state.get('analysis_option', 'choose')
+        
+        if analysis_option == 'choose':
+            analysis_option = st.radio(
+                "Choose analysis source:",
+                ("Upload JSON file", "Select from examples")
+            )
+        
+        if analysis_option == "Upload JSON file":
+            uploaded_file = st.file_uploader("Choose a GTM configuration JSON file", type="json")
+            if uploaded_file is not None:
+                config = load_gtm_config(uploaded_file)
+        elif analysis_option == "Select from examples":
+            json_examples = list_json_examples()
+            selected_example = st.selectbox("Select a JSON example", json_examples)
+            if selected_example:
+                config = load_json_example(selected_example)
+        
+        if 'config' in locals():
+            try:
+                analysis = analyze_config(config)
+                display_analysis(config, analysis, full_access=is_logged_in())
+
+                if is_logged_in():
+                    # Automatically save the project
+                    container_name = config['containerVersion']['container']['name']
+                    save_project(get_user_id(), container_name, config, analysis)
+                    st.success(f"Project '{container_name}' saved automatically!")
+                else:
+                    st.warning("Sign up or log in to save your project and see the full analysis")
+            except ValueError as e:
+                handle_error(e)
 
 def all_projects_page():
     st.title("All Projects")
@@ -419,9 +418,7 @@ def all_projects_page():
                 st.session_state['page'] = 'project_details'
                 st.rerun()
     
-    if st.button("Back to Home"):
-        st.session_state['page'] = 'home'
-        st.rerun()
+
         
 def save_project(user_id, name, config, analysis):
     """Save a new project to the Supabase 'projects' table."""
