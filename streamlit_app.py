@@ -137,6 +137,7 @@ def analyze_with_gpt(config_summary, tags, variables, triggers, client):
 
 
     """
+  
 
     try:
         response = client.chat.completions.create(
@@ -342,28 +343,36 @@ def save_cached_analysis(hash_value, analysis):
         logger.error(f"Error saving cached analysis for hash {hash_value}: {str(e)}")
         handle_error(e)
         return None
-
+    
 def analyze_config(config):
     """Analyze the GTM configuration and return the analysis, using cache if available."""
     
     # Add a checkbox to allow bypassing the cache (hash check)
     bypass_cache = st.checkbox("Bypass cache and re-run analysis")
     
+    # Add a checkbox to skip the GPT analysis
+    skip_gpt_analysis = st.checkbox("Skip GPT analysis and output JSON summary only")
+    
     hash_value = hash_json(config)
     cached_analysis = get_cached_analysis(hash_value)
 
     # If bypass is not checked and cached analysis exists, use the cached result
-    if cached_analysis and not bypass_cache:
+    if cached_analysis and not bypass_cache and not skip_gpt_analysis:
         st.info("This configuration has been analyzed before. Showing cached results.")
         return cached_analysis['analysis']
     
-    # If bypass is checked or no cached analysis exists, perform a new analysis
-    client = OpenAI(api_key=DEFAULT_API_KEY)
     config_summary = summarize_config(config)
     tags = config['containerVersion'].get('tag', [])
     variables = config['containerVersion'].get('variable', [])
     triggers = config['containerVersion'].get('trigger', [])
 
+    # Skip GPT analysis and return JSON summary
+    if skip_gpt_analysis:
+        st.success("Skipped GPT analysis. Displaying JSON summary.")
+        return json.dumps(config_summary, indent=4)  # Provide the JSON summary
+
+    # If bypass is checked or no cached analysis exists, perform a new analysis
+    client = OpenAI(api_key=DEFAULT_API_KEY)
     with st.spinner("Analyzing GTM configuration..."):
         analysis = analyze_with_gpt(config_summary, tags, variables, triggers, client)
 
@@ -381,15 +390,14 @@ def new_analysis_page():
         st.title("New GTM audit")
 
         st.markdown("Generate your JSON file at [Google Tag Manager](https://tagmanager.google.com) > Admin > Export Container then upload below.")
-        analysis_option = st.session_state.get('analysis_option', 'choose')
+        # analysis_option = st.session_state.get('analysis_option', 'choose')        
+        #if analysis_option == 'choose':
+        #    analysis_option = st.radio(
+        #        "Choose analysis source:",
+        #        ("Upload JSON file", "Select from examples")
+        #    )
         
-        if analysis_option == 'choose':
-            analysis_option = st.radio(
-                "Choose analysis source:",
-                ("Upload JSON file", "Select from examples")
-            )
-        
-        #analysis_option = "Upload JSON file"
+        analysis_option = "Upload JSON file"
         
         if analysis_option == "Upload JSON file":
             uploaded_file = st.file_uploader("Choose a GTM configuration JSON file", type="json")
@@ -661,9 +669,7 @@ def main():
                 config = json.loads(project['config'])
                 analysis = project['analysis']
                 display_analysis(config, analysis, full_access=True)
-                if st.button("Back to All Projects"):
-                    st.session_state['page'] = 'all_projects'
-                    st.rerun()
+
             else:
                 st.error("Project not found")
         else:
