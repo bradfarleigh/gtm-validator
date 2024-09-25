@@ -97,7 +97,7 @@ def summarize_config(config):
     return summary
 
 def analyze_with_gpt(config_summary, tags, variables, triggers, client):
-    """Analyze the GTM configuration using OpenAI's GPT."""
+    """Analyze the GTM configuration using OpenAI's GPT. """
     sanitized_summary = json.dumps(config_summary, indent=2)
     sanitized_tags = json.dumps([{k: v for k, v in tag.items() if k in ['name', 'type', 'parameter']} for tag in tags], indent=2)
     sanitized_variables = json.dumps([{k: v for k, v in var.items() if k in ['name', 'type', 'parameter']} for var in variables], indent=2)
@@ -121,8 +121,10 @@ def analyze_with_gpt(config_summary, tags, variables, triggers, client):
     Triggers:
     {sanitized_triggers}
 
-    Output your analysis following the guidelines below:
-    1. List tag that have problems  - one section for each tag, output tag name in format "Tag Name: XXXX" in bold heading (not large)
+    First - output a summary of the tracking ID's used for each of the platforms detected so we can sanity check vs our measurement plan. We should also check to see if there are any discrepancies between ID's used in tags - which could be cause for concern. Recommend the user checks the ID's vs their tracking plans.
+
+    Output your analysis of each tag following the guidelines below:
+    1. List tag that have problems  - one section for each tag, output tag name in format "Tag Name: 'XXXX'" in bold heading (not large)
     2. For each tag provide a dot-point analysis on improvements based on best practice
     3. We should anlyse tag names based on best practice naming convention -  [Platform] - [Type] - [Description] or [Platform] | [Type] - [Description] - if they are not, we should provide a suggestion for a rename
     4. Any UA tags should be deleted - for these do not mention any other output except for the fact they should be deleted because UA is no longer active
@@ -131,9 +133,8 @@ def analyze_with_gpt(config_summary, tags, variables, triggers, client):
     7. When outputting tracking ID's or tag names in content wrap them in code tags for better readability
     8. Skip the UA output analysis if no UA tags were found - this applies with all tags (we should limit redundant output)
     9. If a tag type starts with CVT_ then it is a custom template tag - you should find the matching template ID in the JSON and find the "name" of the template to determine the tag type
-
-    Finally - output a summary of the tracking ID's used for each of the platforms detected so we can sanity check vs our measurement plan. We should also check to see if there are any discrepancies between ID's used in tags - which could be cause for concern. Recommend the user checks the ID's vs their tracking plans.
-
+    10. When outputting floodlight tags we should output the "activity tag" and "advertiser ID" - values for each tag. Do not disregard this step
+    11. When we encounter a html type tag with "insight.adsrvr.org" in the output, it is a "TTD" tag and we should find the image src within the HTML content, extract the URL and display it for verification
 
 
     """
@@ -143,7 +144,7 @@ def analyze_with_gpt(config_summary, tags, variables, triggers, client):
         response = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[
-                {"role": "system", "content": "You are a marketing expert responsible for reviewing and providing feedback on Google Tag Manager configurations."},
+                {"role": "system", "content": "You are a marketing expert responsible for reviewing and providing feedback on Google Tag Manager configurations. You should follow the instructions directly and not omit any steps. Do not guess any results. Do not output any vague suggestions - all action points should have clear and consice instructions that will lead to the problem being solved."},
                 {"role": "user", "content": prompt}
             ]
         )
@@ -496,49 +497,32 @@ def display_analysis(config, analysis, full_access=True):
     """Display the analysis of the GTM configuration."""
     config_summary = summarize_config(config)
 
-    st.divider()
-
-
-    st.subheader("Analysis")
-
     st.markdown(f"**Container Name:** {config_summary['container_name']}")
-    st.markdown(f"**Tag Manager URL:** {config_summary['tag_manager_url']}")
+    # st.markdown(f"**Tag Manager URL:** {config_summary['tag_manager_url']}")
 
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        st.metric("Tags", config_summary['tag_count'])
-    with col2:
-        st.metric("Variables", config_summary['variable_count'])
-    with col3:
-        st.metric("Triggers", config_summary['trigger_count'])
 
     if full_access:
-        st.markdown(analysis)
-    else:
-        paragraphs = analysis.split('\n\n')
-        st.markdown('\n\n'.join(paragraphs[:3]))
-        st.warning("Sign up or log in to see the full analysis")
 
-    if full_access:
-        if st.button("Generate export of findings",type='primary'):
-            export_findings(config_summary, analysis)
-
-        st.divider()
-        st.header("GTM Configuration Details")
-
-        tab1, tab2, tab3 = st.tabs(["Tags", "Variables", "Triggers"])
+        tab1, tab2, tab3, tab4 = st.tabs(["Analysis",f"Tags ({config_summary['tag_count']})", f"Variables ({config_summary['variable_count']})", f"Triggers ({config_summary['trigger_count']})"])
 
         with tab1:
+            st.markdown(analysis)
+
+            st.divider()
+            if st.button("Generate export of findings",type='primary'):
+                export_findings(config_summary, analysis)
+
+        with tab2:
             for i, tag in enumerate(config['containerVersion'].get('tag', []), 1):
                 with st.expander(f"Tag {i}: {tag.get('name', 'Unnamed Tag')}"):
                     st.json(tag)
 
-        with tab2:
+        with tab3:
             for i, variable in enumerate(config['containerVersion'].get('variable', []), 1):
                 with st.expander(f"Variable {i}: {variable.get('name', 'Unnamed Variable')}"):
                     st.json(variable)
 
-        with tab3:
+        with tab4:
             for i, trigger in enumerate(config['containerVersion'].get('trigger', []), 1):
                 with st.expander(f"Trigger {i}: {trigger.get('name', 'Unnamed Trigger')}"):
                     st.json(trigger)
@@ -696,10 +680,10 @@ def main():
     if 'selected_project_id' not in st.session_state:
         st.session_state['selected_project_id'] = None  #
 
-    user_id = get_user_id()
-    project_id = st.session_state['selected_project_id']
-    st.write("User ID:", user_id)
-    st.write("Project ID:", project_id)
+    # user_id = get_user_id()
+    # project_id = st.session_state['selected_project_id']
+    # st.write("User ID:", user_id)
+    # st.write("Project ID:", project_id)
 
 if __name__ == "__main__":
     main()
