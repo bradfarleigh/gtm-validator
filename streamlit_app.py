@@ -317,34 +317,36 @@ def hash_json(json_content):
     """Create a hash of the JSON content."""
     return hashlib.md5(json.dumps(json_content, sort_keys=True).encode()).hexdigest()
 
-def get_cached_analysis(hash_value):
+def get_cached_analysis(hash_value, user_id):
     """Retrieve cached analysis from Supabase."""
     try:
         client = get_supabase_client()
-        result = client.table('analysis_cache').select("*").eq('hash', hash_value).execute()
+        result = client.table('analysis_cache').select("*").eq('hash', hash_value).eq('user_id', user_id).execute()
         return result.data[0] if result and result.data else None
     except Exception as e:
-        logger.error(f"Error retrieving cached analysis for hash {hash_value}: {str(e)}")
+        logger.error(f"Error retrieving cached analysis for hash {hash_value} and user {user_id}: {str(e)}")
         handle_error(e)
         return None
 
-def save_cached_analysis(hash_value, analysis):
+def save_cached_analysis(hash_value, analysis, user_id, project_id):
     """Save analysis to Supabase cache."""
     try:
         client = get_supabase_client()
         data = client.table('analysis_cache').insert({
             "hash": hash_value,
             "analysis": analysis,
+            "user_id": user_id,
+            "project_id": project_id,
             "created_at": datetime.now().isoformat()
         }).execute()
-        logger.info(f"Analysis cached for hash: {hash_value}")
+        logger.info(f"Analysis cached for hash: {hash_value}, user: {user_id}, project: {project_id}")
         return data.data[0] if data and data.data else None
     except Exception as e:
-        logger.error(f"Error saving cached analysis for hash {hash_value}: {str(e)}")
+        logger.error(f"Error saving cached analysis for hash {hash_value}, user {user_id}, project {project_id}: {str(e)}")
         handle_error(e)
         return None
     
-def analyze_config(config):
+def analyze_config(config, user_id, project_id):
     """Analyze the GTM configuration and return the analysis, using cache if available."""
     
     # Add a checkbox to allow bypassing the cache (hash check)
@@ -354,11 +356,11 @@ def analyze_config(config):
     skip_gpt_analysis = st.checkbox("Skip GPT analysis and output JSON summary only")
     
     hash_value = hash_json(config)
-    cached_analysis = get_cached_analysis(hash_value)
+    cached_analysis = get_cached_analysis(hash_value, user_id)
 
     # If bypass is not checked and cached analysis exists, use the cached result
     if cached_analysis and not bypass_cache and not skip_gpt_analysis:
-        st.info("This configuration has been analyzed before. Showing cached results.")
+        st.info("ℹ️ This configuration has been analyzed before. Showing cached results.")
         return cached_analysis['analysis']
     
     config_summary = summarize_config(config)
@@ -378,7 +380,7 @@ def analyze_config(config):
 
     # Save the new analysis to cache if the hash was not bypassed
     if not bypass_cache:
-        save_cached_analysis(hash_value, analysis)
+        save_cached_analysis(hash_value, analysis, user_id, project_id)
 
     return analysis
 
@@ -411,14 +413,23 @@ def new_analysis_page():
         
         if 'config' in locals():
             try:
-                analysis = analyze_config(config)
+                user_id = get_user_id()
+                project_id = None  # We'll set this after saving the project
+                analysis = analyze_config(config, user_id, project_id)
                 display_analysis(config, analysis, full_access=is_logged_in())
 
                 if is_logged_in():
                     # Automatically save the project
                     container_name = config['containerVersion']['container']['name']
-                    save_project(get_user_id(), container_name, config, analysis)
-                    st.success(f"Project '{container_name}' saved automatically!")
+                    saved_project = save_project(user_id, container_name, config, analysis)
+                    if saved_project:
+                        project_id = saved_project['id']
+                        # Update the cached analysis with the project_id
+                        hash_value = hash_json(config)
+                        save_cached_analysis(hash_value, analysis, user_id, project_id)
+                        st.success(f"Project '{container_name}' saved automatically!")
+                    else:
+                        st.error("Failed to save the project.")
                 else:
                     st.warning("Sign up or log in to save your project and see the full analysis")
             except ValueError as e:
@@ -680,5 +691,15 @@ def main():
             st.session_state['page'] = 'home'
             st.rerun()
             
+
+    
+    if 'selected_project_id' not in st.session_state:
+        st.session_state['selected_project_id'] = None  #
+
+    user_id = get_user_id()
+    project_id = st.session_state['selected_project_id']
+    st.write("User ID:", user_id)
+    st.write("Project ID:", project_id)
+
 if __name__ == "__main__":
     main()
