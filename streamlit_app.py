@@ -276,7 +276,7 @@ def sidebar_menu():
             if email and password:
                 response = signup(email, password)
                 if response:
-                    st.sidebar.success("User created successfully! Please log in.")
+                    st.sidebar.success("A profile has now been created - you can now log in.")
                     logger.info(f"New user signed up: {email}")
                 else:
                     st.sidebar.error("Error creating user")
