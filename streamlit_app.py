@@ -21,6 +21,8 @@ import markdown2
 from reportlab.lib.colors import grey
 import re
 from reportlab.pdfgen import canvas
+import logging
+from logging import getLogger
 
 
 # Set up logging
@@ -37,18 +39,18 @@ SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 BRAD_LINKEDIN_URL = "https://www.linkedin.com/in/brad-farleigh"
 
 # Initialize Supabase client
-supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+supabase: Client = create_client(str(SUPABASE_URL or ''), str(SUPABASE_KEY or ''))
 
 def get_supabase_client():
     if 'session' in st.session_state and st.session_state['session'] is not None:
-        client = create_client(SUPABASE_URL, SUPABASE_KEY)
+        client = create_client(str(SUPABASE_URL or ''), str(SUPABASE_KEY or ''))
         client.auth.set_session(
             access_token=st.session_state['session'].access_token,
             refresh_token=st.session_state['session'].refresh_token
         )
         return client
     else:
-        return create_client(SUPABASE_URL, SUPABASE_KEY)
+        return create_client(str(SUPABASE_URL or ''), str(SUPABASE_KEY or ''))
 
 def handle_error(e):
     error_message = f"An error occurred: {str(e)}"
@@ -428,9 +430,9 @@ def new_analysis_page():
                         # Update the cached analysis with the project_id
                         hash_value = hash_json(config)
                         save_cached_analysis(hash_value, analysis, user_id, project_id)
-                        st.success(f"Project '{container_name}' saved automatically!")
+                        st.success(f"Container '{container_name}' saved to profile")
                     else:
-                        st.error("Failed to save the project.")
+                        st.error("Failed to save the analysis.")
                 else:
                     st.warning("Sign up or log in to save your project and see the full analysis")
             except ValueError as e:
@@ -471,8 +473,6 @@ def save_project(user_id, name, config, analysis):
             data = client.table('projects').update({
                 "config": json.dumps(config),
                 "analysis": analysis,
-                # Remove this line if the 'updated_at' column doesn't exist
-                # "updated_at": datetime.now().isoformat()
             }).eq('id', project_id).execute()
             logger.info(f"Project updated for user: {user_id}, name: {name}")
         else:
@@ -487,7 +487,11 @@ def save_project(user_id, name, config, analysis):
             }).execute()
             logger.info(f"New project saved for user: {user_id}, name: {name}")
         
-        return data.data[0] if data and data.data else None
+        if data and data.data:
+            return data.data[0]
+        else:
+            logger.error(f"No data returned when saving project for user {user_id}, name {name}")
+            return None
     except Exception as e:
         logger.error(f"Error saving project for user {user_id}, name {name}: {str(e)}")
         handle_error(e)
