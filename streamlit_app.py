@@ -121,7 +121,7 @@ def analyze_with_gpt(config_summary, tags, variables, triggers, client):
     Triggers:
     {sanitized_triggers}
 
-    First - output a summary of the tracking ID's used for each of the platforms detected so we can sanity check vs our measurement plan. We should also check to see if there are any discrepancies between ID's used in tags - which could be cause for concern. Recommend the user checks the ID's vs their tracking plans.
+    First - output a summary of the tracking ID's used for each of the platforms detected so we can sanity check vs our measurement plan. We should also check to see if there are any discrepancies between ID's used in tags - which could be cause for concern. Recommend the user checks the ID's vs their tracking plans. If you find discrepancies between ID usage flag these as errors.
 
     Output your analysis of each tag following the guidelines below:
     1. List tag that have problems  - one section for each tag, output tag name in format "Tag Name: 'XXXX'" in bold heading (not large)
@@ -354,7 +354,7 @@ def analyze_config(config, user_id, project_id):
     bypass_cache = st.checkbox("Bypass cache and re-run analysis")
     
     # Add a checkbox to skip the GPT analysis
-    skip_gpt_analysis = st.checkbox("Skip GPT analysis and output JSON summary only")
+    skip_gpt_analysis = st.checkbox("Skip analysis and output extraction only")
     
     hash_value = hash_json(config)
     cached_analysis = get_cached_analysis(hash_value, user_id)
@@ -680,8 +680,8 @@ def main():
     if 'selected_project_id' not in st.session_state:
         st.session_state['selected_project_id'] = None  #
 
-    # user_id = get_user_id()
-    # project_id = st.session_state['selected_project_id']
+    user_id = get_user_id()
+    project_id = st.session_state['selected_project_id']
     # st.write("User ID:", user_id)
     # st.write("Project ID:", project_id)
 
