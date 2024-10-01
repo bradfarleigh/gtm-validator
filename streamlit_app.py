@@ -150,7 +150,7 @@ def analyze_with_gpt(config_summary, tags, variables, triggers, client):
         response = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[
-                {"role": "system", "content": "You are a marketing expert responsible for reviewing and providing feedback on Google Tag Manager configurations. You should follow the instructions directly and not omit any steps. Do not guess any results. Do not output any vague suggestions - all action points should have clear and concise instructions that will lead to the problem being solved. Use EN-AU spelling"},
+                {"role": "system", "content": "You are a marketing expert responsible for reviewing and providing feedback on Google Tag Manager configurations. You should follow the instructions directly and not omit any steps. Do not guess any results. Do not output any vague suggestions - all action points should have clear and concise instructions that will lead to the problem being solved. Use EN-AU spelling. Do not say 'in conclusion'"},
                 {"role": "user", "content": full_prompt}
             ]
         )
@@ -177,7 +177,7 @@ def analyze_with_gpt_limited(config_summary, tags, variables, triggers, client):
         response = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[
-                {"role": "system", "content": "You are a marketing expert providing a brief overview of a GTM configuration. Focus on the most important points within the word limit. Use proper formatting with paragraphs and line breaks. Use EN-AU spelling"},
+                {"role": "system", "content": "You are a marketing expert providing a brief overview of a GTM configuration. Focus on the most important points within the word limit. Use proper formatting with paragraphs and line breaks. Use EN-AU spelling. Do not say 'conclusion'"},
                 {"role": "user", "content": limited_prompt}
             ]
         )
