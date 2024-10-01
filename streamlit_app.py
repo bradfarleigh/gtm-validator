@@ -134,7 +134,7 @@ def analyze_with_gpt(config_summary, tags, variables, triggers, client):
     6. Do not number headings
     7. When outputting tracking ID's or tag names in content wrap them in code tags for better readability
     8. Skip the UA output analysis if no UA tags were found - this applies with all tags (we should limit redundant output)
-    9. If a tag type starts with CVT_ then it is a custom template tag - you should find the matching template ID in the JSON and find the "name" of the template to determine the tag type
+    9. If a tag type starts with CVT_ then it is a custom template tag - you should find the matching template ID in the JSON and find the "name" of tche tag type
     10. When outputting floodlight tags we should output the "activity tag" and "advertiser ID" - values for each tag. Do not disregard this step
     11. When we encounter a html type tag with "insight.adsrvr.org" in the output, it is a "TTD" tag and we should find the image src within the HTML content, extract the URL and display it for verification
 
@@ -349,94 +349,190 @@ def save_cached_analysis(hash_value, analysis, user_id, project_id):
         handle_error(e)
         return None
     
-def analyze_config(config, user_id, project_id):
-    """Analyze the GTM configuration and return the analysis, using cache if available."""
-    
-    # Add a checkbox to allow bypassing the cache (hash check)
-    bypass_cache = st.checkbox("Bypass cache and re-run analysis")
-    
-    # Add a checkbox to skip the GPT analysis
-    skip_gpt_analysis = st.checkbox("Skip analysis and output extraction only")
-    
+def analyze_config(config, user_id, project_id, limited=False):
     hash_value = hash_json(config)
-    cached_analysis = get_cached_analysis(hash_value, user_id)
+    cached_analysis = None
+    
+    bypass_cache = st.checkbox("Bypass cache and re-run analysis")
+    skip_gpt_analysis = st.checkbox("Skip analysis and output extraction only")
 
-    # If bypass is not checked and cached analysis exists, use the cached result
-    if cached_analysis and not bypass_cache and not skip_gpt_analysis:
-        st.info("ℹ️ This configuration has been analyzed before. Showing cached results.")
-        return cached_analysis['analysis']
+    if user_id != "anonymous":
+        cached_analysis = get_cached_analysis(hash_value, user_id)
+        if cached_analysis and not bypass_cache and not skip_gpt_analysis:
+            st.info("ℹ️ This configuration has been analyzed before. Showing cached results.")
+            return cached_analysis['analysis']
     
     config_summary = summarize_config(config)
     tags = config['containerVersion'].get('tag', [])
     variables = config['containerVersion'].get('variable', [])
     triggers = config['containerVersion'].get('trigger', [])
 
-    # Skip GPT analysis and return JSON summary
     if skip_gpt_analysis:
         st.success("Skipped GPT analysis. Displaying JSON summary.")
-        return json.dumps(config_summary, indent=4)  # Provide the JSON summary
+        return json.dumps(config_summary, indent=4)
 
-    # If bypass is checked or no cached analysis exists, perform a new analysis
     client = OpenAI(api_key=DEFAULT_API_KEY)
     with st.spinner("Analyzing GTM configuration..."):
-        analysis = analyze_with_gpt(config_summary, tags, variables, triggers, client)
+        if limited:
+            analysis = analyze_with_gpt_limited(config_summary, tags, variables, triggers, client)
+        else:
+            analysis = analyze_with_gpt(config_summary, tags, variables, triggers, client)
 
-    # Save the new analysis to cache if the hash was not bypassed
-    if not bypass_cache:
+    if not bypass_cache and user_id != "anonymous":
         save_cached_analysis(hash_value, analysis, user_id, project_id)
 
     return analysis
 
+def analyze_with_gpt_limited(config_summary, tags, variables, triggers, client):
+    """Analyze the GTM configuration using OpenAI's GPT with a limited output."""
+    sanitized_summary = json.dumps(config_summary, indent=2)
+    sanitized_tags = json.dumps([{k: v for k, v in tag.items() if k in ['name', 'type', 'parameter']} for tag in tags], indent=2)
+    sanitized_variables = json.dumps([{k: v for k, v in var.items() if k in ['name', 'type', 'parameter']} for var in variables], indent=2)
+    sanitized_triggers = json.dumps([{k: v for k, v in trigger.items() if k in ['name', 'type', 'customEventFilter']} for trigger in triggers], indent=2)
+
+    prompt = f"""
+    Analyse the following Google Tag Manager (GTM) configuration:
+
+    Container Name: {config_summary['container_name']}
+    Tag Manager URL: {config_summary['tag_manager_url']}
+
+    Configuration Summary:
+    {sanitized_summary}
+
+    Tags:
+    {sanitized_tags}
+
+    Variables:
+    {sanitized_variables}
+
+    Triggers:
+    {sanitized_triggers}
+
+    First - output a summary of the tracking ID's used for each of the platforms detected so we can sanity check vs our measurement plan. We should also check to see if there are any discrepancies between ID's used in tags - which could be cause for concern. Recommend the user checks the ID's vs their tracking plans. If you find discrepancies between ID usage flag these as errors.
+
+    Output your analysis of each tag following the guidelines below:
+    1. List tag that have problems  - one section for each tag, output tag name in format "Tag Name: 'XXXX'" in bold heading (not large)
+    2. For each tag provide a dot-point analysis on improvements based on best practice
+    3. We should anlyse tag names based on best practice naming convention -  [Platform] - [Type] - [Description] or [Platform] - [Type] - [Description] - if they are not, we should provide a suggestion for a rename
+    4. Any UA tags should be deleted - for these do not mention any other output except for the fact they should be deleted because UA is no longer active
+    5. Any paused tags should be reviewed and removed if unnessary
+    6. Do not number headings
+    7. When outputting tracking ID's or tag names in content wrap them in code tags for better readability
+    8. Skip the UA output analysis if no UA tags were found - this applies with all tags (we should limit redundant output)
+    9. If a tag type starts with CVT_ then it is a custom template tag - you should find the matching template ID in the JSON and find the "name" of tche tag type
+    10. When outputting floodlight tags we should output the "activity tag" and "advertiser ID" - values for each tag. Do not disregard this step
+    11. When we encounter a html type tag with "insight.adsrvr.org" in the output, it is a "TTD" tag and we should find the image src within the HTML content, extract the URL and display it for verification
+    """
+
+    try:
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system", "content": "You are a marketing expert providing a brief overview of a GTM configuration. Focus on the most important points within the word limit. Use proper formatting with paragraphs and line breaks."},
+                {"role": "user", "content": prompt}
+            ]
+        )
+        analysis = response.choices[0].message.content
+
+        # Truncate the analysis to approximately 200 words while preserving formatting
+        paragraphs = analysis.split('\n\n')
+        truncated_paragraphs = []
+        word_count = 0
+        for paragraph in paragraphs:
+            words = paragraph.split()
+            if word_count + len(words) <= 150:
+                truncated_paragraphs.append(paragraph)
+                word_count += len(words)
+            else:
+                remaining_words = 150 - word_count
+                truncated_paragraph = ' '.join(words[:remaining_words]) + '...'
+                truncated_paragraphs.append(truncated_paragraph)
+                break
+
+        truncated_analysis = '\n\n'.join(truncated_paragraphs)
+
+        return truncated_analysis
+
+    except Exception as e:
+        handle_error(e)
+        return "An error occurred during analysis. Please try again later."
+
+
 def new_analysis_page():
     if not is_logged_in():
         st.markdown(INTRO_TEXT)
-    else:
-
-        st.title("New GTM audit")
+        st.markdown("### Analyse your Google Tag Manager setup")
 
         st.markdown("Generate your JSON file at [Google Tag Manager](https://tagmanager.google.com) > Admin > Export Container then upload below.")
-        # analysis_option = st.session_state.get('analysis_option', 'choose')        
-        #if analysis_option == 'choose':
-        #    analysis_option = st.radio(
-        #        "Choose analysis source:",
-        #        ("Upload JSON file", "Select from examples")
-        #    )
+        uploaded_file = st.file_uploader("Choose a GTM configuration JSON file", type="json")
         
-        analysis_option = "Upload JSON file"
-        
-        if analysis_option == "Upload JSON file":
-            uploaded_file = st.file_uploader("Choose a GTM configuration JSON file", type="json")
-            if uploaded_file is not None:
-                config = load_gtm_config(uploaded_file)
-        elif analysis_option == "Select from examples":
-            json_examples = list_json_examples()
-            selected_example = st.selectbox("Select a JSON example", json_examples)
-            if selected_example:
-                config = load_json_example(selected_example)
-        
-        if 'config' in locals():
+        if uploaded_file is not None:
+            config = load_gtm_config(uploaded_file)
             try:
-                user_id = get_user_id()
-                project_id = None  # We'll set this after saving the project
-                analysis = analyze_config(config, user_id, project_id)
-                display_analysis(config, analysis, full_access=is_logged_in())
-
-                if is_logged_in():
-                    # Automatically save the project
-                    container_name = config['containerVersion']['container']['name']
-                    saved_project = save_project(user_id, container_name, config, analysis)
-                    if saved_project:
-                        project_id = saved_project['id']
-                        # Update the cached analysis with the project_id
-                        hash_value = hash_json(config)
-                        save_cached_analysis(hash_value, analysis, user_id, project_id)
-                        st.success(f"Container '{container_name}' saved to profile")
-                    else:
-                        st.error("Failed to save the analysis.")
-                else:
-                    st.warning("Sign up or log in to save your project and see the full analysis")
+                user_id = "anonymous"  # Use a placeholder for non-logged in users
+                project_id = None
+                analysis = analyze_config(config, user_id, project_id, limited=True)
+                display_analysis(config, analysis, full_access=False)
+                st.warning("Sign up to get access to your full analysis, save projects, and more")
+                
+                # Store the analysis in session state for later use
+                st.session_state['temp_analysis'] = {
+                    'config': config,
+                    'analysis': analysis
+                }
             except ValueError as e:
                 handle_error(e)
+    else:
+        st.title("🚀 Getting Started")
+        st.markdown('Tip: We can process draft workspaces to help you spot-check and verify your setup before publishing.')
+
+        st.markdown("Generate your JSON file at [Google Tag Manager](https://tagmanager.google.com) > Admin > Export Container then upload below.")
+        
+        # Check if there's a temporary analysis from before login
+        if 'temp_analysis' in st.session_state:
+            st.info("We found an analysis from before you logged in. Would you like to save it?")
+            if st.button("Save previous analysis"):
+                config = st.session_state['temp_analysis']['config']
+                analysis = st.session_state['temp_analysis']['analysis']
+                save_temp_analysis(config, analysis)
+                del st.session_state['temp_analysis']
+                st.success("Previous analysis saved successfully!")
+                st.rerun()
+        
+        uploaded_file = st.file_uploader("Choose a GTM configuration JSON file", type="json")
+        if uploaded_file is not None:
+            config = load_gtm_config(uploaded_file)
+            try:
+                user_id = get_user_id()
+                project_id = None
+                analysis = analyze_config(config, user_id, project_id, limited=False)
+                display_analysis(config, analysis, full_access=True)
+                
+                # Automatically save the project
+                container_name = config['containerVersion']['container']['name']
+                saved_project = save_project(user_id, container_name, config, analysis)
+                if saved_project:
+                    project_id = saved_project['id']
+                    hash_value = hash_json(config)
+                    save_cached_analysis(hash_value, analysis, user_id, project_id)
+                    st.success(f"Container '{container_name}' saved to profile")
+                else:
+                    st.error("Failed to save the analysis.")
+            except ValueError as e:
+                handle_error(e)
+
+def save_temp_analysis(config, analysis):
+    """Save the temporary analysis after user logs in."""
+    user_id = get_user_id()
+    container_name = config['containerVersion']['container']['name']
+    saved_project = save_project(user_id, container_name, config, analysis)
+    if saved_project:
+        project_id = saved_project['id']
+        hash_value = hash_json(config)
+        save_cached_analysis(hash_value, analysis, user_id, project_id)
+        st.success(f"Container '{container_name}' saved to profile")
+    else:
+        st.error("Failed to save the analysis.")
 
 def all_projects_page():
     st.title("All Projects")
@@ -498,15 +594,15 @@ def save_project(user_id, name, config, analysis):
         return None
 
 def display_analysis(config, analysis, full_access=True):
-    """Display the analysis of the GTM configuration."""
     config_summary = summarize_config(config)
-
-    st.markdown(f"**Container Name:** {config_summary['container_name']}")
-    # st.markdown(f"**Tag Manager URL:** {config_summary['tag_manager_url']}")
-
+    st.divider()
+    if not is_logged_in():
+        st.header(f"Your analysis")
+        st.markdown(f"ℹ️ Sign up or sign in to see the full audit")
+    else:
+        st.header("Your analysis")
 
     if full_access:
-
         tab1, tab2, tab3, tab4 = st.tabs(["Analysis",f"Tags ({config_summary['tag_count']})", f"Variables ({config_summary['variable_count']})", f"Triggers ({config_summary['trigger_count']})"])
 
         with tab1:
@@ -530,6 +626,8 @@ def display_analysis(config, analysis, full_access=True):
             for i, trigger in enumerate(config['containerVersion'].get('trigger', []), 1):
                 with st.expander(f"Trigger {i}: {trigger.get('name', 'Unnamed Trigger')}"):
                     st.json(trigger)
+    else:
+        st.markdown(analysis)
 
 class NumberedCanvas(canvas.Canvas):
     def __init__(self, *args, **kwargs):
