@@ -27,7 +27,7 @@ def analyze_with_gpt(config_summary, tags, variables, triggers, client):
     Output your analysis following the guidelines below:
     1. List tag that have problems  - one section for each tag, output tag name in format "Tag Name: 'XXXX'" in bold heading (not large)
     2. For each tag provide a dot-point analysis on improvements based on best practice
-    3. We should anlyse tag names based on best practice naming convention -  [Platform] - [Type] - [Description] or [Platform] | [Type] - [Description] - if they are not, we should provide a suggestion for a rename
+    3. We should anlyse tag names based on best practice naming convention -  [Platform] - [Type] - [Description] - if they are not, we should provide a suggestion for a rename
     4. Any UA tags should be deleted - for these do not mention any other output except for the fact they should be deleted because UA is no longer active
     5. Any paused tags should be reviewed and removed if unnessary
     6. Do not number headings

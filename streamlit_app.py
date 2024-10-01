@@ -98,14 +98,14 @@ def summarize_config(config):
             summary['folder_ids'].append(tag['parentFolderId'])
     return summary
 
-def analyze_with_gpt(config_summary, tags, variables, triggers, client):
-    """Analyze the GTM configuration using OpenAI's GPT. """
+def create_base_prompt(config_summary, tags, variables, triggers):
+    """Create the base prompt for both full and limited analyses."""
     sanitized_summary = json.dumps(config_summary, indent=2)
     sanitized_tags = json.dumps([{k: v for k, v in tag.items() if k in ['name', 'type', 'parameter']} for tag in tags], indent=2)
     sanitized_variables = json.dumps([{k: v for k, v in var.items() if k in ['name', 'type', 'parameter']} for var in variables], indent=2)
     sanitized_triggers = json.dumps([{k: v for k, v in trigger.items() if k in ['name', 'type', 'customEventFilter']} for trigger in triggers], indent=2)
 
-    prompt = f"""
+    return f"""
     Analyse the following Google Tag Manager (GTM) configuration:
 
     Container Name: {config_summary['container_name']}
@@ -123,34 +123,85 @@ def analyze_with_gpt(config_summary, tags, variables, triggers, client):
     Triggers:
     {sanitized_triggers}
 
-    First - output a summary of the tracking ID's used for each of the platforms detected so we can sanity check vs our measurement plan. We should also check to see if there are any discrepancies between ID's used in tags - which could be cause for concern. Recommend the user checks the ID's vs their tracking plans. If you find discrepancies between ID usage flag these as errors.
+    First - output a summary of the tracking ID's used for each of the platforms detected so we can sanity check vs our measurement plan. We should also check to see if there are any discrepancies between ID's used in tags - which could be cause for concern. If you find discrepancies between ID usage flag these as errors.
+    """
 
+def analyze_with_gpt(config_summary, tags, variables, triggers, client):
+    """Analyse the GTM configuration using OpenAI's GPT for full analysis."""
+    base_prompt = create_base_prompt(config_summary, tags, variables, triggers)
+    full_instructions = """
     Output your analysis of each tag following the guidelines below:
-    1. List tag that have problems  - one section for each tag, output tag name in format "Tag Name: 'XXXX'" in bold heading (not large)
+    1. List tags that have problems - one section for each tag, output tag name in format "Tag Name: 'XXXX'" in bold heading (not large)
     2. For each tag provide a dot-point analysis on improvements based on best practice
-    3. We should anlyse tag names based on best practice naming convention -  [Platform] - [Type] - [Description] or [Platform] | [Type] - [Description] - if they are not, we should provide a suggestion for a rename
+    3. We should analyse tag names based on best practice naming convention -  [Platform] - [Type] - [Description] - if they are not, we should provide a suggestion for a rename
     4. Any UA tags should be deleted - for these do not mention any other output except for the fact they should be deleted because UA is no longer active
-    5. Any paused tags should be reviewed and removed if unnessary
+    5. Any paused tags should be reviewed and removed if unnecessary
     6. Do not number headings
     7. When outputting tracking ID's or tag names in content wrap them in code tags for better readability
     8. Skip the UA output analysis if no UA tags were found - this applies with all tags (we should limit redundant output)
-    9. If a tag type starts with CVT_ then it is a custom template tag - you should find the matching template ID in the JSON and find the "name" of tche tag type
+    9. If a tag type starts with CVT_ then it is a custom template tag - you should find the matching template ID in the JSON and find the "name" of the tag type
     10. When outputting floodlight tags we should output the "activity tag" and "advertiser ID" - values for each tag. Do not disregard this step
     11. When we encounter a html type tag with "insight.adsrvr.org" in the output, it is a "TTD" tag and we should find the image src within the HTML content, extract the URL and display it for verification
-
-
     """
-  
+    
+    full_prompt = base_prompt + full_instructions
 
     try:
         response = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[
-                {"role": "system", "content": "You are a marketing expert responsible for reviewing and providing feedback on Google Tag Manager configurations. You should follow the instructions directly and not omit any steps. Do not guess any results. Do not output any vague suggestions - all action points should have clear and consice instructions that will lead to the problem being solved."},
-                {"role": "user", "content": prompt}
+                {"role": "system", "content": "You are a marketing expert responsible for reviewing and providing feedback on Google Tag Manager configurations. You should follow the instructions directly and not omit any steps. Do not guess any results. Do not output any vague suggestions - all action points should have clear and concise instructions that will lead to the problem being solved. Use EN-AU spelling"},
+                {"role": "user", "content": full_prompt}
             ]
         )
         return response.choices[0].message.content
+    except Exception as e:
+        handle_error(e)
+        return "An error occurred during analysis. Please try again later."
+
+def analyze_with_gpt_limited(config_summary, tags, variables, triggers, client):
+    """Analyse the GTM configuration using OpenAI's GPT with a limited output."""
+    base_prompt = create_base_prompt(config_summary, tags, variables, triggers)
+    limited_instructions = """
+    Provide a brief summary of the configuration and highlight the most critical issues or improvements. Focus on the following:
+    1. Summarize the main tracking IDs used and any discrepancies.
+    2. Highlight up to 3 of the most critical issues or improvements needed.
+    3. Mention any outdated or unnecessary tags (e.g., UA tags).
+    
+    Limit your response to about 150 words. Use proper formatting with paragraphs and line breaks.
+    """
+    
+    limited_prompt = base_prompt + limited_instructions
+
+    try:
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system", "content": "You are a marketing expert providing a brief overview of a GTM configuration. Focus on the most important points within the word limit. Use proper formatting with paragraphs and line breaks. Use EN-AU spelling"},
+                {"role": "user", "content": limited_prompt}
+            ]
+        )
+        analysis = response.choices[0].message.content
+
+        # Truncate the analysis to approximately 150 words while preserving formatting
+        paragraphs = analysis.split('\n\n')
+        truncated_paragraphs = []
+        word_count = 0
+        for paragraph in paragraphs:
+            words = paragraph.split()
+            if word_count + len(words) <= 150:
+                truncated_paragraphs.append(paragraph)
+                word_count += len(words)
+            else:
+                remaining_words = 150 - word_count
+                truncated_paragraph = ' '.join(words[:remaining_words]) + '...'
+                truncated_paragraphs.append(truncated_paragraph)
+                break
+
+        truncated_analysis = '\n\n'.join(truncated_paragraphs)
+
+        return truncated_analysis
+
     except Exception as e:
         handle_error(e)
         return "An error occurred during analysis. Please try again later."
@@ -383,81 +434,6 @@ def analyze_config(config, user_id, project_id, limited=False):
 
     return analysis
 
-def analyze_with_gpt_limited(config_summary, tags, variables, triggers, client):
-    """Analyze the GTM configuration using OpenAI's GPT with a limited output."""
-    sanitized_summary = json.dumps(config_summary, indent=2)
-    sanitized_tags = json.dumps([{k: v for k, v in tag.items() if k in ['name', 'type', 'parameter']} for tag in tags], indent=2)
-    sanitized_variables = json.dumps([{k: v for k, v in var.items() if k in ['name', 'type', 'parameter']} for var in variables], indent=2)
-    sanitized_triggers = json.dumps([{k: v for k, v in trigger.items() if k in ['name', 'type', 'customEventFilter']} for trigger in triggers], indent=2)
-
-    prompt = f"""
-    Analyse the following Google Tag Manager (GTM) configuration:
-
-    Container Name: {config_summary['container_name']}
-    Tag Manager URL: {config_summary['tag_manager_url']}
-
-    Configuration Summary:
-    {sanitized_summary}
-
-    Tags:
-    {sanitized_tags}
-
-    Variables:
-    {sanitized_variables}
-
-    Triggers:
-    {sanitized_triggers}
-
-    First - output a summary of the tracking ID's used for each of the platforms detected so we can sanity check vs our measurement plan. We should also check to see if there are any discrepancies between ID's used in tags - which could be cause for concern. Recommend the user checks the ID's vs their tracking plans. If you find discrepancies between ID usage flag these as errors.
-
-    Output your analysis of each tag following the guidelines below:
-    1. List tag that have problems  - one section for each tag, output tag name in format "Tag Name: 'XXXX'" in bold heading (not large)
-    2. For each tag provide a dot-point analysis on improvements based on best practice
-    3. We should anlyse tag names based on best practice naming convention -  [Platform] - [Type] - [Description] or [Platform] - [Type] - [Description] - if they are not, we should provide a suggestion for a rename
-    4. Any UA tags should be deleted - for these do not mention any other output except for the fact they should be deleted because UA is no longer active
-    5. Any paused tags should be reviewed and removed if unnessary
-    6. Do not number headings
-    7. When outputting tracking ID's or tag names in content wrap them in code tags for better readability
-    8. Skip the UA output analysis if no UA tags were found - this applies with all tags (we should limit redundant output)
-    9. If a tag type starts with CVT_ then it is a custom template tag - you should find the matching template ID in the JSON and find the "name" of tche tag type
-    10. When outputting floodlight tags we should output the "activity tag" and "advertiser ID" - values for each tag. Do not disregard this step
-    11. When we encounter a html type tag with "insight.adsrvr.org" in the output, it is a "TTD" tag and we should find the image src within the HTML content, extract the URL and display it for verification
-    """
-
-    try:
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[
-                {"role": "system", "content": "You are a marketing expert providing a brief overview of a GTM configuration. Focus on the most important points within the word limit. Use proper formatting with paragraphs and line breaks."},
-                {"role": "user", "content": prompt}
-            ]
-        )
-        analysis = response.choices[0].message.content
-
-        # Truncate the analysis to approximately 200 words while preserving formatting
-        paragraphs = analysis.split('\n\n')
-        truncated_paragraphs = []
-        word_count = 0
-        for paragraph in paragraphs:
-            words = paragraph.split()
-            if word_count + len(words) <= 150:
-                truncated_paragraphs.append(paragraph)
-                word_count += len(words)
-            else:
-                remaining_words = 150 - word_count
-                truncated_paragraph = ' '.join(words[:remaining_words]) + '...'
-                truncated_paragraphs.append(truncated_paragraph)
-                break
-
-        truncated_analysis = '\n\n'.join(truncated_paragraphs)
-
-        return truncated_analysis
-
-    except Exception as e:
-        handle_error(e)
-        return "An error occurred during analysis. Please try again later."
-
-
 def new_analysis_page():
     if not is_logged_in():
         st.markdown(INTRO_TEXT)
@@ -483,10 +459,10 @@ def new_analysis_page():
             except ValueError as e:
                 handle_error(e)
     else:
-        st.title("🚀 Getting Started")
+        st.title("🚀 GTM Auditor")
+        st.markdown("Generate your JSON file at [Google Tag Manager](https://tagmanager.google.com) > Admin > Export Container then upload below.")
         st.markdown('Tip: We can process draft workspaces to help you spot-check and verify your setup before publishing.')
 
-        st.markdown("Generate your JSON file at [Google Tag Manager](https://tagmanager.google.com) > Admin > Export Container then upload below.")
         
         # Check if there's a temporary analysis from before login
         if 'temp_analysis' in st.session_state:
